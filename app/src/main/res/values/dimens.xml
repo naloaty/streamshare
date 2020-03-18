@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="short_content_width_padding">15dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="font_size_title">24sp</dimen>
+    <dimen name="font_size_big">18sp</dimen>
+    <dimen name="font_size_primary">16sp</dimen>
+    <dimen name="font_size_secondary">14sp</dimen>
+
+    <dimen name="corner_radius">8dp</dimen>
+</resources>

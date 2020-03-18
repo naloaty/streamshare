@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="roundSelector" format="reference"/>
+    <attr name="roundProgressBar" format="reference" />
+    <attr name="roundProgressBarShape" format="reference" />
+
+    <attr name="dialogBackground" format="reference" />
+</resources>

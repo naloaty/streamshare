@@ -1,0 +1,22 @@
+<resources>
+    <string name="text_appName">SyncShare</string>
+
+    <!-- welcome activity -->
+    <string name="text_welcome">Welcome</string>
+    <string name="text_setUpPermissions">Set up permissions</string>
+    <string name="btn_setUp">Set up</string>
+    <string name="text_allSet">All set!</string>
+
+    <!-- permissions request -->
+    <string name="btn_settings">Settings</string>
+    <string name="btn_ask">Ask</string>
+    <string name="btn_reject">Reject</string>
+    <string name="btn_close">Close</string>
+
+    <string name="text_requestPermissionStorage">Storage permission</string>
+    <string name="text_requestPermissionStorageSummary">This permission allows SyncShare to read and write to your device\'s storage for receiving and sharing files.</string>
+
+    <string name="text_requestPermissionReadPhoneState">Permission to read phone state</string>
+    <string name="text_requestPermissionReadPhoneStateSummary">SyncShare needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you.</string>
+
+</resources>

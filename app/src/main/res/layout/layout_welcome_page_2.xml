@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        style="@style/TextAppearance.Primary.Big"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_setUpPermissions"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/container"
+        android:gravity="center"
+        android:textSize="@dimen/font_size_title"/>
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="wrap_content"
+        android:layout_height="72dp"
+        android:layout_marginTop="24dp"
+        android:layout_centerInParent="true">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/layout_welcome_page_2_perm_ok_img"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_check_white_24dp"
+            android:tint="@color/colorAccent"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/layout_welcome_page_2_request_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/btn_setUp" />
+
+    </FrameLayout>
+
+
+</RelativeLayout>
