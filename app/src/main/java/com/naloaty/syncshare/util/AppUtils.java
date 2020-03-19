@@ -15,19 +15,19 @@ import com.naloaty.syncshare.dialog.RationalePermissionRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * This class provides extra utils
- * -------------------------------------------
- * Some parts of this activity borrowed from TrebleShot (com.genonbeta.TrebleShot.dialog)
- * Author: velitasali (https://github.com/velitasali)
- */
 
 public class AppUtils {
 
+    private static SharedPreferences mSharedPreferences;
+    public static final String DEFAULT_PREF = "default" ;
 
-    /*public static SharedPreferences getDefaultPreferences(final Context context) {
+    public static SharedPreferences getDefaultSharedPreferences(final Context context) {
+        if (mSharedPreferences == null) {
+            mSharedPreferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE);
+        }
 
-    }*/
+        return mSharedPreferences;
+    }
 
     //This method returns list of 'dangerous' permissions, that require dialog with description
     public static List<RationalePermissionRequest.PermissionRequest> getRequiredPermissions(Context context)

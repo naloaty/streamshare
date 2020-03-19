@@ -19,4 +19,12 @@
     <string name="text_requestPermissionReadPhoneState">Permission to read phone state</string>
     <string name="text_requestPermissionReadPhoneStateSummary">SyncShare needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you.</string>
 
+    <!-- drawer main -->
+    <string name="text_devices">Devices</string>
+    <string name="text_prefernces">Preferences</string>
+    <string name="text_about">About</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
 </resources>

@@ -12,15 +12,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.activity.HomeActivity;
 import com.naloaty.syncshare.app.Activity;
 
-/*
- * This class shows permission request dialog with description
- * -----------------------------------------
- * Borrowed from TrebleShot (com.genonbeta.TrebleShot.dialog)
- * Author: velitasali (https://github.com/velitasali)
- */
 
 public class RationalePermissionRequest extends AlertDialog.Builder
 {
@@ -57,7 +50,7 @@ public class RationalePermissionRequest extends AlertDialog.Builder
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
             {
-                ActivityCompat.requestPermissions(activity, new String[]{mPermissionQueue.permission}, HomeActivity.REQUEST_PERMISSION_ALL);
+                ActivityCompat.requestPermissions(activity, new String[]{mPermissionQueue.permission}, Activity.REQUEST_PERMISSION_ALL);
             }
         });
 
@@ -87,10 +80,10 @@ public class RationalePermissionRequest extends AlertDialog.Builder
     //This inner class contains information that will be shown in dialog
     public static class PermissionRequest
     {
-        public String permission;
-        public String title;
-        public String message;
-        public boolean required;
+        String permission;
+        String title;
+        String message;
+        boolean required;
 
         public PermissionRequest(String permission, String title, String message)
         {

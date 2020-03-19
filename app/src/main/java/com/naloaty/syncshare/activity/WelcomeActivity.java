@@ -81,12 +81,13 @@ public class WelcomeActivity extends Activity {
                 if (viewPager.getCurrentItem() + 1 < pagerAdapter.getCount())
                     viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
                 else {
-                    // end presentation
-                    /*getDefaultPreferences().edit()
-                            .putBoolean("introduction_shown", true)
-                            .apply();*/
+                    //Do not show welcome screen anymore
 
-                    startActivity(new Intent(WelcomeActivity.this, HomeActivity.class));
+                    getDefaultSharedPreferences().edit()
+                            .putBoolean(Activity.WELCOME_SHOWN, true)
+                            .apply();
+
+                    startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
                     finish();
                 }
             }
@@ -112,8 +113,8 @@ public class WelcomeActivity extends Activity {
             public void onPageSelected(int position)
             {
                 nextButton.setImageResource(position + 1 >= pagerAdapter.getCount()
-                        ? R.drawable.ic_check_white_24dp
-                        : R.drawable.ic_navigate_next_white_24dp);
+                        ? R.drawable.ic_check_24dp
+                        : R.drawable.ic_navigate_next_24dp);
             }
 
             @Override
