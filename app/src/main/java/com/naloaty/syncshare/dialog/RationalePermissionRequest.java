@@ -80,9 +80,9 @@ public class RationalePermissionRequest extends AlertDialog.Builder
     //This inner class contains information that will be shown in dialog
     public static class PermissionRequest
     {
-        String permission;
-        String title;
-        String message;
+        public String permission;
+        public String title;
+        public String message;
         boolean required;
 
         public PermissionRequest(String permission, String title, String message)

@@ -9,4 +9,7 @@
     <dimen name="font_size_secondary">14sp</dimen>
 
     <dimen name="corner_radius">8dp</dimen>
+    <dimen name="corner_radius_small">4dp</dimen>
+
+    <dimen name="devices_online_padding">8dp</dimen>
 </resources>

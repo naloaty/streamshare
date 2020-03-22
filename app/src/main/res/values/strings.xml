@@ -27,4 +27,9 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
+    <!-- content main -->
+    <string name="text_localDevice">Local Device</string>
+    <string name="text_localArea">Local area</string>
+    <string name="text_nearbyArea">Nearby devices</string>
+
 </resources>
