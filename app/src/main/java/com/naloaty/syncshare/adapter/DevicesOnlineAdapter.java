@@ -11,14 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.syncshare.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DevicesOnlineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<ListItem> mItems;
+    private List<ListItem> mItems = new ArrayList<>();
 
-    public DevicesOnlineAdapter(List<ListItem> items) {
-        this.mItems = items;
+    public void setItems(List<ListItem> items) {
+        mItems = items;
+        notifyDataSetChanged();
     }
 
     @Override

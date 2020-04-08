@@ -31,5 +31,20 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
+    def room_version = "2.2.5"
+
+    //Material design
     implementation 'com.google.android.material:material:1.1.0-alpha05'
+
+    //Cool socket
+    implementation 'com.genonbeta.coolsocket:main:1.0.2'
+
+    //Room components
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    //Fragment ViewModel support
+    implementation "androidx.fragment:fragment:1.2.4"
+
+
 }

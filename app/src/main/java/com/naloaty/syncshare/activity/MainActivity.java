@@ -1,5 +1,6 @@
 package com.naloaty.syncshare.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +16,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.Activity;
 import com.naloaty.syncshare.fragment.MainFragment;
+import com.naloaty.syncshare.service.CommunicationService;
+import com.naloaty.syncshare.util.AppUtils;
 
 public class MainActivity extends Activity {
 
@@ -39,6 +42,8 @@ public class MainActivity extends Activity {
         MainFragment fragment = new MainFragment();
         fragmentTransaction.replace(R.id.content_main_fragment, fragment);
         fragmentTransaction.commit();
+
+        AppUtils.startForegroundService(this, new Intent(this, CommunicationService.class));
 
     }
 
