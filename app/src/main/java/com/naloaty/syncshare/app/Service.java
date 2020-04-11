@@ -1,15 +1,18 @@
 package com.naloaty.syncshare.app;
 
 
-import android.content.SharedPreferences;
-
-import com.naloaty.syncshare.util.AppUtils;
+import com.naloaty.syncshare.util.NotificationUtils;
 
 abstract public class Service extends android.app.Service {
 
-    protected SharedPreferences getDefaultSharedPreferences()
-    {
-        return AppUtils.getDefaultSharedPreferences(getApplicationContext());
+    private NotificationUtils mNotificationUtils;
+
+
+    protected NotificationUtils getNotificationUtils() {
+        if (mNotificationUtils == null)
+            mNotificationUtils = new NotificationUtils(getApplicationContext());
+
+        return mNotificationUtils;
     }
 
 }

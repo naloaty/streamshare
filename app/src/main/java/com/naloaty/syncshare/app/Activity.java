@@ -3,13 +3,16 @@ package com.naloaty.syncshare.app;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.naloaty.syncshare.activity.WelcomeActivity;
+import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.dialog.RationalePermissionRequest;
+import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 
 
@@ -24,11 +27,6 @@ public class Activity extends AppCompatActivity {
     private boolean mWelcomePageDisallowed = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
@@ -36,20 +34,37 @@ public class Activity extends AppCompatActivity {
             startActivity(new Intent(this, WelcomeActivity.class));
             finish();
         }
-        else if (!AppUtils.checkRunningConditions(this))
-        {
+        else if (!AppUtils.checkRunningConditions(this)) {
             if (!mSkipPermissionRequest)
                 requestRequiredPermissions(true);
         }
+        else {
+            Log.i("BASE_Activity", "onResume() -> start service");
+            AppUtils.startForegroundService(this,
+                    new Intent(this, CommunicationService.class)
+                        .setAction("kostyl")); //TODO: kostyl
+        }
     }
 
-    protected SharedPreferences getDefaultSharedPreferences()
-    {
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        /*if (AppUtils.checkRunningConditions(this)) {
+            Log.i("BASE_Activity", "onPause() -> delete connections");
+
+            AppUtils.startForegroundService(this,
+                    new Intent(this, CommunicationService.class)
+                            .setAction(CommunicationService.ACTION_STOP_DISCOVERING));
+        }*/
+    }
+
+
+    protected SharedPreferences getDefaultSharedPreferences() {
         return AppUtils.getDefaultSharedPreferences(this);
     }
 
-    public boolean requestRequiredPermissions(boolean killActivityOtherwise)
-    {
+    public boolean requestRequiredPermissions(boolean killActivityOtherwise) {
         if (mOngoingRequest != null && mOngoingRequest.isShowing())
             return false;
 
@@ -68,12 +83,13 @@ public class Activity extends AppCompatActivity {
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        /*if (AppUtils.checkRunningConditions(this))
-            AppUtils.startForegroundService(this, new Intent(this, CommunicationService.class));
+        if (AppUtils.checkRunningConditions(this)){
+            Log.i("BASE_Activity", "onRequestPermissionsResult() -> start service");
+            AppUtils.startForegroundService(this,
+                    new Intent(this, CommunicationService.class)
+                            .setAction("kostyl")); //TODO: kostyl
+        }
         else
-            requestRequiredPermissions(!mSkipPermissionRequest);*/
-
-        if (!AppUtils.checkRunningConditions(this))
             requestRequiredPermissions(!mSkipPermissionRequest);
 
     }

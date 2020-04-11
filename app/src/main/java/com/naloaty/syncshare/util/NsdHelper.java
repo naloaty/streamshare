@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import com.naloaty.syncshare.config.AppConfig;
+import com.naloaty.syncshare.database.DeviceConnection;
 
 public class NsdHelper {
     private static final String TAG = "NsdHelper";
@@ -34,7 +35,8 @@ public class NsdHelper {
 
             final NsdServiceInfo serviceInfo = new NsdServiceInfo();
 
-            serviceInfo.setServiceName(AppConfig.NSD_SERVICE_NAME + "_" + AppUtils.getUniqueNumber());
+            mServiceName = AppConfig.NSD_SERVICE_NAME + "_" + AppUtils.getUniqueNumber();
+            serviceInfo.setServiceName(mServiceName);
             serviceInfo.setServiceType(AppConfig.NSD_SERVICE_TYPE);
             serviceInfo.setPort(AppConfig.SERVER_PORT);
 
@@ -62,13 +64,13 @@ public class NsdHelper {
                 @Override
                 public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode)
                 {
-                    Log.e(TAG, "NDS registration failed with error code " + errorCode);
+                    Log.e(TAG, "NSD registration failed with error code " + errorCode);
                 }
 
                 @Override
                 public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode)
                 {
-                    Log.e(TAG, "NDS failed to unregister with error code " + errorCode);
+                    Log.e(TAG, "NSD failed to unregister with error code " + errorCode);
                 }
 
                 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -76,14 +78,14 @@ public class NsdHelper {
                 public void onServiceRegistered(NsdServiceInfo serviceInfo)
                 {
                     mServiceName = serviceInfo.getServiceName();
-                    Log.v(TAG, "NDS registered with success " + serviceInfo.getServiceName());
+                    Log.v(TAG, "NSD registered with success " + serviceInfo.getServiceName());
                 }
 
                 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                 @Override
                 public void onServiceUnregistered(NsdServiceInfo serviceInfo)
                 {
-                    Log.i(TAG, "NDS unregistered with success " + serviceInfo.getServiceName());
+                    Log.i(TAG, "NSD unregistered with success " + serviceInfo.getServiceName());
                 }
             };
 
@@ -150,9 +152,11 @@ public class NsdHelper {
 
                             @Override
                             public void onServiceResolved(NsdServiceInfo serviceInfo) {
-                                Log.i(TAG, "Resolved with success " + serviceInfo.getServiceName()
+                                Log.i(TAG, "Resolved service " + serviceInfo.getServiceName()
                                         + " with IP address of " + serviceInfo.getHost().getHostAddress());
-                                NetworkDeviceManager.manageDevice(mContext, serviceInfo.getHost().getHostAddress(), serviceInfo.getServiceName());
+
+                                NetworkDeviceManager.manageDevice(mContext,
+                                        new DeviceConnection(serviceInfo.getHost().getHostAddress(), serviceInfo.getServiceName()));
                             }
                         });
                     }

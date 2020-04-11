@@ -1,6 +1,7 @@
 package com.naloaty.syncshare.util;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.genonbeta.CoolSocket.CoolSocket;
 import com.naloaty.syncshare.config.AppConfig;
@@ -40,6 +41,7 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
 
     public static class Client extends CoolSocket.Client {
 
+        private static final String TAG = Client.class.getSimpleName();
         /*
          * [CommunicationBridge.Client.ConnectionHandler]
          *   onConnect(CommunicationBridge.Client client);
@@ -85,17 +87,22 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
         {
             /*
              * handshakeOnly means that devices will only exchange information
-             * about each other and nothing else
+             * about each other and disconnect
              */
-            return handleDevice(connectWithHandshake(ipAddress, true));
+            return handleDevice(connectWithHandshake(ipAddress, true), true);
         }
 
-        public NetworkDevice handleDevice(CoolSocket.ActiveConnection activeConnection)
+        public NetworkDevice handleDevice(CoolSocket.ActiveConnection activeConnection, boolean handshakeOnly)
                 throws CommunicationException, IOException, TimeoutException
         {
             try {
                 CoolSocket.ActiveConnection.Response response = activeConnection.receive();
                 JSONObject responseJSON = new JSONObject(response.response);
+
+                if (handshakeOnly){
+                    Log.i(TAG, "Disconnecting from server due handshake only");
+                    activeConnection.getSocket().close();
+                }
 
                 return NetworkDeviceManager.loadDeviceFromJson(responseJSON);
 
@@ -143,13 +150,6 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
         }
     }
 
-    public static class DifferentClientException extends Exception
-    {
-        public DifferentClientException(String desc)
-        {
-            super(desc);
-        }
-    }
     public static class CommunicationException extends Exception
     {
         public CommunicationException(String desc)

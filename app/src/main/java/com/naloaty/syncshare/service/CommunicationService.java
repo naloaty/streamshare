@@ -6,20 +6,20 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.genonbeta.CoolSocket.CoolSocket;
 import com.naloaty.syncshare.app.Service;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.Keyword;
-import com.naloaty.syncshare.other.NetworkDevice;
+import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.util.AppUtils;
-import com.naloaty.syncshare.util.CommunicationBridge;
+import com.naloaty.syncshare.util.CommunicationNotification;
 import com.naloaty.syncshare.util.NsdHelper;
 
 import org.json.JSONException;
@@ -31,8 +31,13 @@ import java.util.concurrent.TimeoutException;
 public class CommunicationService extends Service {
 
     private static final String TAG = CommunicationService.class.getSimpleName();
+    public static final String
+            ACTION_STOP_SHARING = "stopSharing",
+            ACTION_STOP_DISCOVERING = "stopDiscovering",
+            EXTRA_STATUS_RUNNING = "statusRunning";
 
     private CommunicationServer mCommunicationServer;
+    private CommunicationNotification mNotification;
     private NsdHelper mNsdHelper;
 
     @Nullable
@@ -48,38 +53,64 @@ public class CommunicationService extends Service {
         mCommunicationServer = new CommunicationServer(AppConfig.SERVER_PORT);
         mNsdHelper = new NsdHelper(getApplicationContext());
         mNsdHelper.registerService();
+        mNotification = new CommunicationNotification(getNotificationUtils());
 
         if (!AppUtils.checkRunningConditions(this) || !mCommunicationServer.start()){
             Log.i(TAG, "Aborting CommunicationService");
             stopSelf();
         }
 
-
-        if (Build.VERSION.SDK_INT >= 26) {
-            String CHANNEL_ID = "my_channel_01";
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("")
-                    .setContentText("").build();
-
-            startForeground(1, notification);
-        }
+        startForeground(CommunicationNotification.SERVICE_NOTIFICATION_ID,
+                mNotification.getServiceNotification().build());
 
         Log.i(TAG, "Communication service started");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+
+        if (intent != null)
+            Log.d(TAG, "onStartCommand() with action = " + intent.getAction());
+
+        if (intent != null && intent.getAction() != null && AppUtils.checkRunningConditions(this)) {
+
+            if (intent.getAction().contentEquals(ACTION_STOP_SHARING)) {
+                Log.d(TAG, "User stopped service");
+                stopSelf();
+            }
+            else if (intent.getAction().contentEquals(ACTION_STOP_DISCOVERING)) {
+
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run() {
+                        {
+                            Log.d(TAG, "onStartCommand(): deleting connections");
+                            DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());
+                            repository.deleteAllConnections();
+                        }
+                    }
+                }, 3000);
+            }
+        }
+
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        Log.i(TAG, "Communication service -> destroy");
+        Log.d(TAG, "Stopping and unregistering NSD");
         mCommunicationServer.stop();
         mNsdHelper.unregisterService();
+
+        /*Log.d(TAG, "Deleting all connections");
+        DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());
+        repository.deleteAllConnections();*/
+
+        Log.d(TAG, "Destroy :(");
     }
 
     public class CommunicationServer extends CoolSocket {
@@ -119,6 +150,8 @@ public class CommunicationService extends Service {
                         clientRequest = activeConnection.receive();
                         responseJSON = analyzeResponse(clientRequest);
                     } else {
+                        Log.i(TAG, "Disconnecting client due handshake only");
+                        activeConnection.getSocket().close();
                         return;
                     }
                 }

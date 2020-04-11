@@ -15,14 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.activity.MainActivity;
 import com.naloaty.syncshare.adapter.DeviceItem;
 import com.naloaty.syncshare.adapter.DevicesOnlineAdapter;
 import com.naloaty.syncshare.adapter.HeaderItem;
 import com.naloaty.syncshare.adapter.ListItem;
 import com.naloaty.syncshare.database.DeviceConnection;
 import com.naloaty.syncshare.database.DeviceConnectionViewModel;
-import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.NsdHelper;
 
 import java.util.ArrayList;
@@ -69,18 +67,6 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Toast.makeText(getContext(), "Fragment created.", Toast.LENGTH_SHORT).show();
-
-        //mList = new ArrayList<>();
-
-        //mList.add(new HeaderItem(R.string.text_localArea));
-        //mList.add(new DeviceItem("This Device", R.drawable.ic_home_24dp));
-
-        //mList.add(new HeaderItem(R.string.text_nearbyArea));
-        //mList.add(new DeviceItem("Test device #1", R.drawable.ic_phone_android_24dp));
-        //mList.add(new DeviceItem("Test device #2", R.drawable.ic_phone_android_24dp));
-        //mList.add(new DeviceItem("Test device #3", R.drawable.ic_phone_android_24dp));
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mDevicesOnlineAdapter = new DevicesOnlineAdapter();
 
@@ -95,11 +81,13 @@ public class MainFragment extends Fragment {
                 mList.add(new HeaderItem(R.string.text_nearbyArea));
 
                 for(DeviceConnection connection: deviceConnections) {
+                    if (connection.isLocalDevice())
+                        continue;
+
                     mList.add(new DeviceItem(connection.getDeviceId(), R.drawable.ic_phone_android_24dp));
                 }
 
                 mDevicesOnlineAdapter.setItems(mList);
-                Toast.makeText(getContext(), "New connection", Toast.LENGTH_SHORT).show();
             }
         });
     }

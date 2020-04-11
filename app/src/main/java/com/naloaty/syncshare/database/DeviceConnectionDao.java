@@ -18,12 +18,12 @@ public interface DeviceConnectionDao {
     @Delete
     void delete(DeviceConnection deviceConnection);
 
-    /*@Query("DELETE FROM device_connection_table")
-    void deleteAllConnections();*/
-
     @Query("SELECT * FROM device_connection_table")
     LiveData<List<DeviceConnection>> getAllConnections();
 
-    @Query("SELECT * FROM device_connection_table WHERE serviceName=:serviceName")
-    DeviceConnection getConnectionByService(String serviceName);
+    @Query("DELETE FROM device_connection_table")
+    void deleteAllConnections();
+
+    @Query("SELECT * FROM device_connection_table WHERE ipAddress=:ipAddress OR deviceId=:deviceId OR serviceName=:serviceName")
+    DeviceConnection findConnection(String ipAddress, String deviceId, String serviceName);
 }

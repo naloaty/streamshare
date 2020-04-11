@@ -32,4 +32,14 @@
     <string name="text_localArea">Local area</string>
     <string name="text_nearbyArea">Nearby devices</string>
 
+    <!-- notification channels -->
+    <string name="text_ncHighPriority">High priority</string>
+    <string name="text_ncHighPriorityDescription">SyncShare high priority notifications</string>
+    <string name="text_ncLowPriority">Low priority</string>
+    <string name="text_ncLowPriorityDescription">SyncShare low priority notifications</string>
+
+    <!-- communication service notification -->
+    <string name="text_communicationServiceIdle">SyncShare is sharing your media</string>
+    <string name="text_communicationServiceIdleAction">Tap to stop sharing</string>
+
 </resources>

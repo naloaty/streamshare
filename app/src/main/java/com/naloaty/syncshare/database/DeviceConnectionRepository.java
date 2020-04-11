@@ -3,6 +3,7 @@ package com.naloaty.syncshare.database;
 import android.app.Application;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class DeviceConnectionRepository {
+    private static final String TAG = DeviceConnectionRepository.class.getSimpleName();
+
     private DeviceConnectionDao deviceConnectionDao;
     private LiveData<List<DeviceConnection>> allConnections;
 
@@ -22,25 +25,35 @@ public class DeviceConnectionRepository {
     }
 
     public void insert(DeviceConnection connection) {
-        new InsertConnectionAsyncTask(deviceConnectionDao).execute(connection);
+        new InsertConnectionAT(deviceConnectionDao).execute(connection);
     }
 
     public void delete(DeviceConnection connection) {
-        new DeleteConnectionAsyncTask(deviceConnectionDao).execute(connection);
-    }
-
-    public DeviceConnection getConnectionByService(String serviceName) throws ExecutionException, InterruptedException {
-        return new FindConnectionAsyncTask(deviceConnectionDao).execute(serviceName).get();
+        new DeleteConnectionAT(deviceConnectionDao).execute(connection);
     }
 
     public LiveData<List<DeviceConnection>> getAllConnections() {
         return allConnections;
     }
 
-    public static class InsertConnectionAsyncTask extends AsyncTask<DeviceConnection, Void, Void> {
+    public void deleteAllConnections() {
+        new DeleteAllConnectionsAT(deviceConnectionDao).execute();
+    }
+
+    public DeviceConnection findConnection(String ipAddress, String deviceId, String serviceName) {
+        try {
+            return new FindConnectionAT(deviceConnectionDao).execute(ipAddress, deviceId, serviceName).get();
+        }
+        catch (Exception e) {
+            Log.d(TAG, "findConnection() exception: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static class InsertConnectionAT extends AsyncTask<DeviceConnection, Void, Void> {
         private DeviceConnectionDao deviceConnectionDao;
 
-        private InsertConnectionAsyncTask(DeviceConnectionDao deviceConnectionDao) {
+        private InsertConnectionAT(DeviceConnectionDao deviceConnectionDao) {
             this.deviceConnectionDao = deviceConnectionDao;
         }
 
@@ -51,10 +64,10 @@ public class DeviceConnectionRepository {
         }
     }
 
-    public static class DeleteConnectionAsyncTask extends AsyncTask<DeviceConnection, Void, Void> {
+    public static class DeleteConnectionAT extends AsyncTask<DeviceConnection, Void, Void> {
         private DeviceConnectionDao deviceConnectionDao;
 
-        private DeleteConnectionAsyncTask(DeviceConnectionDao deviceConnectionDao) {
+        private DeleteConnectionAT(DeviceConnectionDao deviceConnectionDao) {
             this.deviceConnectionDao = deviceConnectionDao;
         }
 
@@ -65,16 +78,30 @@ public class DeviceConnectionRepository {
         }
     }
 
-    public static class FindConnectionAsyncTask extends AsyncTask<String, Void, DeviceConnection> {
+    public static class DeleteAllConnectionsAT extends AsyncTask<Void, Void, Void> {
         private DeviceConnectionDao deviceConnectionDao;
 
-        private FindConnectionAsyncTask(DeviceConnectionDao deviceConnectionDao) {
+        private DeleteAllConnectionsAT(DeviceConnectionDao deviceConnectionDao) {
+            this.deviceConnectionDao = deviceConnectionDao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            deviceConnectionDao.deleteAllConnections();
+            return null;
+        }
+    }
+
+    public static class FindConnectionAT extends AsyncTask<String, Void, DeviceConnection> {
+        private DeviceConnectionDao deviceConnectionDao;
+
+        public FindConnectionAT(DeviceConnectionDao deviceConnectionDao){
             this.deviceConnectionDao = deviceConnectionDao;
         }
 
         @Override
         protected DeviceConnection doInBackground(String... strings) {
-            return deviceConnectionDao.getConnectionByService(strings[0]);
+            return deviceConnectionDao.findConnection(strings[0], strings[1], strings[2]);
         }
     }
 }

@@ -91,7 +91,6 @@ public class AppUtils {
         device.brand = Build.BRAND;
         device.model = Build.MODEL;
         device.nickname = AppUtils.getLocalDeviceName();
-        device.isLocalAddress = true;
 
         //TODO: add app version info
 

@@ -17,16 +17,27 @@ public class DeviceConnection {
 
     private String serviceName;
 
+    public boolean isLocalDevice() {
+        return isLocalDevice;
+    }
+
+    public void setLocalDevice(boolean localDevice) {
+        isLocalDevice = localDevice;
+    }
+
+    private boolean isLocalDevice;
+
+    public DeviceConnection(String ipAddress, String serviceName) {
+        this.ipAddress = ipAddress;
+        this.serviceName = serviceName;
+    }
+
     public String getServiceName() {
         return serviceName;
     }
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
-    }
-
-    public DeviceConnection(String ipAddress) {
-        this.ipAddress = ipAddress;
     }
 
     public void setId(int id) {

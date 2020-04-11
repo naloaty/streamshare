@@ -5,8 +5,6 @@ public class NetworkDevice {
     public String model;
     public String nickname;
     public String deviceId;
-    public boolean isLocalAddress = false;
-    public boolean isTrusted = false;
     public long lastUsageTime;
 
     //TODO: add app version info

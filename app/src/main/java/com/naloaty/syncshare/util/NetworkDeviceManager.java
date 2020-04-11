@@ -1,15 +1,12 @@
 package com.naloaty.syncshare.util;
 
 import android.content.Context;
-import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
-import androidx.lifecycle.ViewModelProvider;
 
 import com.naloaty.syncshare.config.Keyword;
 import com.naloaty.syncshare.database.DeviceConnection;
 import com.naloaty.syncshare.database.DeviceConnectionRepository;
-import com.naloaty.syncshare.database.DeviceConnectionViewModel;
 import com.naloaty.syncshare.other.NetworkDevice;
 
 import org.json.JSONException;
@@ -25,63 +22,58 @@ public class NetworkDeviceManager {
      */
 
 
-    public static void manageDevice(Context context, String ipAddress, String serviceName) {
-        manageDevice(context, ipAddress, serviceName, false);
+    public static void manageDevice(Context context, DeviceConnection deviceConnection) {
+        manageDevice(context, deviceConnection, false);
     }
 
-    public static CommunicationBridge.Client manageDevice(final Context context, final String ipAddress, final String serviceName, boolean useCurrentThread) {
+    public static CommunicationBridge.Client manageDevice(final Context context, final DeviceConnection deviceConnection, boolean useCurrentThread) {
 
         CommunicationBridge.Client.ConnectionHandler connectionHandler =
                 new CommunicationBridge.Client.ConnectionHandler() {
                     @Override
                     public void onConnect(CommunicationBridge.Client client) {
                         try {
-                            NetworkDevice device = client.handleDevice(ipAddress);
+                            NetworkDevice device = client.handleDevice(deviceConnection.getIpAddress());
                             client.setDevice(device);
 
                             if (device.deviceId != null) {
+
                                 NetworkDevice localDevice = AppUtils.getLocalDevice(context);
 
-                                //Save information about connection to database (current connections)
-                                processConnection(context, device, ipAddress, serviceName);
-
-                                if (!localDevice.deviceId.equals(device.deviceId)) {
+                                if (localDevice.deviceId.contentEquals(device.deviceId))
+                                    deviceConnection.setLocalDevice(true);
+                                else
                                     device.lastUsageTime = System.currentTimeMillis();
 
-                                    //Save information about device to database
-                                    // database.publish(device);
-                                }
+                                processConnection(context, device, deviceConnection);
                             }
                         } catch (Exception e) {
-                            Log.i(TAG, "Could not connect to device " + ipAddress + " because: " + e.getMessage());
+                            Log.i(TAG, "Could not connect to device " + deviceConnection.getIpAddress() + ": " + e.getMessage());
                         }
                     }
                 };
 
-       Log.i(TAG, "Connecting to " + ipAddress);
+       Log.i(TAG, "Connecting to " + deviceConnection.getIpAddress());
        return CommunicationBridge.connect(context, useCurrentThread, connectionHandler);
     }
 
-    public static void processConnection(Context context, NetworkDevice device, String ipAddress, String serviceName)
+    public static void processConnection(Context context, NetworkDevice device, DeviceConnection deviceConnection)
     {
-        DeviceConnection connection = new DeviceConnection(ipAddress);
 
-        connection.setLastCheckedDate(System.currentTimeMillis());
-        connection.setDeviceId(device.deviceId);
-        connection.setServiceName(serviceName);
+        deviceConnection.setLastCheckedDate(System.currentTimeMillis());
+        deviceConnection.setDeviceId(device.deviceId);
 
         DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(context);
-        repository.insert(connection);
+        DeviceConnection entry = repository.findConnection(deviceConnection.getIpAddress(), deviceConnection.getDeviceId(), deviceConnection.getServiceName());
 
-        Log.i(TAG, "Connection with ip " + ipAddress + " added to database. Service name: " + serviceName);
+        if (entry != null)
+            repository.delete(entry);
 
-        /*database.remove(new SQLQuery.Select(AccessDatabase.TABLE_DEVICECONNECTION)
-                .setWhere(AccessDatabase.FIELD_DEVICECONNECTION_DEVICEID + "=? AND "
-                                + AccessDatabase.FIELD_DEVICECONNECTION_ADAPTERNAME + " =? AND "
-                                + AccessDatabase.FIELD_DEVICECONNECTION_IPADDRESS + " != ?",
-                        connection.deviceId, connection.adapterName, connection.ipAddress));
+        repository.insert(deviceConnection);
 
-        database.publish(connection);*/
+        Log.i(TAG, "Connection with ip " + deviceConnection.getIpAddress() + " and service name "
+                + deviceConnection.getServiceName() + " added to database");
+
     }
 
     public static NetworkDevice loadDeviceFromJson(JSONObject json) throws JSONException {
@@ -101,11 +93,11 @@ public class NetworkDeviceManager {
 
         DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(context);
         try {
-            DeviceConnection connection = repository.getConnectionByService(serviceName);
+            DeviceConnection connection = repository.findConnection(null, null, serviceName);
 
             if (connection != null){
                 repository.delete(connection);
-                Log.i(TAG, "Connection with service name " + serviceName + " removed to database");
+                Log.i(TAG, "Connection with service name " + serviceName + " removed from database");
             }
             else
                 Log.i(TAG, "Connection with service name " + serviceName + " not found in database");
