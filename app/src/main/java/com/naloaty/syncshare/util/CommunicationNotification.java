@@ -40,7 +40,8 @@ public class CommunicationNotification {
                 .setContentText(textContent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true) //After tap notification will be auto canceled
-                .setContentIntent(contentAction);
+                .setContentIntent(contentAction)
+                .setOngoing(true);
 
 
         return notification.show();

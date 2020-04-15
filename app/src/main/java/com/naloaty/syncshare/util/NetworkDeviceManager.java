@@ -1,6 +1,12 @@
 package com.naloaty.syncshare.util;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.PersistableBundle;
 import android.util.Log;
 
 
@@ -8,6 +14,7 @@ import com.naloaty.syncshare.config.Keyword;
 import com.naloaty.syncshare.database.DeviceConnection;
 import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.other.NetworkDevice;
+import com.naloaty.syncshare.service.DetectiveJobService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +22,8 @@ import org.json.JSONObject;
 public class NetworkDeviceManager {
 
     private static final String TAG = NetworkDeviceManager.class.getSimpleName();
+
+    public static final int JOB_DETECTIVE_ID = 43123;
 
     /*
      * [NsdHelper]                               [NetworkDeviceManager]
@@ -49,6 +58,7 @@ public class NetworkDeviceManager {
                             }
                         } catch (Exception e) {
                             Log.i(TAG, "Could not connect to device " + deviceConnection.getIpAddress() + ": " + e.getMessage());
+                            processConnection(context, null, deviceConnection);
                         }
                     }
                 };
@@ -57,11 +67,55 @@ public class NetworkDeviceManager {
        return CommunicationBridge.connect(context, useCurrentThread, connectionHandler);
     }
 
+    public static void scheduleDetective(final Context context) {
+
+        ComponentName componentName = new ComponentName(context, DetectiveJobService.class);
+        /*
+         * See useful methods here
+         * https://developer.android.com/reference/android/app/job/JobInfo.Builder.html
+         */
+        JobInfo jobInfo = new JobInfo.Builder(JOB_DETECTIVE_ID, componentName)
+                .setMinimumLatency(15 * 1000)
+                .build();
+
+        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        int resultCode = scheduler.schedule(jobInfo);
+
+        if (resultCode == JobScheduler.RESULT_SUCCESS)
+            Log.d(TAG, "Detective scheduled with success");
+        else
+            Log.d(TAG, "Detective scheduling fail");
+
+    }
+
+    public static boolean isJobServiceOn(Context context, int jobId) {
+        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE) ;
+
+        boolean hasBeenScheduled = false ;
+
+        for (JobInfo jobInfo : scheduler.getAllPendingJobs()) {
+            if (jobInfo.getId() == jobId) {
+                hasBeenScheduled = true ;
+                break ;
+            }
+        }
+
+        return hasBeenScheduled ;
+    }
+
+
     public static void processConnection(Context context, NetworkDevice device, DeviceConnection deviceConnection)
     {
 
         deviceConnection.setLastCheckedDate(System.currentTimeMillis());
-        deviceConnection.setDeviceId(device.deviceId);
+
+        if (device != null)
+            deviceConnection.setDeviceId(device.deviceId);
+        else if (!isJobServiceOn(context, JOB_DETECTIVE_ID)){
+            deviceConnection.setDeviceId("-");
+            scheduleDetective(context);
+        }
+
 
         DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(context);
         DeviceConnection entry = repository.findConnection(deviceConnection.getIpAddress(), deviceConnection.getDeviceId(), deviceConnection.getServiceName());

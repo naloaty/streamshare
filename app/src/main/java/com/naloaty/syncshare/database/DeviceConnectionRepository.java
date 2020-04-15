@@ -1,17 +1,17 @@
 package com.naloaty.syncshare.database;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class DeviceConnectionRepository {
-    private static final String TAG = DeviceConnectionRepository.class.getSimpleName();
+    private static final String TAG = "DeviceConnectionRepo";
 
     private DeviceConnectionDao deviceConnectionDao;
     private LiveData<List<DeviceConnection>> allConnections;
@@ -47,6 +47,31 @@ public class DeviceConnectionRepository {
         catch (Exception e) {
             Log.d(TAG, "findConnection() exception: " + e.getMessage());
             return null;
+        }
+    }
+
+    public List<DeviceConnection> getUnknown() {
+        try {
+            return new GetUnknownAT(deviceConnectionDao).execute().get();
+        }
+        catch (Exception e) {
+            Log.d(TAG, "getUnknown() exception: " + e.getMessage());
+            return null;
+        }
+
+    }
+
+    public static class GetUnknownAT extends AsyncTask<Void, Void, List<DeviceConnection>> {
+
+        private DeviceConnectionDao deviceConnectionDao;
+
+        private GetUnknownAT(DeviceConnectionDao deviceConnectionDao) {
+            this.deviceConnectionDao = deviceConnectionDao;
+        }
+
+        @Override
+        protected List<DeviceConnection> doInBackground(Void... voids) {
+            return deviceConnectionDao.getUnknown();
         }
     }
 

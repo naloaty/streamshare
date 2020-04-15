@@ -81,7 +81,7 @@ public class MainFragment extends Fragment {
                 mList.add(new HeaderItem(R.string.text_nearbyArea));
 
                 for(DeviceConnection connection: deviceConnections) {
-                    if (connection.isLocalDevice())
+                    if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
                         continue;
 
                     mList.add(new DeviceItem(connection.getDeviceId(), R.drawable.ic_phone_android_24dp));

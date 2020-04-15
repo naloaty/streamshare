@@ -3,20 +3,26 @@ package com.naloaty.syncshare.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.PersistableBundle;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.genonbeta.CoolSocket.CoolSocket;
+import com.google.gson.Gson;
 import com.naloaty.syncshare.app.Service;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.Keyword;
+import com.naloaty.syncshare.database.DeviceConnection;
 import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.CommunicationNotification;
@@ -30,7 +36,7 @@ import java.util.concurrent.TimeoutException;
 
 public class CommunicationService extends Service {
 
-    private static final String TAG = CommunicationService.class.getSimpleName();
+    private static final String TAG = "CommunicationService";
     public static final String
             ACTION_STOP_SHARING = "stopSharing",
             ACTION_STOP_DISCOVERING = "stopDiscovering",

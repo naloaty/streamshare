@@ -26,4 +26,7 @@ public interface DeviceConnectionDao {
 
     @Query("SELECT * FROM device_connection_table WHERE ipAddress=:ipAddress OR deviceId=:deviceId OR serviceName=:serviceName")
     DeviceConnection findConnection(String ipAddress, String deviceId, String serviceName);
+
+    @Query("SELECT * FROM device_connection_table WHERE deviceId='-'")
+    List<DeviceConnection> getUnknown();
 }
