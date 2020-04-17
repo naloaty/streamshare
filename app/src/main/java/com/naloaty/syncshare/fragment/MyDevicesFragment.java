@@ -18,47 +18,33 @@ import com.naloaty.syncshare.adapter.DeviceItem;
 import com.naloaty.syncshare.adapter.DevicesOnlineAdapter;
 import com.naloaty.syncshare.adapter.HeaderItem;
 import com.naloaty.syncshare.adapter.ListItem;
+import com.naloaty.syncshare.adapter.MyDevicesAdapter;
 import com.naloaty.syncshare.database.DeviceConnection;
 import com.naloaty.syncshare.database.DeviceConnectionViewModel;
 import com.naloaty.syncshare.util.NsdHelper;
+import com.naloaty.syncshare.widget.RecyclerViewEmptySupport;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainFragment extends Fragment {
+public class MyDevicesFragment extends Fragment {
 
     private ArrayList<ListItem> mList;
-    private RecyclerView mRecyclerView;
-    private DevicesOnlineAdapter mDevicesOnlineAdapter;
-    private NsdHelper mNsdHelper;
+    private RecyclerViewEmptySupport mRecyclerView;
+    private MyDevicesAdapter mMyDevicesAdapter;
     private DeviceConnectionViewModel deviceConnectionViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mNsdHelper = new NsdHelper(getContext());
 
         deviceConnectionViewModel = new ViewModelProvider(this).get(DeviceConnectionViewModel.class);
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        mNsdHelper.startDiscovering();
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        mNsdHelper.stopDiscovering();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_main_fragment, container, false);
+        final View view = inflater.inflate(R.layout.layout_my_devices_fragment, container, false);
         return view;
     }
 
@@ -67,17 +53,19 @@ public class MainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mDevicesOnlineAdapter = new DevicesOnlineAdapter();
+        mMyDevicesAdapter = new MyDevicesAdapter();
 
-        mRecyclerView = view.findViewById(R.id.main_fragment_devices_online);
+        mRecyclerView = view.findViewById(R.id.my_devices_recycler_view);
+        mRecyclerView.setEmptyView(view.findViewById(R.id.my_devices_empty_placeholder));
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mDevicesOnlineAdapter);
+        mRecyclerView.setAdapter(mMyDevicesAdapter);
 
         deviceConnectionViewModel.getAllConnections().observe(getViewLifecycleOwner(), new Observer<List<DeviceConnection>>() {
             @Override
             public void onChanged(List<DeviceConnection> deviceConnections) {
+
                 mList = new ArrayList<>();
-                mList.add(new HeaderItem(R.string.text_nearbyArea));
+                mList.add(new HeaderItem(R.string.text_myDevices));
 
                 for(DeviceConnection connection: deviceConnections) {
                     if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
@@ -86,7 +74,8 @@ public class MainFragment extends Fragment {
                     mList.add(new DeviceItem(connection.getDeviceId(), R.drawable.ic_phone_android_24dp));
                 }
 
-                mDevicesOnlineAdapter.setItems(mList);
+                if (mList.size() > 1)
+                    mMyDevicesAdapter.setItems(mList);
             }
         });
     }

@@ -28,7 +28,7 @@ public class AppUtils {
     private static final String TAG = AppUtils.class.getSimpleName();
     private static int mUniqueNumber = 0;
     private static SharedPreferences mSharedPreferences;
-    public static final String DEFAULT_PREF = "default";
+    private static final String DEFAULT_PREF = "default";
 
     private static DeviceConnectionRepository mDeviceConnectionRepo;
 
@@ -122,7 +122,7 @@ public class AppUtils {
         return mDeviceConnectionRepo;
     }
 
-    public static void startForegroundService(Context context, Intent intent)
+    /*public static void startForegroundService(Context context, Intent intent)
     {
         if (Build.VERSION.SDK_INT >= 26)
             context.startForegroundService(intent);
@@ -130,5 +130,5 @@ public class AppUtils {
             context.startService(intent);
 
         Log.i(TAG, "Starting service");
-    }
+    }*/
 }

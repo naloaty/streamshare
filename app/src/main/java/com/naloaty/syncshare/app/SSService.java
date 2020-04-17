@@ -3,7 +3,7 @@ package com.naloaty.syncshare.app;
 
 import com.naloaty.syncshare.util.NotificationUtils;
 
-abstract public class Service extends android.app.Service {
+abstract public class SSService extends android.app.Service {
 
     private NotificationUtils mNotificationUtils;
 

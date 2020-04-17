@@ -12,7 +12,7 @@
         layout="@layout/toolbar_main"/>
 
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/activity_main_drawer"
+        android:id="@+id/activity_main_nav_view"
         android:layout_gravity="start"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

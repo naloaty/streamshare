@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group
-        android:id="@+id/group_main">
+
+
+    <group>
+
         <item
-            android:title="@string/text_devices"
+            android:id="@+id/menu_main_manage_devices"
+            android:title="@string/menu_devices"
             android:icon="@drawable/ic_devices_24dp"
             android:orderInCategory="1"/>
 
-    </group>
-
-    <group
-        android:id="@+id/group_about">
-
         <item
-            android:title="@string/text_prefernces"
+            android:id="@+id/menu_main_preferences"
+            android:title="@string/menu_prefernces"
             android:icon="@drawable/ic_settings_24dp"
             android:orderInCategory="2"/>
 
         <item
-            android:title="@string/text_about"
+            android:id="@+id/menu_main_about"
+            android:title="@string/menu_about"
             android:icon="@drawable/ic_info_24dp"
             android:orderInCategory="3"/>
     </group>

@@ -20,14 +20,14 @@
     <string name="text_requestPermissionReadPhoneStateSummary">SyncShare needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you.</string>
 
     <!-- drawer main -->
-    <string name="text_devices">Devices</string>
-    <string name="text_prefernces">Preferences</string>
-    <string name="text_about">About</string>
+    <string name="menu_devices">Manage devices</string>
+    <string name="menu_prefernces">Preferences</string>
+    <string name="menu_about">About</string>
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
-    <!-- content main -->
+    <!-- online devices list -->
     <string name="text_localDevice">Local Device</string>
     <string name="text_localArea">Local area</string>
     <string name="text_nearbyArea">Nearby devices</string>
@@ -42,4 +42,10 @@
     <string name="text_communicationServiceIdle">SyncShare is sharing your media</string>
     <string name="text_communicationServiceIdleAction">Tap to stop sharing</string>
 
+    <!-- device manage activity action bar -->
+    <string name="text_deviceManageTitle">Manage devices</string>
+
+    <!-- my devices list -->
+    <string name="text_noDevices">No devices added yet</string>
+    <string name="text_myDevices">My devices</string>
 </resources>

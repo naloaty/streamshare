@@ -2,7 +2,6 @@ package com.naloaty.syncshare.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,14 +9,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.naloaty.syncshare.activity.WelcomeActivity;
-import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.dialog.RationalePermissionRequest;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 
 
 
-public class Activity extends AppCompatActivity {
+public class SSActivity extends AppCompatActivity {
 
     public static final int REQUEST_PERMISSION_ALL = 1;
     public static final String WELCOME_SHOWN = "welcome_shown";
@@ -40,8 +38,7 @@ public class Activity extends AppCompatActivity {
         }
         else {
             Log.i("BASE_Activity", "onResume() -> start service");
-            AppUtils.startForegroundService(this,
-                    new Intent(this, CommunicationService.class)
+            startService(new Intent(this, CommunicationService.class)
                         .setAction("kostyl")); //TODO: kostyl
         }
     }
@@ -85,8 +82,7 @@ public class Activity extends AppCompatActivity {
 
         if (AppUtils.checkRunningConditions(this)){
             Log.i("BASE_Activity", "onRequestPermissionsResult() -> start service");
-            AppUtils.startForegroundService(this,
-                    new Intent(this, CommunicationService.class)
+            startService(new Intent(this, CommunicationService.class)
                             .setAction("kostyl")); //TODO: kostyl
         }
         else

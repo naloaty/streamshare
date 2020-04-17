@@ -5,16 +5,14 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_stop_sharing"
         android:orderInCategory="1"
-        android:title="test_popup"
+        android:title="Stop sharing"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_search"
+        android:id="@+id/action_scan_devices"
         android:orderInCategory="2"
-        android:title="test"
-        android:icon="@drawable/ic_test_icon"
-        app:showAsAction="ifRoom"/>
-
+        android:title="Scan devices"
+        app:showAsAction="never" />
 </menu>

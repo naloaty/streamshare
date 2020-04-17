@@ -13,11 +13,11 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.app.Activity;
+import com.naloaty.syncshare.app.SSActivity;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.widget.DynamicViewPagerAdapter;
 
-public class WelcomeActivity extends Activity {
+public class WelcomeActivity extends SSActivity {
 
     private ViewGroup mSplashView;
     private ViewGroup mPermissionsView;
@@ -84,7 +84,7 @@ public class WelcomeActivity extends Activity {
                     //Do not show welcome screen anymore
 
                     getDefaultSharedPreferences().edit()
-                            .putBoolean(Activity.WELCOME_SHOWN, true)
+                            .putBoolean(SSActivity.WELCOME_SHOWN, true)
                             .apply();
 
                     startActivity(new Intent(WelcomeActivity.this, MainActivity.class));

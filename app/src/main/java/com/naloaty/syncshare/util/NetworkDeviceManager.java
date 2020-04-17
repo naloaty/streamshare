@@ -4,9 +4,6 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.PersistableBundle;
 import android.util.Log;
 
 
@@ -109,13 +106,14 @@ public class NetworkDeviceManager {
 
         deviceConnection.setLastCheckedDate(System.currentTimeMillis());
 
-        if (device != null)
-            deviceConnection.setDeviceId(device.deviceId);
-        else if (!isJobServiceOn(context, JOB_DETECTIVE_ID)){
+        if (device == null){
             deviceConnection.setDeviceId("-");
-            scheduleDetective(context);
-        }
 
+            if (!isJobServiceOn(context, JOB_DETECTIVE_ID))
+                scheduleDetective(context);
+        }
+        else
+            deviceConnection.setDeviceId(device.deviceId);
 
         DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(context);
         DeviceConnection entry = repository.findConnection(deviceConnection.getIpAddress(), deviceConnection.getDeviceId(), deviceConnection.getServiceName());

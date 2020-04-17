@@ -12,18 +12,18 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.app.Activity;
+import com.naloaty.syncshare.app.SSActivity;
 
 
 public class RationalePermissionRequest extends AlertDialog.Builder
 {
     public PermissionRequest mPermissionQueue;
 
-    public RationalePermissionRequest(final Activity activity,
+    public RationalePermissionRequest(final SSActivity SSActivity,
                                       @NonNull PermissionRequest permission,
                                       boolean killActivityOtherwise)
     {
-        super(activity);
+        super(SSActivity);
 
         mPermissionQueue = permission;
 
@@ -31,7 +31,7 @@ public class RationalePermissionRequest extends AlertDialog.Builder
         setTitle(permission.title);
         setMessage(permission.message);
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, mPermissionQueue.permission))
+        if (ActivityCompat.shouldShowRequestPermissionRationale(SSActivity, mPermissionQueue.permission))
             setNeutralButton(R.string.btn_settings, new DialogInterface.OnClickListener()
             {
                 @Override
@@ -39,9 +39,9 @@ public class RationalePermissionRequest extends AlertDialog.Builder
                 {
                     Intent intent = new Intent()
                             .setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                            .setData(Uri.fromParts("package", activity.getPackageName(), null));
+                            .setData(Uri.fromParts("package", SSActivity.getPackageName(), null));
 
-                    activity.startActivity(intent);
+                    SSActivity.startActivity(intent);
                 }
             });
 
@@ -50,7 +50,7 @@ public class RationalePermissionRequest extends AlertDialog.Builder
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
             {
-                ActivityCompat.requestPermissions(activity, new String[]{mPermissionQueue.permission}, Activity.REQUEST_PERMISSION_ALL);
+                ActivityCompat.requestPermissions(SSActivity, new String[]{mPermissionQueue.permission}, SSActivity.REQUEST_PERMISSION_ALL);
             }
         });
 
@@ -60,7 +60,7 @@ public class RationalePermissionRequest extends AlertDialog.Builder
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i)
                 {
-                    activity.finish();
+                    SSActivity.finish();
                 }
             });
         else
@@ -68,13 +68,13 @@ public class RationalePermissionRequest extends AlertDialog.Builder
     }
 
     //This method will show dialog if permission not granted
-    public static AlertDialog requestIfNecessary(Activity activity,
+    public static AlertDialog requestIfNecessary(SSActivity SSActivity,
                                                  PermissionRequest permissionQueue,
                                                  boolean killActivityOtherwise)
     {
-        return ActivityCompat.checkSelfPermission(activity, permissionQueue.permission) == PackageManager.PERMISSION_GRANTED
+        return ActivityCompat.checkSelfPermission(SSActivity, permissionQueue.permission) == PackageManager.PERMISSION_GRANTED
                 ? null
-                : new RationalePermissionRequest(activity, permissionQueue, killActivityOtherwise).show();
+                : new RationalePermissionRequest(SSActivity, permissionQueue, killActivityOtherwise).show();
     }
 
     //This inner class contains information that will be shown in dialog
