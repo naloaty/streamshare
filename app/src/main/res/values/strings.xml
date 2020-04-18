@@ -48,4 +48,13 @@
     <!-- my devices list -->
     <string name="text_noDevices">No devices added yet</string>
     <string name="text_myDevices">My devices</string>
+    <string name="btn_addDevices">Add device</string>
+
+    <!-- pair device activity -->
+    <string name="text_pairDevice">Pair device</string>
+    <string name="text_pairDeviceHelp">Choose an option to connect to other device.</string>
+    <string name="btn_showQrCode">Show QR Code</string>
+    <string name="btn_scanQrCode">Scan QR Code</string>
+    <string name="btn_enterIpManually">Enter IP Manually</string>
+    <string name="text_useDiscoveredDevices">Use discovered devices</string>
 </resources>

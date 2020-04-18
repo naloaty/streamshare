@@ -1,9 +1,11 @@
 package com.naloaty.syncshare.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 
 import com.naloaty.syncshare.R;
@@ -32,6 +34,14 @@ public class DeviceManageActivity extends SSActivity {
         //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(R.string.text_deviceManageTitle);
+
+        AppCompatButton addDeviceButton = findViewById(R.id.device_manage_add_device_btn);
+        addDeviceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DeviceManageActivity.this, PairDeviceActivity.class));
+            }
+        });
     }
 
     @Override

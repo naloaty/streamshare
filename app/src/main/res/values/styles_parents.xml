@@ -18,6 +18,7 @@
         <item name="materialButtonStyle">@style/Widget.SyncShare.ButtonStyle</item>
         <item name="buttonStyle">@style/Widget.SyncShare.ButtonStyle</item>
         <item name="textAppearanceButton">@style/TextAppearance.Button</item>
+        <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
 
         <item name="dialogBackground">@drawable/dialog_background</item>
     </style>

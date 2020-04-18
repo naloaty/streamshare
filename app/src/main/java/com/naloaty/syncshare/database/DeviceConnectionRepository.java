@@ -3,11 +3,9 @@ package com.naloaty.syncshare.database;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DeviceConnectionRepository {

@@ -7,7 +7,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {DeviceConnection.class}, version = 1)
+@Database(entities = {DeviceConnection.class, SSDevice.class}, version = 1)
 public abstract class SSDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "syncshare_db";
@@ -26,5 +26,7 @@ public abstract class SSDatabase extends RoomDatabase {
     }
 
     public abstract DeviceConnectionDao deviceConnectionDao();
+
+    public abstract SSDeviceDao ssDeviceDao();
 
 }

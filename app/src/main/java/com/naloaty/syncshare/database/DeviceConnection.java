@@ -17,54 +17,57 @@ public class DeviceConnection {
 
     private String serviceName;
 
-    public boolean isLocalDevice() {
-        return isLocalDevice;
-    }
-
-    public void setLocalDevice(boolean localDevice) {
-        isLocalDevice = localDevice;
-    }
-
     private boolean isLocalDevice;
+
 
     public DeviceConnection(String ipAddress, String serviceName) {
         this.ipAddress = ipAddress;
         this.serviceName = serviceName;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
-
-    public void setLastCheckedDate(Long lastCheckedDate) {
-        this.lastCheckedDate = lastCheckedDate;
-    }
-
-    public int getId() {
-        return id;
-    }
-
+    //ipAddress
     public String getIpAddress() {
         return ipAddress;
     }
 
-    public Long getLastCheckedDate() {
-        return lastCheckedDate;
+    //id
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 
+    //deviceId
     public String getDeviceId() {
         return deviceId;
     }
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    //lastCheckedDate
+    public Long getLastCheckedDate() {
+        return lastCheckedDate;
+    }
+    public void setLastCheckedDate(Long lastCheckedDate) {
+        this.lastCheckedDate = lastCheckedDate;
+    }
+
+    //serviceName
+    public String getServiceName() {
+        return serviceName;
+    }
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    //isLocalDevice
+    public boolean isLocalDevice() {
+        return isLocalDevice;
+    }
+    public void setLocalDevice(boolean localDevice) {
+        isLocalDevice = localDevice;
+    }
+
 }

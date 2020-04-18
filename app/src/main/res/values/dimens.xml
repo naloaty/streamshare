@@ -12,4 +12,6 @@
     <dimen name="corner_radius_small">4dp</dimen>
 
     <dimen name="devices_online_padding">8dp</dimen>
+
+    <dimen name="collapsing_app_bar_height">180dp</dimen>
 </resources>

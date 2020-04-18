@@ -26,14 +26,6 @@ public class DeviceConnectionViewModel extends AndroidViewModel {
         return mContext;
     }
 
-    public void insert(DeviceConnection connection) {
-        repository.insert(connection);
-    }
-
-    public void delete(DeviceConnection connection) {
-        repository.delete(connection);
-    }
-
     public LiveData<List<DeviceConnection>> getAllConnections () {
         return allConnections;
     }
