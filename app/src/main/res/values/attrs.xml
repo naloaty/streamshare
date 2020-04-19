@@ -4,5 +4,7 @@
     <attr name="roundProgressBar" format="reference" />
     <attr name="roundProgressBarShape" format="reference" />
 
+    <attr name="rippleSelector" format="reference" />
+
     <attr name="dialogBackground" format="reference" />
 </resources>

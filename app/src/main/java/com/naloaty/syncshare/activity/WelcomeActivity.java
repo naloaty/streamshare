@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.viewpager.widget.ViewPager;
 
@@ -21,6 +22,7 @@ public class WelcomeActivity extends SSActivity {
 
     private ViewGroup mSplashView;
     private ViewGroup mPermissionsView;
+    private ViewGroup mBatteryOptimizationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +59,25 @@ public class WelcomeActivity extends SSActivity {
         }
 
         /*--------- layout_welcome_page_3 ------------ */
-        View view = getLayoutInflater().inflate(R.layout.layout_welcome_page_3, null, false);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            mBatteryOptimizationView = (ViewGroup) getLayoutInflater().inflate(R.layout.layout_welcome_page_3, null, false);
+            pagerAdapter.addView(mBatteryOptimizationView);
+            checkBatteryOptimizationState();
+
+            mBatteryOptimizationView.findViewById(R.id.welcome_page_3_request_btn)
+                    .setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            AppUtils.requestDisableBatteryOptimization(WelcomeActivity.this);
+                        }
+                    });
+        }
+
+        /*--------- layout_welcome_page_4 ------------ */
+        View view = getLayoutInflater().inflate(R.layout.layout_welcome_page_4, null, false);
         pagerAdapter.addView(view);
 
         /*--------- Widgets setup ------------ */
@@ -128,7 +148,7 @@ public class WelcomeActivity extends SSActivity {
         viewPager.setAdapter(pagerAdapter);
     }
 
-    protected void checkPermissionsState()
+    private void checkPermissionsState()
     {
         if (Build.VERSION.SDK_INT < 23)
             return;
@@ -140,6 +160,28 @@ public class WelcomeActivity extends SSActivity {
 
         mPermissionsView.findViewById(R.id.layout_welcome_page_2_request_btn)
                 .setVisibility(permissionsOk ? View.GONE : View.VISIBLE);
+    }
+
+    private void checkBatteryOptimizationState()
+    {
+        if (Build.VERSION.SDK_INT < 23)
+            return;
+
+        boolean batteryOptimizationDisabled = AppUtils.checkBatteryOptimizationDisabled(this);
+
+        mBatteryOptimizationView.findViewById(R.id.welcome_page_3_perm_ok_img)
+                .setVisibility(batteryOptimizationDisabled ? View.VISIBLE : View.GONE);
+
+        mBatteryOptimizationView.findViewById(R.id.welcome_page_3_request_btn)
+                .setVisibility(batteryOptimizationDisabled ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == AppUtils.OPTIMIZATION_DISABLE)
+            checkBatteryOptimizationState();
     }
 
     @Override

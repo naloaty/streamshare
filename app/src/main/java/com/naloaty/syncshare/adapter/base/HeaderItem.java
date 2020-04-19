@@ -1,6 +1,8 @@
-package com.naloaty.syncshare.adapter;
+package com.naloaty.syncshare.adapter.base;
 
-public class HeaderItem extends ListItem {
+import androidx.recyclerview.widget.RecyclerView;
+
+public abstract class HeaderItem extends ListItem {
 
     private int captionResource;
 

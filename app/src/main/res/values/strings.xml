@@ -19,6 +19,10 @@
     <string name="text_requestPermissionReadPhoneState">Permission to read phone state</string>
     <string name="text_requestPermissionReadPhoneStateSummary">SyncShare needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you.</string>
 
+    <!-- battery optimization request -->
+    <string name="text_batteryOptimization">Battery optimization</string>
+    <string name="btn_requestDisableBO">Disable</string>
+
     <!-- drawer main -->
     <string name="menu_devices">Manage devices</string>
     <string name="menu_prefernces">Preferences</string>
@@ -52,9 +56,13 @@
 
     <!-- pair device activity -->
     <string name="text_pairDevice">Pair device</string>
-    <string name="text_pairDeviceHelp">Choose an option to connect to other device.</string>
-    <string name="btn_showQrCode">Show QR Code</string>
+    <string name="text_pairDeviceHelp">Choose an option to connect to other device. </string>
+    <string name="btn_showConnectionInfo">Show connection information</string>
     <string name="btn_scanQrCode">Scan QR Code</string>
     <string name="btn_enterIpManually">Enter IP Manually</string>
-    <string name="text_useDiscoveredDevices">Use discovered devices</string>
+    <string name="text_pairWithDiscoveredDevices">Pair with discovered devices</string>
+    <string name="text_noDeviceDiscovered">No nearby devices found</string>
+
+    <!-- category adapter -->
+    <string name="text_defaultCategoryName">Category without name</string>
 </resources>

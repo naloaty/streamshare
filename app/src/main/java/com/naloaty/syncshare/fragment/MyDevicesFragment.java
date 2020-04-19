@@ -11,17 +11,17 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.adapter.DeviceItem;
-import com.naloaty.syncshare.adapter.DevicesOnlineAdapter;
-import com.naloaty.syncshare.adapter.HeaderItem;
-import com.naloaty.syncshare.adapter.ListItem;
-import com.naloaty.syncshare.adapter.MyDevicesAdapter;
+import com.naloaty.syncshare.adapter.CategoryAdapter;
+import com.naloaty.syncshare.adapter.base.Category;
+import com.naloaty.syncshare.adapter.custom.DefaultHeader;
+import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
+import com.naloaty.syncshare.adapter.base.HeaderItem;
+import com.naloaty.syncshare.adapter.base.ListItem;
+import com.naloaty.syncshare.adapter.custom.MyDevice;
 import com.naloaty.syncshare.database.DeviceConnection;
 import com.naloaty.syncshare.database.DeviceConnectionViewModel;
-import com.naloaty.syncshare.util.NsdHelper;
 import com.naloaty.syncshare.widget.RecyclerViewEmptySupport;
 
 import java.util.ArrayList;
@@ -29,9 +29,9 @@ import java.util.List;
 
 public class MyDevicesFragment extends Fragment {
 
-    private ArrayList<ListItem> mList;
+    private ArrayList<Category> mList;
     private RecyclerViewEmptySupport mRecyclerView;
-    private MyDevicesAdapter mMyDevicesAdapter;
+    private CategoryAdapter mCategoryAdapter;
     private DeviceConnectionViewModel deviceConnectionViewModel;
 
     @Override
@@ -53,29 +53,31 @@ public class MyDevicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mMyDevicesAdapter = new MyDevicesAdapter();
+        mCategoryAdapter = new CategoryAdapter();
 
         mRecyclerView = view.findViewById(R.id.my_devices_recycler_view);
         mRecyclerView.setEmptyView(view.findViewById(R.id.my_devices_empty_placeholder));
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mMyDevicesAdapter);
+        mRecyclerView.setAdapter(mCategoryAdapter);
 
         deviceConnectionViewModel.getAllConnections().observe(getViewLifecycleOwner(), new Observer<List<DeviceConnection>>() {
             @Override
             public void onChanged(List<DeviceConnection> deviceConnections) {
 
                 mList = new ArrayList<>();
-                mList.add(new HeaderItem(R.string.text_myDevices));
+                Category myDevices = new Category(new DefaultHeader(R.string.text_myDevices));
 
                 for(DeviceConnection connection: deviceConnections) {
                     if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
                         continue;
 
-                    mList.add(new DeviceItem(connection.getDeviceId(), R.drawable.ic_phone_android_24dp));
+                    myDevices.addItem(new MyDevice(connection.getDeviceId(), connection.getIpAddress(), R.drawable.ic_phone_android_24dp));
                 }
 
-                if (mList.size() > 1)
-                    mMyDevicesAdapter.setItems(mList);
+                if (myDevices.getItemsCount() > 0) {
+                    mList.add(myDevices);
+                    mCategoryAdapter.setItems(mList);
+                }
             }
         });
     }

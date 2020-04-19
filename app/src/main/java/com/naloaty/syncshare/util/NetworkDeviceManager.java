@@ -72,7 +72,7 @@ public class NetworkDeviceManager {
          * https://developer.android.com/reference/android/app/job/JobInfo.Builder.html
          */
         JobInfo jobInfo = new JobInfo.Builder(JOB_DETECTIVE_ID, componentName)
-                .setMinimumLatency(15 * 1000)
+                .setMinimumLatency(10 * 1000) //10 sec
                 .build();
 
         JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
