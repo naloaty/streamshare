@@ -39,6 +39,7 @@ public class AppUtils {
     public static final int OPTIMIZATION_DISABLE = 756;
 
     private static DeviceConnectionRepository mDeviceConnectionRepo;
+    private static DNSSDHelper mDNSSDHelper;
 
     public static SharedPreferences getDefaultSharedPreferences(final Context context) {
         if (mSharedPreferences == null) {
@@ -150,6 +151,13 @@ public class AppUtils {
             mDeviceConnectionRepo = new DeviceConnectionRepository(context);
 
         return mDeviceConnectionRepo;
+    }
+
+    public static DNSSDHelper getDNSSDHelper(Context context) {
+        if (mDNSSDHelper == null)
+            mDNSSDHelper = new DNSSDHelper(context);
+
+        return mDNSSDHelper;
     }
 
     /*public static void startForegroundService(Context context, Intent intent)

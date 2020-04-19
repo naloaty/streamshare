@@ -16,6 +16,7 @@ import com.naloaty.syncshare.config.Keyword;
 import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.CommunicationNotification;
+import com.naloaty.syncshare.util.DNSSDHelper;
 import com.naloaty.syncshare.util.NsdHelper;
 
 import org.json.JSONException;
@@ -34,7 +35,8 @@ public class CommunicationService extends SSService {
 
     private CommunicationServer mCommunicationServer;
     private CommunicationNotification mNotification;
-    private NsdHelper mNsdHelper;
+    //private NsdHelper mNsdHelper;
+    private DNSSDHelper mDNSSDHelper;
 
     @Nullable
     @Override
@@ -47,8 +49,11 @@ public class CommunicationService extends SSService {
         super.onCreate();
 
         mCommunicationServer = new CommunicationServer(AppConfig.SERVER_PORT);
-        mNsdHelper = new NsdHelper(getApplicationContext());
-        mNsdHelper.registerService();
+        //mNsdHelper = new NsdHelper(getApplicationContext());
+        //mNsdHelper.registerService();
+        mDNSSDHelper = AppUtils.getDNSSDHelper(getApplicationContext());
+        mDNSSDHelper.register();
+
         mNotification = new CommunicationNotification(getNotificationUtils());
 
         if (!AppUtils.checkRunningConditions(this) || !mCommunicationServer.start()){
@@ -102,7 +107,8 @@ public class CommunicationService extends SSService {
 
         Log.d(TAG, "Stopping and unregistering NSD");
         mCommunicationServer.stop();
-        mNsdHelper.unregisterService();
+        //mNsdHelper.unregisterService();
+        mDNSSDHelper.unregister();
 
         /*Log.d(TAG, "Deleting all connections");
         DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());

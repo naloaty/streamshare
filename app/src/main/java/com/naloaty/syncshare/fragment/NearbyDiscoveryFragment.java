@@ -18,6 +18,8 @@ import com.naloaty.syncshare.adapter.base.Category;
 import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
 import com.naloaty.syncshare.database.DeviceConnection;
 import com.naloaty.syncshare.database.DeviceConnectionViewModel;
+import com.naloaty.syncshare.util.AppUtils;
+import com.naloaty.syncshare.util.DNSSDHelper;
 import com.naloaty.syncshare.util.NsdHelper;
 import com.naloaty.syncshare.widget.RecyclerViewEmptySupport;
 
@@ -29,29 +31,33 @@ public class NearbyDiscoveryFragment extends Fragment {
     private ArrayList<Category> mList;
     private RecyclerViewEmptySupport mRecyclerView;
     private CategoryAdapter mCategoryAdapter;
-    private NsdHelper mNsdHelper;
+   // private NsdHelper mNsdHelper;
+    private DNSSDHelper mDNSSDHelper;
     private DeviceConnectionViewModel deviceConnectionViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mNsdHelper = new NsdHelper(getContext());
+        //mNsdHelper = new NsdHelper(getContext());
 
-        deviceConnectionViewModel = new ViewModelProvider(this).get(DeviceConnectionViewModel.class);
+        this.mDNSSDHelper = AppUtils.getDNSSDHelper(getActivity().getApplicationContext());
+        this.deviceConnectionViewModel = new ViewModelProvider(this).get(DeviceConnectionViewModel.class);
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
-        mNsdHelper.startDiscovering();
+        //mNsdHelper.startDiscovering();
+        mDNSSDHelper.startBrowse();
     }
 
     @Override
     public void onPause()
     {
         super.onPause();
-        mNsdHelper.stopDiscovering();
+        //mNsdHelper.stopDiscovering();
+        mDNSSDHelper.stopBrowse();
     }
 
     @Nullable
