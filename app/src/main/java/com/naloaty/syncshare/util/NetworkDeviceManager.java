@@ -16,6 +16,8 @@ import com.naloaty.syncshare.service.DetectiveJobService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.InetAddress;
+
 public class NetworkDeviceManager {
 
     private static final String TAG = NetworkDeviceManager.class.getSimpleName();
@@ -115,7 +117,7 @@ public class NetworkDeviceManager {
         else
             deviceConnection.setDeviceId(device.deviceId);
 
-        DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(context);
+        DeviceConnectionRepository repository = new DeviceConnectionRepository(context);
         DeviceConnection entry = repository.findConnection(deviceConnection.getIpAddress(), deviceConnection.getDeviceId(), deviceConnection.getServiceName());
 
         if (entry != null)
@@ -143,7 +145,7 @@ public class NetworkDeviceManager {
 
     public static void manageLostDevice(Context context, String serviceName) {
 
-        DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(context);
+        DeviceConnectionRepository repository = new DeviceConnectionRepository(context);
         try {
             DeviceConnection connection = repository.findConnection(null, null, serviceName);
 

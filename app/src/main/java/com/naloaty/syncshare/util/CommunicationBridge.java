@@ -85,11 +85,17 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
         public NetworkDevice handleDevice(String ipAddress)
                 throws CommunicationException, IOException, TimeoutException
         {
+            return handleDevice(InetAddress.getByName(ipAddress));
+        }
+
+        public NetworkDevice handleDevice(InetAddress address)
+                throws CommunicationException, IOException, TimeoutException
+        {
             /*
              * handshakeOnly means that devices will only exchange information
              * about each other and disconnect
              */
-            return handleDevice(connectWithHandshake(ipAddress, true), true);
+            return handleDevice(connectWithHandshake(address, true), true);
         }
 
         public NetworkDevice handleDevice(CoolSocket.ActiveConnection activeConnection, boolean handshakeOnly)
@@ -111,10 +117,10 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
             }
         }
 
-        public CoolSocket.ActiveConnection connectWithHandshake(String ipAddress, boolean handshakeOnly)
+        public CoolSocket.ActiveConnection connectWithHandshake(InetAddress address, boolean handshakeOnly)
                 throws IOException, CommunicationException, TimeoutException {
 
-            return handshake(connect(ipAddress), handshakeOnly);
+            return handshake(connect(address), handshakeOnly);
         }
 
         public CoolSocket.ActiveConnection handshake(CoolSocket.ActiveConnection activeConnection, boolean handshakeOnly)
@@ -131,17 +137,15 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
             return activeConnection;
         }
 
-        public CoolSocket.ActiveConnection connect(String ipAddress) throws IOException {
-            InetAddress inetAddress = InetAddress.getByName(ipAddress);
-
-            if (!inetAddress.isReachable(1000))
+        public CoolSocket.ActiveConnection connect(InetAddress address) throws IOException {
+            if (!address.isReachable(1000))
                 throw new IOException("Ping test before connection to the address has failed");
 
             /*
              * This class extends from CoolSocket.Client and use it's method
              * CoolSocket.Client.connect(SocketAddress socketAddress, int operationTimeout) throws IOException
              */
-            return super.connect(new InetSocketAddress(ipAddress, AppConfig.SERVER_PORT), AppConfig.SOCKET_TIMEOUT);
+            return super.connect(new InetSocketAddress(address, AppConfig.SERVER_PORT), AppConfig.SOCKET_TIMEOUT);
         }
 
         public interface ConnectionHandler

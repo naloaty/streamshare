@@ -25,7 +25,7 @@ public class DetectiveJobService extends JobService {
     public boolean onStartJob(JobParameters params) {
         Log.d(TAG, "Detective is hunting now");
 
-        DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(this);
+        DeviceConnectionRepository repository = new DeviceConnectionRepository(getApplicationContext());
 
         for (DeviceConnection deviceConnection: repository.getUnknown()) {
             NetworkDeviceManager.manageDevice(this, deviceConnection);

@@ -36,11 +36,11 @@ public class SSActivity extends AppCompatActivity {
             if (!mSkipPermissionRequest)
                 requestRequiredPermissions(true);
         }
-        else {
+        /*else {
             Log.i("BASE_Activity", "onResume() -> start service");
             startService(new Intent(this, CommunicationService.class)
                         .setAction("kostyl")); //TODO: kostyl
-        }
+        }*/
     }
 
     @Override
@@ -80,13 +80,16 @@ public class SSActivity extends AppCompatActivity {
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (AppUtils.checkRunningConditions(this)){
+        if (!AppUtils.checkRunningConditions(this))
+            requestRequiredPermissions(!mSkipPermissionRequest);
+
+        /*if (AppUtils.checkRunningConditions(this)){
             Log.i("BASE_Activity", "onRequestPermissionsResult() -> start service");
             startService(new Intent(this, CommunicationService.class)
                             .setAction("kostyl")); //TODO: kostyl
         }
         else
-            requestRequiredPermissions(!mSkipPermissionRequest);
+            requestRequiredPermissions(!mSkipPermissionRequest);*/
 
     }
 

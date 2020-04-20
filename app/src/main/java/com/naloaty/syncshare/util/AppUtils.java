@@ -2,6 +2,8 @@ package com.naloaty.syncshare.util;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,7 +40,6 @@ public class AppUtils {
     private static final String DEFAULT_PREF = "default";
     public static final int OPTIMIZATION_DISABLE = 756;
 
-    private static DeviceConnectionRepository mDeviceConnectionRepo;
     private static DNSSDHelper mDNSSDHelper;
 
     public static SharedPreferences getDefaultSharedPreferences(final Context context) {
@@ -146,18 +147,26 @@ public class AppUtils {
         return (int) (System.currentTimeMillis() / 1000) + (++mUniqueNumber);
     }
 
-    public static DeviceConnectionRepository getDeviceConnectionRepository(Context context) {
-        if (mDeviceConnectionRepo == null)
-            mDeviceConnectionRepo = new DeviceConnectionRepository(context);
-
-        return mDeviceConnectionRepo;
-    }
-
     public static DNSSDHelper getDNSSDHelper(Context context) {
         if (mDNSSDHelper == null)
             mDNSSDHelper = new DNSSDHelper(context);
 
         return mDNSSDHelper;
+    }
+
+    /*
+     * Copied from https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android/5921190#5921190
+     */
+    public static boolean isServiceRunning(Application application, Class<?> serviceClass) {
+        final ActivityManager activityManager = (ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+        for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
+            if (runningServiceInfo.service.getClassName().equals(serviceClass.getName())){
+                return true;
+            }
+        }
+        return false;
     }
 
     /*public static void startForegroundService(Context context, Intent intent)

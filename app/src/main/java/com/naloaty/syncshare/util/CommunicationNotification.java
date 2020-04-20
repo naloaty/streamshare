@@ -39,11 +39,15 @@ public class CommunicationNotification {
                 .setContentTitle(titleContent)
                 .setContentText(textContent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true) //After tap notification will be auto canceled
+                //.setAutoCancel(true) //After tap notification will be auto canceled
                 .setContentIntent(contentAction)
                 .setOngoing(true);
 
 
         return notification.show();
+    }
+
+    public void cancelNotification() {
+        notificationUtils.cancelNotification(SERVICE_NOTIFICATION_ID);
     }
 }

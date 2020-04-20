@@ -22,6 +22,7 @@ import com.naloaty.syncshare.database.DeviceConnection;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
@@ -111,8 +112,11 @@ public class DNSSDHelper {
                                 builder.inet6Address((Inet6Address) address);
                             }*/
 
+                            //TODO: At some reason it is trying to connect to ipv6 LOCALDEVICE address
                             NetworkDeviceManager.manageDevice(mContext,
                                     new DeviceConnection(address.getHostAddress(), serviceName));
+
+
                         } catch (UnknownHostException e) {
                             e.printStackTrace();
                         }
@@ -126,7 +130,7 @@ public class DNSSDHelper {
                 }
             };
             mDNSSD.queryRecord(0, ifIndex, hostName, 1, 1, listener);
-            mDNSSD.queryRecord(0, ifIndex, hostName, 28, 1, listener);
+            //mDNSSD.queryRecord(0, ifIndex, hostName, 28, 1, listener);
         } catch (DNSSDException e) {
             e.printStackTrace();
         }

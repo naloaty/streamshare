@@ -5,14 +5,9 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_stop_sharing"
+        android:id="@+id/action_toggle_sharing"
         android:orderInCategory="1"
         android:title="Stop sharing"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_scan_devices"
-        android:orderInCategory="2"
-        android:title="Scan devices"
-        app:showAsAction="never" />
 </menu>

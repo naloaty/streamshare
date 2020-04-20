@@ -61,8 +61,12 @@
     <string name="btn_scanQrCode">Scan QR Code</string>
     <string name="btn_enterIpManually">Enter IP Manually</string>
     <string name="text_pairWithDiscoveredDevices">Pair with discovered devices</string>
-    <string name="text_noDeviceDiscovered">No nearby devices found</string>
+    <string name="text_discoveringDevices">Searching nearby devices</string>
 
     <!-- category adapter -->
     <string name="text_defaultCategoryName">Category without name</string>
+
+    <!-- main activity toolbar menu -->
+    <string name="menu_stopSharing">Stop sharing</string>
+    <string name="menu_startSharing">Start sharing</string>
 </resources>

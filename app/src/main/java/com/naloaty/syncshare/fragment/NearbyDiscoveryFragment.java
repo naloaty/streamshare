@@ -17,6 +17,7 @@ import com.naloaty.syncshare.adapter.CategoryAdapter;
 import com.naloaty.syncshare.adapter.base.Category;
 import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
 import com.naloaty.syncshare.database.DeviceConnection;
+import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.database.DeviceConnectionViewModel;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.DNSSDHelper;
@@ -49,6 +50,9 @@ public class NearbyDiscoveryFragment extends Fragment {
     {
         super.onResume();
         //mNsdHelper.startDiscovering();
+        DeviceConnectionRepository repository = new DeviceConnectionRepository(getContext());
+        repository.deleteAllConnections();
+
         mDNSSDHelper.startBrowse();
     }
 

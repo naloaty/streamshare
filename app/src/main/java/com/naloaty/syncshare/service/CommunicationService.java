@@ -17,6 +17,7 @@ import com.naloaty.syncshare.database.DeviceConnectionRepository;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.CommunicationNotification;
 import com.naloaty.syncshare.util.DNSSDHelper;
+import com.naloaty.syncshare.util.NotificationUtils;
 import com.naloaty.syncshare.util.NsdHelper;
 
 import org.json.JSONException;
@@ -32,6 +33,8 @@ public class CommunicationService extends SSService {
             ACTION_STOP_SHARING = "stopSharing",
             ACTION_STOP_DISCOVERING = "stopDiscovering",
             EXTRA_STATUS_RUNNING = "statusRunning";
+            //PREFERNCE_SERVICE_RUNNING = "communicationServiceRunning";
+
 
     private CommunicationServer mCommunicationServer;
     private CommunicationNotification mNotification;
@@ -66,6 +69,11 @@ public class CommunicationService extends SSService {
 
         mNotification.getServiceNotification().build();
 
+        /*AppUtils.getDefaultSharedPreferences(this)
+                .edit()
+                .putBoolean(PREFERNCE_SERVICE_RUNNING, true)
+                .apply();*/
+
         Log.i(TAG, "Communication service started");
     }
 
@@ -90,7 +98,7 @@ public class CommunicationService extends SSService {
                     public void run() {
                         {
                             Log.d(TAG, "onStartCommand(): deleting connections");
-                            DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());
+                            DeviceConnectionRepository repository = new DeviceConnectionRepository(getApplicationContext());
                             repository.deleteAllConnections();
                         }
                     }
@@ -114,6 +122,12 @@ public class CommunicationService extends SSService {
         DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());
         repository.deleteAllConnections();*/
 
+        /*AppUtils.getDefaultSharedPreferences(this)
+                .edit()
+                .putBoolean(PREFERNCE_SERVICE_RUNNING, false)
+                .apply();*/
+
+        mNotification.cancelNotification();
         Log.d(TAG, "Destroy :(");
     }
 

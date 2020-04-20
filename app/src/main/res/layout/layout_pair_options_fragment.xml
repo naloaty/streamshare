@@ -118,10 +118,9 @@
 
         </androidx.cardview.widget.CardView>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginLeft="22dp"
             android:layout_marginRight="22dp"
             android:layout_marginTop="20dp"
@@ -134,9 +133,18 @@
                 android:layout_height="wrap_content"
                 android:text="@string/text_pairWithDiscoveredDevices"
                 android:textStyle="bold"
-                android:textSize="@dimen/font_size_secondary"/>
+                android:textSize="@dimen/font_size_secondary"
+                android:layout_centerVertical="true"/>
 
-        </LinearLayout>
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
 
         <fragment
             android:layout_width="match_parent"
