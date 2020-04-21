@@ -41,11 +41,13 @@
 
                 <!-- Show connection information -->
                 <LinearLayout
+                    android:id="@+id/pair_option_connection_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="16dp"
                     android:background="?rippleSelector"
+                    android:gravity="center_vertical"
                     android:clickable="true">
 
                     <ImageView
@@ -66,11 +68,13 @@
 
                 <!-- Scan qr code -->
                 <LinearLayout
+                    android:id="@+id/pair_option_scan_qr"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="16dp"
                     android:background="?rippleSelector"
+                    android:gravity="center_vertical"
                     android:clickable="true">
 
                     <ImageView
@@ -79,7 +83,7 @@
                         android:layout_marginRight="20dp"
                         android:layout_marginLeft="4dp"
                         android:tint="@color/colorAccent"
-                        android:src="@drawable/ic_scan_qr_24dp"/>
+                        android:src="@drawable/ic_qr_code_24dp"/>
 
                     <TextView
                         style="@style/TextAppearance.Primary"
@@ -91,11 +95,13 @@
 
                 <!-- Enter IP Manually -->
                 <LinearLayout
+                    android:id="@+id/pair_option_enter_ip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="16dp"
                     android:background="?rippleSelector"
+                    android:gravity="center_vertical"
                     android:clickable="true">
 
                     <ImageView

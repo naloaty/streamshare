@@ -55,13 +55,21 @@
     <string name="btn_addDevices">Add device</string>
 
     <!-- pair device activity -->
-    <string name="text_pairDevice">Pair device</string>
+    <string name="title_pairDevice">Pair device</string>
+    <string name="title_connectionInfo">Connection information</string>
+
     <string name="text_pairDeviceHelp">Choose an option to connect to other device. </string>
     <string name="btn_showConnectionInfo">Show connection information</string>
     <string name="btn_scanQrCode">Scan QR Code</string>
     <string name="btn_enterIpManually">Enter IP Manually</string>
     <string name="text_pairWithDiscoveredDevices">Pair with discovered devices</string>
     <string name="text_discoveringDevices">Searching nearby devices</string>
+
+    <!-- connection info fragment -->
+    <string name="text_connectionInfoHelp">Scan this if both devices are on the same network. You also can manually enter ip address of this device on other</string>
+    <string name="text_defaultValues">Unknown</string>
+    <string name="btn_openWifiSettings">Wi-Fi</string>
+    <string name="text_connectToWifiNetwork">Connect to Wi-Fi network to continue</string>
 
     <!-- category adapter -->
     <string name="text_defaultCategoryName">Category without name</string>
