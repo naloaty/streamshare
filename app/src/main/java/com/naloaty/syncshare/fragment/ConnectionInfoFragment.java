@@ -142,8 +142,9 @@ public class ConnectionInfoFragment extends Fragment{
         int actionButtonResource;
         int networkInfoVisibility;
 
-        if (currentUIState != null && currentUIState.equals(state))
-            return;
+        //TODO: fix this in other way (create method getCurrentState() based on views state)
+        /*if (currentUIState != null && currentUIState.equals(state))
+            return;*/
 
         switch (state) {
             case QRShown:
@@ -162,13 +163,17 @@ public class ConnectionInfoFragment extends Fragment{
             default:
                 helpTextResource = R.string.text_defaultValues;
                 actionButtonResource = R.string.text_defaultValues;
-                networkInfoVisibility = View.VISIBLE;
+                networkInfoVisibility = View.GONE;
                 mQRCode.setImageResource(R.drawable.ic_qr_code_24dp);
         }
 
         mHelpText.setText(helpTextResource);
         mActionButton.setText(actionButtonResource);
-        mNetworkNameLayout.setVisibility(networkInfoVisibility);
+
+        //TODO: to see wifi network name app needs Location permission.
+        //Add permission request to PermissionHelper
+        mNetworkNameLayout.setVisibility(View.GONE);
+
         mDeviceipAddressLayout.setVisibility(networkInfoVisibility);
 
         currentUIState = state;
