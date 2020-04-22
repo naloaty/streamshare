@@ -4,9 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.ConnectivityManager.NetworkCallback;
-import android.net.Network;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -24,8 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.activity.PairDeviceActivity;
-import com.naloaty.syncshare.util.ConnectionStateMonitor;
+import com.naloaty.syncshare.util.NetworkStateMonitor;
 
 public class ConnectionInfoFragment extends Fragment{
 
@@ -41,7 +37,7 @@ public class ConnectionInfoFragment extends Fragment{
     private TextView mDeviceIpAddress;
     private RelativeLayout mDeviceipAddressLayout;
 
-    private ConnectionStateMonitor mMonitor;
+    private NetworkStateMonitor mMonitor;
 
     private UIState currentUIState;
 
@@ -51,28 +47,31 @@ public class ConnectionInfoFragment extends Fragment{
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.d(TAG, "Received Broadcast");
+            if (NetworkStateMonitor.NETWORK_MONITOR_STATE_CHANGED.equals(intent.getAction())
+                    && intent.hasExtra(NetworkStateMonitor.EXTRA_NETWORK_TYPE)) {
 
-            if (ConnectionStateMonitor.NETWORK_MONITOR_STATE_CHANGED.equals(intent.getAction())
-                    && intent.hasExtra(ConnectionStateMonitor.EXTRA_WIFI_CONNECTED)) {
+                int networkType = intent.getIntExtra(NetworkStateMonitor.EXTRA_NETWORK_TYPE, NetworkStateMonitor.NETWORK_TYPE_NOT_CONNECTED);
 
-                boolean wifiConnected = intent.getBooleanExtra(ConnectionStateMonitor.EXTRA_WIFI_CONNECTED, false);
+                switch (networkType) {
+                    case NetworkStateMonitor.NETWORK_TYPE_WIFI:
+                        mNetworkName.setText(intent.getStringExtra(NetworkStateMonitor.EXTRA_WIFI_SSID));
+                        mDeviceIpAddress.setText(intent.getStringExtra(NetworkStateMonitor.EXTRA_WIFI_IP_ADDRESS));
+                        setUIState(UIState.QRShown);
+                        break;
 
-                if (wifiConnected) {
-                    mNetworkName.setText(intent.getStringExtra(ConnectionStateMonitor.EXTRA_NETWORK_NAME));
-                    mDeviceIpAddress.setText(intent.getStringExtra(ConnectionStateMonitor.EXTRA_IP_ADDRESS));
-                    setUIState(UIState.QRShown);
+                    case NetworkStateMonitor.NETWORK_TYPE_CELLULAR:
+                    case NetworkStateMonitor.NETWORK_TYPE_NOT_CONNECTED:
+                        setUIState(UIState.WifiUnavailable);
+                        break;
                 }
-                else
-                    setUIState(UIState.WifiUnavilable);
-
             }
         }
     };
 
+
     private enum UIState {
         QRShown,
-        WifiUnavilable,
+        WifiUnavailable,
     }
 
     @Nullable
@@ -102,16 +101,22 @@ public class ConnectionInfoFragment extends Fragment{
                 startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
             }
         });
-    }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        mMonitor = new NetworkStateMonitor(getContext());
+        mFilter.addAction(NetworkStateMonitor.NETWORK_MONITOR_STATE_CHANGED);
 
-        mMonitor = new ConnectionStateMonitor(getContext());
+        int networkType = mMonitor.getCurrentNetworkType();
 
-        //======= Init broadcast =========
-        mFilter.addAction(ConnectionStateMonitor.NETWORK_MONITOR_STATE_CHANGED);
+        switch (networkType) {
+            case NetworkStateMonitor.NETWORK_TYPE_WIFI:
+                setUIState(UIState.QRShown);
+                break;
+
+            case NetworkStateMonitor.NETWORK_TYPE_CELLULAR:
+            case NetworkStateMonitor.NETWORK_TYPE_NOT_CONNECTED:
+                setUIState(UIState.WifiUnavailable);
+                break;
+        }
     }
 
     @Override
@@ -147,7 +152,7 @@ public class ConnectionInfoFragment extends Fragment{
                 networkInfoVisibility = View.VISIBLE;
                 break;
 
-            case WifiUnavilable:
+            case WifiUnavailable:
                 helpTextResource = R.string.text_connectToWifiNetwork;
                 actionButtonResource = R.string.btn_openWifiSettings;
                 networkInfoVisibility = View.GONE;
@@ -167,11 +172,5 @@ public class ConnectionInfoFragment extends Fragment{
         mDeviceipAddressLayout.setVisibility(networkInfoVisibility);
 
         currentUIState = state;
-    }
-
-    private void changeFragment(PairFragment targetFragment) {
-
-        getContext().sendBroadcast(new Intent(PairDeviceActivity.ACTION_CHANGE_FRAGMENT)
-                .putExtra(PairDeviceActivity.EXTRA_TARGET_FRAGMENT, targetFragment.toString()));
     }
 }
