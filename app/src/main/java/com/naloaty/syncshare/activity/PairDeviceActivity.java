@@ -1,15 +1,20 @@
 package com.naloaty.syncshare.activity;
 
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Debug;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentFactory;
@@ -17,8 +22,11 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
+import com.naloaty.syncshare.dialog.EnterIpAddressDialog;
 import com.naloaty.syncshare.fragment.ConnectionInfoFragment;
 import com.naloaty.syncshare.fragment.PairFragment;
 import com.naloaty.syncshare.fragment.PairOptionsFragment;
@@ -51,7 +59,20 @@ public class PairDeviceActivity extends SSActivity {
                 switch (targetFragment){
 
                     case EnterIP:
-                        //show enter dialog
+                        new EnterIpAddressDialog(PairDeviceActivity.this).show();
+                        break;
+
+                    case ScanQR:
+                        //TODO: it definitely should be replaced with customized scanner (with toolbar)
+                        /*
+                         * Since I don’t have enough time to create customized scanner,
+                         * so far the standard version of the scanner will be used
+                         */
+                        IntentIntegrator integrator = new IntentIntegrator(PairDeviceActivity.this);
+                        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+                        integrator.setOrientationLocked(false);
+                        integrator.setBeepEnabled(false);
+                        integrator.initiateScan();
                         break;
 
                     default:
@@ -126,6 +147,20 @@ public class PairDeviceActivity extends SSActivity {
             setFragment(PairFragment.Options);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if(result != null) {
+            if(result.getContents() == null) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     private void setFragment(PairFragment targetFragment) {
 
         Fragment candidate = null;
@@ -138,10 +173,6 @@ public class PairDeviceActivity extends SSActivity {
             case ConnectionInfo:
                 candidate = mConnectionInfoFragment;
                 break;
-
-            case ScanQR:
-                //TODO
-
         }
 
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.pair_device_fragment_placeholder);

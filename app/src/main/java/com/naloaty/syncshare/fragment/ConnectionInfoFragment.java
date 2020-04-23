@@ -4,9 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +20,16 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.app.GlideApp;
 import com.naloaty.syncshare.util.NetworkStateMonitor;
+import com.naloaty.syncshare.util.PermissionHelper;
+
+import org.json.JSONObject;
 
 public class ConnectionInfoFragment extends Fragment{
 
@@ -47,23 +55,8 @@ public class ConnectionInfoFragment extends Fragment{
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (NetworkStateMonitor.NETWORK_MONITOR_STATE_CHANGED.equals(intent.getAction())
-                    && intent.hasExtra(NetworkStateMonitor.EXTRA_NETWORK_TYPE)) {
-
-                int networkType = intent.getIntExtra(NetworkStateMonitor.EXTRA_NETWORK_TYPE, NetworkStateMonitor.NETWORK_TYPE_NOT_CONNECTED);
-
-                switch (networkType) {
-                    case NetworkStateMonitor.NETWORK_TYPE_WIFI:
-                        mNetworkName.setText(intent.getStringExtra(NetworkStateMonitor.EXTRA_WIFI_SSID));
-                        mDeviceIpAddress.setText(intent.getStringExtra(NetworkStateMonitor.EXTRA_WIFI_IP_ADDRESS));
-                        setUIState(UIState.QRShown);
-                        break;
-
-                    case NetworkStateMonitor.NETWORK_TYPE_CELLULAR:
-                    case NetworkStateMonitor.NETWORK_TYPE_NOT_CONNECTED:
-                        setUIState(UIState.WifiUnavailable);
-                        break;
-                }
+            if (NetworkStateMonitor.NETWORK_MONITOR_STATE_CHANGED.equals(intent.getAction())) {
+                setUIState(getRequiredState());
             }
         }
     };
@@ -72,6 +65,8 @@ public class ConnectionInfoFragment extends Fragment{
     private enum UIState {
         QRShown,
         WifiUnavailable,
+        LocationServiceDisabled,
+        LocationPermissionDenied
     }
 
     @Nullable
@@ -98,25 +93,27 @@ public class ConnectionInfoFragment extends Fragment{
             @Override
             public void onClick(View v)
             {
-                startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                switch (currentUIState) {
+                    case QRShown:
+                    case WifiUnavailable:
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                        break;
+
+                    case LocationServiceDisabled:
+                        PermissionHelper.requestLocationService(getActivity());
+                        break;
+
+                    case LocationPermissionDenied:
+                        PermissionHelper.requestLocationPermission(getActivity(), PermissionHelper.REQUEST_LOCATION_PERMISSION);
+                        break;
+                }
             }
         });
 
         mMonitor = new NetworkStateMonitor(getContext());
         mFilter.addAction(NetworkStateMonitor.NETWORK_MONITOR_STATE_CHANGED);
 
-        int networkType = mMonitor.getCurrentNetworkType();
-
-        switch (networkType) {
-            case NetworkStateMonitor.NETWORK_TYPE_WIFI:
-                setUIState(UIState.QRShown);
-                break;
-
-            case NetworkStateMonitor.NETWORK_TYPE_CELLULAR:
-            case NetworkStateMonitor.NETWORK_TYPE_NOT_CONNECTED:
-                setUIState(UIState.WifiUnavailable);
-                break;
-        }
+        setUIState(getRequiredState());
     }
 
     @Override
@@ -136,6 +133,98 @@ public class ConnectionInfoFragment extends Fragment{
         mMonitor.stopMonitor();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionHelper.REQUEST_LOCATION_PERMISSION) {
+            setUIState(getRequiredState());
+        }
+    }
+
+    private UIState getRequiredState() {
+        int networkType = mMonitor.getCurrentNetworkType();
+        boolean locationGranted = PermissionHelper.checkLocationPermission(getContext());
+        boolean locationServiceEnabled = PermissionHelper.checkLocationService(getContext());
+
+        if (locationGranted)
+            if (locationServiceEnabled)
+                if (networkType == NetworkStateMonitor.NETWORK_TYPE_WIFI)
+                    return UIState.QRShown;
+                else
+                    return UIState.WifiUnavailable;
+
+            else
+                return UIState.LocationServiceDisabled;
+
+        else
+            return UIState.LocationPermissionDenied;
+    }
+
+    private void setQRCode(String wifiSSID, String ipAddress) {
+        JSONObject json = new JSONObject();
+
+        try{
+            json.put(NetworkStateMonitor.JSON_WIFI_SSID, wifiSSID);
+            json.put(NetworkStateMonitor.JSON_WIFI_IP_ADDRESS, ipAddress);
+
+            setQRCode(json);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void setQRCode(JSONObject networkInfo) {
+
+        if (networkInfo == null) {
+            mQRCode.setImageResource(R.drawable.ic_scan_qr_code_24dp);
+            return;
+        }
+
+        try {
+            MultiFormatWriter formatWriter = new MultiFormatWriter();
+
+            BitMatrix bitMatrix = formatWriter.encode(networkInfo.toString(), BarcodeFormat.QR_CODE, 400, 400);
+            BarcodeEncoder encoder = new BarcodeEncoder();
+
+            Bitmap bitmap = encoder.createBitmap(bitMatrix);
+
+            GlideApp.with(getContext())
+                    .load(bitmap)
+                    .into(mQRCode);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void setNetworkInfo(JSONObject networkInfo) {
+
+        if (networkInfo == null){
+            mNetworkName.setText(R.string.text_defaultValue);
+            mDeviceIpAddress.setText(R.string.text_defaultValue);
+            return;
+        }
+
+        try {
+            if (networkInfo.has(NetworkStateMonitor.JSON_WIFI_SSID))
+                mNetworkName.setText(networkInfo.getString(NetworkStateMonitor.JSON_WIFI_SSID));
+            else
+                mNetworkName.setText(R.string.text_defaultValue);
+
+            if (networkInfo.has(NetworkStateMonitor.JSON_WIFI_IP_ADDRESS))
+                mDeviceIpAddress.setText(networkInfo.getString(NetworkStateMonitor.JSON_WIFI_IP_ADDRESS));
+            else
+                mDeviceIpAddress.setText(R.string.text_defaultValue);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setUIState(UIState state) {
 
         int helpTextResource;
@@ -151,31 +240,49 @@ public class ConnectionInfoFragment extends Fragment{
                 helpTextResource = R.string.text_connectionInfoHelp;
                 actionButtonResource = R.string.btn_openWifiSettings;
                 networkInfoVisibility = View.VISIBLE;
+
+                JSONObject wifiInfo = mMonitor.getCurrentWifiInfo();
+                setNetworkInfo(wifiInfo);
+
+                if (wifiInfo.has(NetworkStateMonitor.JSON_WIFI_SSID))
+                    wifiInfo.remove(NetworkStateMonitor.JSON_WIFI_SSID);
+
+                setQRCode(wifiInfo);
                 break;
 
             case WifiUnavailable:
-                helpTextResource = R.string.text_connectToWifiNetwork;
+                helpTextResource = R.string.text_wifiNetworkUnavailable;
                 actionButtonResource = R.string.btn_openWifiSettings;
                 networkInfoVisibility = View.GONE;
-                mQRCode.setImageResource(R.drawable.ic_qr_code_24dp);
+                break;
+
+            case LocationServiceDisabled:
+                helpTextResource = R.string.text_locationServiceDisabled;
+                actionButtonResource = R.string.btn_enableLocationService;
+                networkInfoVisibility = View.GONE;
+                break;
+
+            case LocationPermissionDenied:
+                helpTextResource = R.string.text_locationPermissionDenied;
+                actionButtonResource = R.string.btn_ask;
+                networkInfoVisibility = View.GONE;
                 break;
 
             default:
-                helpTextResource = R.string.text_defaultValues;
-                actionButtonResource = R.string.text_defaultValues;
+                helpTextResource = R.string.text_defaultValue;
+                actionButtonResource = R.string.text_defaultValue;
                 networkInfoVisibility = View.GONE;
-                mQRCode.setImageResource(R.drawable.ic_qr_code_24dp);
         }
+
+        if (!state.equals(UIState.QRShown))
+            mQRCode.setImageResource(R.drawable.ic_qr_code_24dp);
 
         mHelpText.setText(helpTextResource);
         mActionButton.setText(actionButtonResource);
-
-        //TODO: to see wifi network name app needs Location permission.
-        //Add permission request to PermissionHelper
-        mNetworkNameLayout.setVisibility(View.GONE);
-
+        mNetworkNameLayout.setVisibility(networkInfoVisibility);
         mDeviceipAddressLayout.setVisibility(networkInfoVisibility);
 
         currentUIState = state;
     }
+
 }

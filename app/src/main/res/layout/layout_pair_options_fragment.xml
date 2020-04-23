@@ -83,7 +83,7 @@
                         android:layout_marginRight="20dp"
                         android:layout_marginLeft="4dp"
                         android:tint="@color/colorAccent"
-                        android:src="@drawable/ic_qr_code_24dp"/>
+                        android:src="@drawable/ic_scan_qr_code_24dp"/>
 
                     <TextView
                         style="@style/TextAppearance.Primary"

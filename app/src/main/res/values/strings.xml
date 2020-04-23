@@ -1,6 +1,8 @@
 <resources>
     <string name="text_appName">SyncShare</string>
 
+    <string name="text_defaultValue">Unknown</string>
+
     <!-- welcome activity -->
     <string name="text_welcome">Welcome</string>
     <string name="text_setUpPermissions">Set up permissions</string>
@@ -19,9 +21,16 @@
     <string name="text_requestPermissionReadPhoneState">Permission to read phone state</string>
     <string name="text_requestPermissionReadPhoneStateSummary">SyncShare needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you.</string>
 
+    <string name="text_requestPermissionLocationServiceSummary">SyncShare uses location service to see Wi-Wi network name</string>
+
     <!-- battery optimization request -->
     <string name="text_batteryOptimization">Battery optimization</string>
     <string name="btn_requestDisableBO">Disable</string>
+
+    <!-- enter ip address dialog -->
+    <string name="title_enterIpAdress">Enter IP Address</string>
+    <string name="btn_connect">Connect</string>
+    <string name="msg_wrongIpAddressFormat">Wrong format (correct looks like 192.168.1.2)</string>
 
     <!-- drawer main -->
     <string name="menu_devices">Manage devices</string>
@@ -67,9 +76,17 @@
 
     <!-- connection info fragment -->
     <string name="text_connectionInfoHelp">Scan this if both devices are on the same network. You also can manually enter ip address of this device on other</string>
-    <string name="text_defaultValues">Unknown</string>
+
+    <string name="text_wifiNetworkUnavailable">Connect to Wi-Fi network to continue</string>
     <string name="btn_openWifiSettings">Wi-Fi</string>
-    <string name="text_connectToWifiNetwork">Connect to Wi-Fi network to continue</string>
+
+    <string name="text_locationServiceDisabled">Turn on location service to continue</string>
+    <string name="btn_enableLocationService">Enable</string>
+
+    <string name="text_locationPermissionDenied">Grant location permission to continue</string>
+
+    <!-- scan qr code activity -->
+    <string name="text_cameraPermissionDenied">Camera permission required</string>
 
     <!-- category adapter -->
     <string name="text_defaultCategoryName">Category without name</string>

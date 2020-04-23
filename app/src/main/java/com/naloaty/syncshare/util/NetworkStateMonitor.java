@@ -15,6 +15,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import org.json.JSONObject;
+
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -31,8 +33,9 @@ public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
     public static final String
                     NETWORK_MONITOR_STATE_CHANGED = "com.naloaty.intent.NETWORK_MONITOR_STATE_CHANGED",
                     EXTRA_NETWORK_TYPE = "networkType",
-                    EXTRA_WIFI_SSID = "wifiSSID",
-                    EXTRA_WIFI_IP_ADDRESS = "wifiIpAddress";
+                    JSON_WIFI_SSID = "wifiSSID",
+                    JSON_WIFI_BSSID = "BSSID",
+                    JSON_WIFI_IP_ADDRESS = "ipAddress";
 
     public static final int
                     NETWORK_TYPE_WIFI = 0,
@@ -91,15 +94,31 @@ public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
 
         Log.d(TAG, "Network type: " + networkType);
 
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+    }
+
+    public JSONObject getCurrentWifiInfo() {
+        int networkType = getCurrentNetworkType();
+
         if (networkType == NETWORK_TYPE_WIFI) {
             WifiManager mainWifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
             WifiInfo currentWifi = mainWifi.getConnectionInfo();
 
-            intent.putExtra(EXTRA_WIFI_SSID, currentWifi.getSSID());
-            intent.putExtra(EXTRA_WIFI_IP_ADDRESS, convertIpAddress(currentWifi.getIpAddress()));
+            JSONObject json = new JSONObject();
+
+            try {
+                json.put(JSON_WIFI_SSID, currentWifi.getSSID().replaceAll("\"", ""));
+                json.put(JSON_WIFI_IP_ADDRESS, convertIpAddress(currentWifi.getIpAddress()));
+                json.put(JSON_WIFI_BSSID, currentWifi.getBSSID());
+                return json;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
 
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        return null;
     }
 
     /*

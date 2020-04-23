@@ -10,6 +10,8 @@
     <uses-permission  android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission  android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission  android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission  android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission  android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
@@ -18,7 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SyncShare.NoActionBar"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        android:hardwareAccelerated="true">
 
         <activity
             android:name=".activity.MainActivity">
@@ -39,6 +42,11 @@
         <activity
             android:name=".activity.PairDeviceActivity">
         </activity>
+
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="sensor"
+            tools:replace="screenOrientation" />
 
         <service
             android:name=".service.CommunicationService"
