@@ -6,8 +6,9 @@ import android.util.Log;
 import com.genonbeta.CoolSocket.CoolSocket;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.Keyword;
+import com.naloaty.syncshare.database.NetworkDevice;
 import com.naloaty.syncshare.database.SSDatabase;
-import com.naloaty.syncshare.other.NetworkDevice;
+import com.naloaty.syncshare.database.SSDevice;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,7 +63,7 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
          *     | ------------> loadFromJson(json);
          *     --------------- NetworkDevice
          */
-        private NetworkDevice mDevice;
+        private SSDevice mDevice;
         private Context mContext;
 
         public Client(Context context) {
@@ -73,22 +74,22 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
             return mContext;
         }
 
-        public NetworkDevice getDevice()
+        public SSDevice getDevice()
         {
             return mDevice;
         }
 
-        public void setDevice(NetworkDevice device) {
+        public void setDevice(SSDevice device) {
             this.mDevice = device;
         }
 
-        public NetworkDevice handleDevice(String ipAddress)
+        public SSDevice handleDevice(String ipAddress)
                 throws CommunicationException, IOException, TimeoutException
         {
             return handleDevice(InetAddress.getByName(ipAddress));
         }
 
-        public NetworkDevice handleDevice(InetAddress address)
+        public SSDevice handleDevice(InetAddress address)
                 throws CommunicationException, IOException, TimeoutException
         {
             /*
@@ -98,7 +99,7 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
             return handleDevice(connectWithHandshake(address, true), true);
         }
 
-        public NetworkDevice handleDevice(CoolSocket.ActiveConnection activeConnection, boolean handshakeOnly)
+        public SSDevice handleDevice(CoolSocket.ActiveConnection activeConnection, boolean handshakeOnly)
                 throws CommunicationException, IOException, TimeoutException
         {
             try {

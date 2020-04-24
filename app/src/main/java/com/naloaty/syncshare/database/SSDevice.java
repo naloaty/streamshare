@@ -21,7 +21,7 @@ public class SSDevice {
 
     private String appVersion;
 
-    public void SSDevice(String deviceId, String appVersion) {
+    public SSDevice(String deviceId, String appVersion) {
         this.deviceId = deviceId;
         this.appVersion = appVersion;
     }

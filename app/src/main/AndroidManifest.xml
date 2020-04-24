@@ -40,7 +40,7 @@
         </activity>
 
         <activity
-            android:name=".activity.PairDeviceActivity">
+            android:name=".activity.AddDeviceActivity">
         </activity>
 
         <activity

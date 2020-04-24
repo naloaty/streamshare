@@ -12,16 +12,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.Keyword;
-import com.naloaty.syncshare.database.DeviceConnectionRepository;
+import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.SSDevice;
 import com.naloaty.syncshare.dialog.RationalePermissionRequest;
-import com.naloaty.syncshare.other.NetworkDevice;
-import com.naloaty.syncshare.service.CommunicationService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,24 +104,25 @@ public class AppUtils {
 
     public static void applyDeviceToJSON(Context context, JSONObject object) throws JSONException
     {
-        NetworkDevice device = getLocalDevice(context);
+        SSDevice device = getLocalDevice(context);
         JSONObject deviceInformation = new JSONObject();
 
-        deviceInformation.put(Keyword.DEVICE_INFO_SERIAL, device.deviceId);
-        deviceInformation.put(Keyword.DEVICE_INFO_BRAND, device.brand);
-        deviceInformation.put(Keyword.DEVICE_INFO_MODEL, device.model);
-        deviceInformation.put(Keyword.DEVICE_INFO_USER, device.nickname);
+        deviceInformation.put(Keyword.DEVICE_INFO_SERIAL, device.getDeviceId());
+        deviceInformation.put(Keyword.DEVICE_INFO_BRAND, device.getBrand());
+        deviceInformation.put(Keyword.DEVICE_INFO_MODEL, device.getModel());
+        deviceInformation.put(Keyword.DEVICE_INFO_USER, device.getNickname());
+        deviceInformation.put(Keyword.APP_INFO_VERSION, AppConfig.APP_VERSION);
 
         object.put(Keyword.DEVICE_INFO, deviceInformation);
     }
 
-    public static NetworkDevice getLocalDevice(Context context)
+    public static SSDevice getLocalDevice(Context context)
     {
-        NetworkDevice device = new NetworkDevice(getDeviceSerial(context));
+        SSDevice device = new SSDevice(getDeviceSerial(context), AppConfig.APP_VERSION);
 
-        device.brand = Build.BRAND;
-        device.model = Build.MODEL;
-        device.nickname = AppUtils.getLocalDeviceName();
+        device.setBrand(Build.BRAND);
+        device.setModel(Build.MODEL);
+        device.setNickname(AppUtils.getLocalDeviceName());
 
         //TODO: add app version info
 

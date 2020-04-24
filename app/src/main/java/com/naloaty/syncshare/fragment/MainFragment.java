@@ -18,8 +18,8 @@ import com.naloaty.syncshare.adapter.CategoryAdapter;
 import com.naloaty.syncshare.adapter.base.Category;
 import com.naloaty.syncshare.adapter.custom.DefaultHeader;
 import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
-import com.naloaty.syncshare.database.DeviceConnection;
-import com.naloaty.syncshare.database.DeviceConnectionViewModel;
+import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.NetworkDeviceViewModel;
 import com.naloaty.syncshare.util.NsdHelper;
 
 import java.util.ArrayList;
@@ -31,14 +31,14 @@ public class MainFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private CategoryAdapter mCategoryAdapter;
     private NsdHelper mNsdHelper;
-    private DeviceConnectionViewModel deviceConnectionViewModel;
+    private NetworkDeviceViewModel networkDeviceViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mNsdHelper = new NsdHelper(getContext());
 
-        deviceConnectionViewModel = new ViewModelProvider(this).get(DeviceConnectionViewModel.class);
+        networkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
     }
 
     @Override
@@ -73,14 +73,14 @@ public class MainFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mCategoryAdapter);
 
-        deviceConnectionViewModel.getAllConnections().observe(getViewLifecycleOwner(), new Observer<List<DeviceConnection>>() {
+        networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
             @Override
-            public void onChanged(List<DeviceConnection> deviceConnections) {
+            public void onChanged(List<NetworkDevice> networkDevices) {
                 mList = new ArrayList<>();
 
                 Category category = new Category(new DefaultHeader(R.string.text_nearbyArea));
 
-                for(DeviceConnection connection: deviceConnections) {
+                for(NetworkDevice connection: networkDevices) {
                     if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
                         continue;
 

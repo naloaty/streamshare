@@ -13,12 +13,10 @@ import com.genonbeta.CoolSocket.CoolSocket;
 import com.naloaty.syncshare.app.SSService;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.Keyword;
-import com.naloaty.syncshare.database.DeviceConnectionRepository;
+import com.naloaty.syncshare.database.NetworkDeviceRepository;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.CommunicationNotification;
 import com.naloaty.syncshare.util.DNSSDHelper;
-import com.naloaty.syncshare.util.NotificationUtils;
-import com.naloaty.syncshare.util.NsdHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +96,7 @@ public class CommunicationService extends SSService {
                     public void run() {
                         {
                             Log.d(TAG, "onStartCommand(): deleting connections");
-                            DeviceConnectionRepository repository = new DeviceConnectionRepository(getApplicationContext());
+                            NetworkDeviceRepository repository = new NetworkDeviceRepository(getApplicationContext());
                             repository.deleteAllConnections();
                         }
                     }
@@ -119,8 +117,8 @@ public class CommunicationService extends SSService {
         mDNSSDHelper.unregister();
 
         /*Log.d(TAG, "Deleting all connections");
-        DeviceConnectionRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());
-        repository.deleteAllConnections();*/
+        NetworkDeviceRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());
+        repository.deleteAllDevices();*/
 
         /*AppUtils.getDefaultSharedPreferences(this)
                 .edit()

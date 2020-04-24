@@ -9,6 +9,7 @@ public class Keyword {
         DEVICE_INFO_BRAND = "deviceInfoBrand",
         DEVICE_INFO_MODEL = "deviceInfoModel",
         DEVICE_INFO_USER = "deviceInfoUser",
+        APP_INFO_VERSION = "appInfoVersion",
         HANDSHAKE_REQUIRED = "handshakeRequired",
         HANDSHAKE_ONLY = "handshakeOnly";
 }

@@ -39,7 +39,7 @@ public class DeviceManageActivity extends SSActivity {
         addDeviceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DeviceManageActivity.this, PairDeviceActivity.class));
+                startActivity(new Intent(DeviceManageActivity.this, AddDeviceActivity.class));
             }
         });
     }

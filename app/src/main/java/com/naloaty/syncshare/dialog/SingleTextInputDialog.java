@@ -5,21 +5,21 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.naloaty.syncshare.R;
 
-public abstract class SingleTextInputDialog extends AlertDialog.Builder {
+public abstract class SingleTextInputDialog extends ManualDismissDialog {
 
     private EditText mEditText;
     private ViewGroup mView;
+    private OnEnteredListener mListener;
 
-    public SingleTextInputDialog(Context context)
+    public SingleTextInputDialog(Context context,OnEnteredListener listener)
     {
         super(context);
 
         mView = (ViewGroup) LayoutInflater.from(context).inflate(R.layout.layout_dialog_single_text_input, null);
         mEditText = mView.findViewById(R.id.dialog_single_text_input_edit_text);
+        mListener = listener;
 
         setView(mView);
         setTitle(R.string.text_defaultValue);
@@ -28,8 +28,16 @@ public abstract class SingleTextInputDialog extends AlertDialog.Builder {
         mEditText.requestFocus();
     }
 
-    public EditText getEditText()
+    protected EditText getEditText()
     {
         return mEditText;
+    }
+
+    protected OnEnteredListener getOnEnteredListener() {
+        return mListener;
+    }
+
+    public interface OnEnteredListener {
+        void onEntered(String text);
     }
 }

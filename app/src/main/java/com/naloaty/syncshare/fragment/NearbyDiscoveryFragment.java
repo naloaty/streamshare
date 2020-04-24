@@ -14,14 +14,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.adapter.CategoryAdapter;
+import com.naloaty.syncshare.adapter.base.BodyItem;
 import com.naloaty.syncshare.adapter.base.Category;
 import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
-import com.naloaty.syncshare.database.DeviceConnection;
-import com.naloaty.syncshare.database.DeviceConnectionRepository;
-import com.naloaty.syncshare.database.DeviceConnectionViewModel;
+import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.NetworkDeviceRepository;
+import com.naloaty.syncshare.database.NetworkDeviceViewModel;
+import com.naloaty.syncshare.util.AddDeviceHelper;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.DNSSDHelper;
-import com.naloaty.syncshare.util.NsdHelper;
 import com.naloaty.syncshare.widget.RecyclerViewEmptySupport;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class NearbyDiscoveryFragment extends Fragment {
     private CategoryAdapter mCategoryAdapter;
    // private NsdHelper mNsdHelper;
     private DNSSDHelper mDNSSDHelper;
-    private DeviceConnectionViewModel deviceConnectionViewModel;
+    private NetworkDeviceViewModel networkDeviceViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,7 +43,7 @@ public class NearbyDiscoveryFragment extends Fragment {
         //mNsdHelper = new NsdHelper(getContext());
 
         this.mDNSSDHelper = AppUtils.getDNSSDHelper(getActivity().getApplicationContext());
-        this.deviceConnectionViewModel = new ViewModelProvider(this).get(DeviceConnectionViewModel.class);
+        this.networkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class NearbyDiscoveryFragment extends Fragment {
     {
         super.onResume();
         //mNsdHelper.startDiscovering();
-        DeviceConnectionRepository repository = new DeviceConnectionRepository(getContext());
+        NetworkDeviceRepository repository = new NetworkDeviceRepository(getContext());
         repository.deleteAllConnections();
 
         mDNSSDHelper.startBrowse();
@@ -83,19 +84,29 @@ public class NearbyDiscoveryFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mCategoryAdapter);
 
-        deviceConnectionViewModel.getAllConnections().observe(getViewLifecycleOwner(), new Observer<List<DeviceConnection>>() {
+        BodyItem.OnItemClickListener clickListener = new BodyItem.OnItemClickListener() {
             @Override
-            public void onChanged(List<DeviceConnection> deviceConnections) {
+            public void onItemClick(BodyItem item) {
+                DiscoveredDevice device = (DiscoveredDevice)item;
+                AddDeviceHelper.proccessDevice(device.getIpAddress());
+            }
+        };
+
+        networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
+            @Override
+            public void onChanged(List<NetworkDevice> networkDevices) {
                 mList = new ArrayList<>();
 
                 //Category category = new Category(new DefaultHeader(R.string.text_pairWithDiscoveredDevices));
                 Category category = new Category(null);
 
-                for(DeviceConnection connection: deviceConnections) {
-                    if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
+                for(NetworkDevice networkDevice: networkDevices) {
+                    if (networkDevice.isLocalDevice() || networkDevice.getDeviceId().contentEquals("-"))
                         continue;
 
-                    category.addItem(new DiscoveredDevice(connection.getDeviceId(), "1.0", R.drawable.ic_phone_android_24dp));
+                    DiscoveredDevice device = new DiscoveredDevice(networkDevice.getDeviceName(), networkDevice.getIpAddress(), R.drawable.ic_phone_android_24dp);
+                    device.setOnItemClickListener(clickListener);
+                    category.addItem(device);
                 }
 
                 mList.add(category);

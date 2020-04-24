@@ -8,15 +8,13 @@ import android.util.Log;
 
 
 import com.naloaty.syncshare.config.Keyword;
-import com.naloaty.syncshare.database.DeviceConnection;
-import com.naloaty.syncshare.database.DeviceConnectionRepository;
-import com.naloaty.syncshare.other.NetworkDevice;
+import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.NetworkDeviceRepository;
+import com.naloaty.syncshare.database.SSDevice;
 import com.naloaty.syncshare.service.DetectiveJobService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.net.InetAddress;
 
 public class NetworkDeviceManager {
 
@@ -30,39 +28,44 @@ public class NetworkDeviceManager {
      */
 
 
-    public static void manageDevice(Context context, DeviceConnection deviceConnection) {
-        manageDevice(context, deviceConnection, false);
+    public static void manageDevice(Context context, NetworkDevice networkDevice) {
+        manageDevice(context, networkDevice, false);
     }
 
-    public static CommunicationBridge.Client manageDevice(final Context context, final DeviceConnection deviceConnection, boolean useCurrentThread) {
+    public static CommunicationBridge.Client manageDevice(final Context context, final NetworkDevice networkDevice, boolean useCurrentThread) {
 
         CommunicationBridge.Client.ConnectionHandler connectionHandler =
                 new CommunicationBridge.Client.ConnectionHandler() {
                     @Override
                     public void onConnect(CommunicationBridge.Client client) {
                         try {
-                            NetworkDevice device = client.handleDevice(deviceConnection.getIpAddress());
+                            SSDevice device = client.handleDevice(networkDevice.getIpAddress());
                             client.setDevice(device);
 
-                            if (device.deviceId != null) {
+                            if (device.getDeviceId() != null) {
 
-                                NetworkDevice localDevice = AppUtils.getLocalDevice(context);
+                                SSDevice localDevice = AppUtils.getLocalDevice(context);
 
-                                if (localDevice.deviceId.contentEquals(device.deviceId))
-                                    deviceConnection.setLocalDevice(true);
+                                if (localDevice.getDeviceId().contentEquals(device.getDeviceId()))
+                                    networkDevice.setLocalDevice(true);
                                 else
-                                    device.lastUsageTime = System.currentTimeMillis();
+                                {
+                                    networkDevice.setDeviceId(device.getDeviceId());
+                                    networkDevice.setDeviceName(device.getNickname());
+                                    networkDevice.setLastCheckedDate(System.currentTimeMillis());
+                                }
 
-                                processConnection(context, device, deviceConnection);
+
+                                processConnection(context, networkDevice);
                             }
                         } catch (Exception e) {
-                            Log.i(TAG, "Could not connect to device " + deviceConnection.getIpAddress() + ": " + e.getMessage());
-                            processConnection(context, null, deviceConnection);
+                            Log.i(TAG, "Could not connect to device " + networkDevice.getIpAddress() + ": " + e.getMessage());
+                            processConnection(context, networkDevice);
                         }
                     }
                 };
 
-       Log.i(TAG, "Connecting to " + deviceConnection.getIpAddress());
+       Log.i(TAG, "Connecting to " + networkDevice.getIpAddress());
        return CommunicationBridge.connect(context, useCurrentThread, connectionHandler);
     }
 
@@ -103,51 +106,44 @@ public class NetworkDeviceManager {
     }
 
 
-    public static void processConnection(Context context, NetworkDevice device, DeviceConnection deviceConnection)
+    public static void processConnection(Context context, NetworkDevice networkDevice)
     {
 
-        deviceConnection.setLastCheckedDate(System.currentTimeMillis());
-
-        if (device == null){
-            deviceConnection.setDeviceId("-");
-
+        if (networkDevice.getDeviceId().equals("-"))
             if (!isJobServiceOn(context, JOB_DETECTIVE_ID))
                 scheduleDetective(context);
-        }
-        else
-            deviceConnection.setDeviceId(device.deviceId);
 
-        DeviceConnectionRepository repository = new DeviceConnectionRepository(context);
-        DeviceConnection entry = repository.findConnection(deviceConnection.getIpAddress(), deviceConnection.getDeviceId(), deviceConnection.getServiceName());
+        NetworkDeviceRepository repository = new NetworkDeviceRepository(context);
+        NetworkDevice entry = repository.findConnection(networkDevice.getIpAddress(), networkDevice.getDeviceId(), networkDevice.getServiceName());
 
         if (entry != null)
             repository.delete(entry);
 
-        repository.insert(deviceConnection);
+        repository.insert(networkDevice);
 
-        Log.i(TAG, "Connection with ip " + deviceConnection.getIpAddress() + " and service name "
-                + deviceConnection.getServiceName() + " added to database");
+        Log.i(TAG, "Connection with ip " + networkDevice.getIpAddress() + " and service name "
+                + networkDevice.getServiceName() + " added to database");
 
     }
 
-    public static NetworkDevice loadDeviceFromJson(JSONObject json) throws JSONException {
+    public static SSDevice loadDeviceFromJson(JSONObject json) throws JSONException {
         JSONObject deviceInfo = json.getJSONObject(Keyword.DEVICE_INFO);
 
-        NetworkDevice device = new NetworkDevice(deviceInfo.getString(Keyword.DEVICE_INFO_SERIAL));
+        SSDevice device = new SSDevice(deviceInfo.getString(Keyword.DEVICE_INFO_SERIAL), deviceInfo.getString(Keyword.APP_INFO_VERSION));
 
-        device.brand = deviceInfo.getString(Keyword.DEVICE_INFO_BRAND);
-        device.model = deviceInfo.getString(Keyword.DEVICE_INFO_MODEL);
-        device.nickname = deviceInfo.getString(Keyword.DEVICE_INFO_USER);
-        device.lastUsageTime = System.currentTimeMillis();
+        device.setBrand(deviceInfo.getString(Keyword.DEVICE_INFO_BRAND));
+        device.setModel(deviceInfo.getString(Keyword.DEVICE_INFO_MODEL));
+        device.setNickname(deviceInfo.getString(Keyword.DEVICE_INFO_USER));
+        device.setLastUsageTime(System.currentTimeMillis());
 
         return device;
     }
 
     public static void manageLostDevice(Context context, String serviceName) {
 
-        DeviceConnectionRepository repository = new DeviceConnectionRepository(context);
+        NetworkDeviceRepository repository = new NetworkDeviceRepository(context);
         try {
-            DeviceConnection connection = repository.findConnection(null, null, serviceName);
+            NetworkDevice connection = repository.findConnection(null, null, serviceName);
 
             if (connection != null){
                 repository.delete(connection);

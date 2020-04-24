@@ -16,12 +16,9 @@ import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.adapter.CategoryAdapter;
 import com.naloaty.syncshare.adapter.base.Category;
 import com.naloaty.syncshare.adapter.custom.DefaultHeader;
-import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
-import com.naloaty.syncshare.adapter.base.HeaderItem;
-import com.naloaty.syncshare.adapter.base.ListItem;
 import com.naloaty.syncshare.adapter.custom.MyDevice;
-import com.naloaty.syncshare.database.DeviceConnection;
-import com.naloaty.syncshare.database.DeviceConnectionViewModel;
+import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.NetworkDeviceViewModel;
 import com.naloaty.syncshare.widget.RecyclerViewEmptySupport;
 
 import java.util.ArrayList;
@@ -32,13 +29,13 @@ public class MyDevicesFragment extends Fragment {
     private ArrayList<Category> mList;
     private RecyclerViewEmptySupport mRecyclerView;
     private CategoryAdapter mCategoryAdapter;
-    private DeviceConnectionViewModel deviceConnectionViewModel;
+    private NetworkDeviceViewModel networkDeviceViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        deviceConnectionViewModel = new ViewModelProvider(this).get(DeviceConnectionViewModel.class);
+        networkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
     }
 
     @Nullable
@@ -60,14 +57,14 @@ public class MyDevicesFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mCategoryAdapter);
 
-        deviceConnectionViewModel.getAllConnections().observe(getViewLifecycleOwner(), new Observer<List<DeviceConnection>>() {
+        networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
             @Override
-            public void onChanged(List<DeviceConnection> deviceConnections) {
+            public void onChanged(List<NetworkDevice> networkDevices) {
 
                 mList = new ArrayList<>();
                 Category myDevices = new Category(new DefaultHeader(R.string.text_myDevices));
 
-                for(DeviceConnection connection: deviceConnections) {
+                for(NetworkDevice connection: networkDevices) {
                     if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
                         continue;
 

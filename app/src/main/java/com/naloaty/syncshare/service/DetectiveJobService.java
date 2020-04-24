@@ -4,9 +4,8 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.util.Log;
 
-import com.naloaty.syncshare.database.DeviceConnection;
-import com.naloaty.syncshare.database.DeviceConnectionRepository;
-import com.naloaty.syncshare.util.AppUtils;
+import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.NetworkDeviceRepository;
 import com.naloaty.syncshare.util.NetworkDeviceManager;
 
 public class DetectiveJobService extends JobService {
@@ -25,10 +24,10 @@ public class DetectiveJobService extends JobService {
     public boolean onStartJob(JobParameters params) {
         Log.d(TAG, "Detective is hunting now");
 
-        DeviceConnectionRepository repository = new DeviceConnectionRepository(getApplicationContext());
+        NetworkDeviceRepository repository = new NetworkDeviceRepository(getApplicationContext());
 
-        for (DeviceConnection deviceConnection: repository.getUnknown()) {
-            NetworkDeviceManager.manageDevice(this, deviceConnection);
+        for (NetworkDevice networkDevice : repository.getUnknown()) {
+            NetworkDeviceManager.manageDevice(this, networkDevice);
         }
 
         Log.d(TAG, "Detective is resting now");

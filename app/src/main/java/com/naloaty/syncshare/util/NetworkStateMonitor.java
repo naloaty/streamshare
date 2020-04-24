@@ -98,11 +98,18 @@ public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
     }
 
     public JSONObject getCurrentWifiInfo() {
-        int networkType = getCurrentNetworkType();
+        return getCurrentWfifInfo(mContext);
+    }
+
+    public static JSONObject getCurrentWfifInfo(Context context) {
+        int networkType = getCurrentNetworkType(context);
 
         if (networkType == NETWORK_TYPE_WIFI) {
-            WifiManager mainWifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager mainWifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             WifiInfo currentWifi = mainWifi.getConnectionInfo();
+
+            if (currentWifi == null)
+                return null;
 
             JSONObject json = new JSONObject();
 
@@ -124,7 +131,7 @@ public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
     /*
      * Copied from https://stackoverflow.com/questions/16730711/get-my-wifi-ip-address-android
      */
-    private String convertIpAddress(int ipAddress) {
+    private static String convertIpAddress(int ipAddress) {
 
         // Convert little-endian to big-endian if needed
         if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
@@ -148,8 +155,11 @@ public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
      * Based on https://stackoverflow.com/questions/59704596/how-to-use-connectivity-manager-networkcallback-to-get-network-type
      */
     public int getCurrentNetworkType() {
+        return getCurrentNetworkType(mContext);
+    }
 
-        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static int getCurrentNetworkType(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (cm != null) {

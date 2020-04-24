@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/discovered_device_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,6 +7,7 @@
     app:cardUseCompatPadding="true">
 
     <RelativeLayout
+        android:id="@+id/discovered_device_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="4dp"
@@ -37,7 +37,7 @@
                 android:textSize="@dimen/font_size_primary" />
 
             <TextView
-                android:id="@+id/discovered_device_app_version"
+                android:id="@+id/discovered_device_ip_address"
                 style="@style/TextAppearance.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

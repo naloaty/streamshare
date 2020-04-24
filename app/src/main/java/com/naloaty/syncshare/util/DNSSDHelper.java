@@ -1,7 +1,6 @@
 package com.naloaty.syncshare.util;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -15,14 +14,10 @@ import com.github.druk.dnssd.DNSSDService;
 import com.github.druk.dnssd.QueryListener;
 import com.github.druk.dnssd.RegisterListener;
 import com.github.druk.dnssd.ResolveListener;
-import com.github.druk.rx2dnssd.BonjourService;
 import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.database.DeviceConnection;
+import com.naloaty.syncshare.database.NetworkDevice;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
@@ -113,8 +108,10 @@ public class DNSSDHelper {
                             }*/
 
                             //TODO: At some reason it is trying to connect to ipv6 LOCALDEVICE address
-                            NetworkDeviceManager.manageDevice(mContext,
-                                    new DeviceConnection(address.getHostAddress(), serviceName));
+                            NetworkDevice device = new NetworkDevice(address.getHostAddress(), serviceName);
+                            device.setDeviceName("-");
+                            device.setDeviceId("-");
+                            NetworkDeviceManager.manageDevice(mContext, device);
 
 
                         } catch (UnknownHostException e) {

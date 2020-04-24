@@ -30,7 +30,14 @@
     <!-- enter ip address dialog -->
     <string name="title_enterIpAdress">Enter IP Address</string>
     <string name="btn_connect">Connect</string>
-    <string name="msg_wrongIpAddressFormat">Wrong format (correct looks like 192.168.1.2)</string>
+    <string name="msg_wrongIpAddressFormat">Wrong format\n(enter like 192.168.1.2)</string>
+    
+    <!-- process qr code -->
+    <string name="title_unrecognizedCode">Unrecognized code</string>
+    <string name="title_cannotVerify">Cannot verify code</string>
+    <string name="text_notConnected">You are probably not connected to the Wi-Fi network</string>
+    <string name="title_differentNetwork">Different network</string>
+    <string name="text_connectToSameNetwork">Devices are not on the same network. Please connect the devices to the same network and try again</string>
 
     <!-- drawer main -->
     <string name="menu_devices">Manage devices</string>

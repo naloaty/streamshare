@@ -1,9 +1,11 @@
 package com.naloaty.syncshare.adapter.custom;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,18 +13,18 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.adapter.CategoryAdapter;
 import com.naloaty.syncshare.adapter.base.BodyItem;
-import com.naloaty.syncshare.adapter.base.ListItem;
 
 public class DiscoveredDevice extends BodyItem {
 
     private int iconResource;
     private String deviceName;
-    private String appVersion;
+    private String ipAddress;
 
-    public DiscoveredDevice(String deviceName, String appVersion, int iconResource) {
+    public DiscoveredDevice(String deviceName, String ipAddress, int iconResource) {
         this.deviceName = deviceName;
-        this.appVersion = appVersion;
+        this.ipAddress = ipAddress;
         this.iconResource = iconResource;
     }
 
@@ -34,8 +36,8 @@ public class DiscoveredDevice extends BodyItem {
         return deviceName;
     }
 
-    public String getAppVersion() {
-        return appVersion;
+    public String getIpAddress() {
+        return ipAddress;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class DiscoveredDevice extends BodyItem {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.discovered_device, parent, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view, getOnItemClickListener());
     }
 
     @Override
@@ -53,24 +55,36 @@ public class DiscoveredDevice extends BodyItem {
 
             holder.deviceIcon.setImageResource(getIconResource());
             holder.deviceName.setText(getDeviceName());
-            holder.appVersion.setText(getAppVersion());
+            holder.ipAddress.setText(getIpAddress());
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView deviceIcon;
         TextView deviceName;
-        TextView appVersion;
-        CardView cardView;
+        TextView ipAddress;
+        RelativeLayout layout;
 
-        public ViewHolder(@NonNull View itemView) {
+        OnItemClickListener onItemClickListener;
+
+        public ViewHolder(@NonNull View itemView, OnItemClickListener listener) {
             super(itemView);
 
             deviceIcon = itemView.findViewById(R.id.discovered_device_icon);
             deviceName = itemView.findViewById(R.id.discovered_device_name);
-            appVersion = itemView.findViewById(R.id.discovered_device_app_version);
-            cardView = itemView.findViewById(R.id.discovered_device_card_view);
+            ipAddress = itemView.findViewById(R.id.discovered_device_ip_address);
+            layout = itemView.findViewById(R.id.discovered_device_layout);
+            onItemClickListener = listener;
+
+            layout.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("DiscoveredDevice", "OnClick");
+            if (onItemClickListener != null)
+                onItemClickListener.onItemClick(DiscoveredDevice.this);
         }
     }
 }

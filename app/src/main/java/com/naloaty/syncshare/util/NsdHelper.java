@@ -9,7 +9,7 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.database.DeviceConnection;
+import com.naloaty.syncshare.database.NetworkDevice;
 
 public class NsdHelper {
     private static final String TAG = "NsdHelper";
@@ -156,7 +156,7 @@ public class NsdHelper {
                                         + " with IP address of " + serviceInfo.getHost().getHostAddress());
 
                                 NetworkDeviceManager.manageDevice(mContext,
-                                        new DeviceConnection(serviceInfo.getHost().getHostAddress(), serviceInfo.getServiceName()));
+                                        new NetworkDevice(serviceInfo.getHost().getHostAddress(), serviceInfo.getServiceName()));
                             }
                         });
                     }
