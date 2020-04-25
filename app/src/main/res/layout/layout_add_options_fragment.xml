@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <!-- Required by NestedScrollView -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            app:cardCornerRadius="@dimen/corner_radius">
+
+            <!-- To make vertical align -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="10dp">
+
+                <!-- Options description -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <TextView
+                        style="@style/TextAppearance.Secondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_pairDeviceHelp" />
+                </LinearLayout>
+
+                <!-- Show connection information -->
+                <LinearLayout
+                    android:id="@+id/add_option_connection_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:background="?rippleSelector"
+                    android:gravity="center_vertical"
+                    android:clickable="true">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginLeft="4dp"
+                        android:tint="@color/colorAccent"
+                        android:src="@drawable/ic_info_24dp"/>
+
+                    <TextView
+                        style="@style/TextAppearance.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_showConnectionInfo"/>
+
+                </LinearLayout>
+
+                <!-- Scan qr code -->
+                <LinearLayout
+                    android:id="@+id/add_option_scan_qr"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:background="?rippleSelector"
+                    android:gravity="center_vertical"
+                    android:clickable="true">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginLeft="4dp"
+                        android:tint="@color/colorAccent"
+                        android:src="@drawable/ic_scan_qr_code_24dp"/>
+
+                    <TextView
+                        style="@style/TextAppearance.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_scanQrCode"/>
+
+                </LinearLayout>
+
+                <!-- Enter IP Manually -->
+                <LinearLayout
+                    android:id="@+id/add_option_enter_ip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:background="?rippleSelector"
+                    android:gravity="center_vertical"
+                    android:clickable="true">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginLeft="4dp"
+                        android:tint="@color/colorAccent"
+                        android:src="@drawable/ic_edit_24dp"/>
+
+                    <TextView
+                        style="@style/TextAppearance.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_enterIpManually"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="22dp"
+            android:layout_marginRight="22dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                style="@style/TextAppearance.Primary"
+                android:id="@+id/default_header_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_pairWithDiscoveredDevices"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_size_secondary"
+                android:layout_centerVertical="true"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="380dp"
+            class="com.naloaty.syncshare.fragment.NearbyDiscoveryFragment"
+            android:tag="nearbyDevicesList"/>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -10,9 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.naloaty.syncshare.activity.WelcomeActivity;
 import com.naloaty.syncshare.dialog.RationalePermissionRequest;
-import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
-
+import com.naloaty.syncshare.util.EncryptionUtils;
 
 
 public class SSActivity extends AppCompatActivity {
@@ -36,6 +35,15 @@ public class SSActivity extends AppCompatActivity {
             if (!mSkipPermissionRequest)
                 requestRequiredPermissions(true);
         }
+        else if (!EncryptionUtils.checkStuff(this)) {
+            EncryptionUtils.generateStuff(this);
+        }
+
+        Log.d("SSActivity", "Direct: " + EncryptionUtils.calculateDeviceId(this));
+        String cert = EncryptionUtils.loadCertificateAsString(this);
+
+        Log.d("SSActivity", "From string: " + EncryptionUtils.calculateDeviceId(cert));
+
         /*else {
             Log.i("BASE_Activity", "onResume() -> start service");
             startService(new Intent(this, CommunicationService.class)
