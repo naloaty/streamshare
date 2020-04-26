@@ -9,6 +9,13 @@
     <color name="colorSurface">#fefefe</color>
     <color name="colorBlack">#212121</color>
 
+    <color name="colorDecorator">#DCDCDC</color>
+    <color name="colorTextSecondary">#737373</color>
+
+    <color name="colorNotVerified">#F7B900</color>
+    <color name="colorOffline">#F53703</color>
+    <color name="colorOnline">#12BC00</color>
+
     <color name="dark_colorShadowStart">#000E171A</color>
     <color name="dark_colorShadowEnd">#500E171A</color>
 </resources>

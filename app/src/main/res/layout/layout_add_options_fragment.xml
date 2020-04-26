@@ -36,7 +36,7 @@
                         style="@style/TextAppearance.Secondary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/text_pairDeviceHelp" />
+                        android:text="@string/text_addDeviceHelp" />
                 </LinearLayout>
 
                 <!-- Show connection information -->
@@ -62,7 +62,7 @@
                         style="@style/TextAppearance.Primary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/btn_showConnectionInfo"/>
+                        android:text="@string/btn_showDeviceInfo"/>
 
                 </LinearLayout>
 
@@ -116,7 +116,7 @@
                         style="@style/TextAppearance.Primary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/btn_enterIpManually"/>
+                        android:text="@string/btn_enterIdManually"/>
 
                 </LinearLayout>
 
@@ -137,7 +137,7 @@
                 android:id="@+id/default_header_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_pairWithDiscoveredDevices"
+                android:text="@string/text_useDiscoveredDevices"
                 android:textStyle="bold"
                 android:textSize="@dimen/font_size_secondary"
                 android:layout_centerVertical="true"/>

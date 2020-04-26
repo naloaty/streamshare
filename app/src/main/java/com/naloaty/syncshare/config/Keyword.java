@@ -12,4 +12,5 @@ public class Keyword {
         APP_INFO_VERSION = "appInfoVersion",
         HANDSHAKE_REQUIRED = "handshakeRequired",
         HANDSHAKE_ONLY = "handshakeOnly";
+
 }

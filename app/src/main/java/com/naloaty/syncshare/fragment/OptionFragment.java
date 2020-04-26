@@ -3,7 +3,7 @@ package com.naloaty.syncshare.fragment;
 public enum OptionFragment
 {
     Options,
-    ConnectionInfo,
+    DeviceInfo,
     ScanQR,
-    EnterIP;
+    EnterDeviceId;
 }

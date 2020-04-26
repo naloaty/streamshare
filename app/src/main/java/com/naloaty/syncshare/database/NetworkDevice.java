@@ -18,8 +18,8 @@ public class NetworkDevice {
     private Long lastCheckedDate;
 
     private String serviceName;
-    
-    private boolean isLocalDevice;
+
+    private String appVersion;
 
 
     public NetworkDevice(String ipAddress, String serviceName) {
@@ -76,12 +76,11 @@ public class NetworkDevice {
         this.serviceName = serviceName;
     }
 
-    //isLocalDevice
-    public boolean isLocalDevice() {
-        return isLocalDevice;
+    //appVersion
+    public String getAppVersion() {
+        return appVersion;
     }
-    public void setLocalDevice(boolean localDevice) {
-        isLocalDevice = localDevice;
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
     }
-
 }

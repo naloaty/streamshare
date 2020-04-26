@@ -29,7 +29,13 @@ public class NetworkDeviceManager {
 
 
     public static void manageDevice(Context context, NetworkDevice networkDevice) {
-        manageDevice(context, networkDevice, false);
+        //manageDevice(context, networkDevice, false);
+        String myId = AppUtils.getDeviceId(context);
+
+        if (networkDevice.getDeviceId().equals(myId))
+            return;
+
+        processDevice(context, networkDevice);
     }
 
     public static CommunicationBridge.Client manageDevice(final Context context, final NetworkDevice networkDevice, boolean useCurrentThread) {
@@ -46,7 +52,7 @@ public class NetworkDeviceManager {
 
                                 SSDevice localDevice = AppUtils.getLocalDevice(context);
 
-                                if (localDevice.getDeviceId().contentEquals(device.getDeviceId()))
+                                /*if (localDevice.getDeviceId().contentEquals(device.getDeviceId()))
                                     networkDevice.setLocalDevice(true);
                                 else
                                 {
@@ -56,11 +62,11 @@ public class NetworkDeviceManager {
                                 }
 
 
-                                processConnection(context, networkDevice);
+                                processDevice(context, networkDevice);*/
                             }
                         } catch (Exception e) {
                             Log.i(TAG, "Could not connect to device " + networkDevice.getIpAddress() + ": " + e.getMessage());
-                            processConnection(context, networkDevice);
+                            processDevice(context, networkDevice);
                         }
                     }
                 };
@@ -106,22 +112,21 @@ public class NetworkDeviceManager {
     }
 
 
-    public static void processConnection(Context context, NetworkDevice networkDevice)
+    public static void processDevice(Context context, NetworkDevice networkDevice)
     {
-
-        if (networkDevice.getDeviceId().equals("-"))
+        /*if (networkDevice.getDeviceId().equals("-"))
             if (!isJobServiceOn(context, JOB_DETECTIVE_ID))
-                scheduleDetective(context);
+                scheduleDetective(context);*/
 
         NetworkDeviceRepository repository = new NetworkDeviceRepository(context);
-        NetworkDevice entry = repository.findConnection(networkDevice.getIpAddress(), networkDevice.getDeviceId(), networkDevice.getServiceName());
+        NetworkDevice entry = repository.findDevice(networkDevice.getIpAddress(), networkDevice.getDeviceId(), networkDevice.getServiceName());
 
         if (entry != null)
             repository.delete(entry);
 
         repository.insert(networkDevice);
 
-        Log.i(TAG, "Connection with ip " + networkDevice.getIpAddress() + " and service name "
+        Log.d(TAG, "Device with ip " + networkDevice.getIpAddress() + " and service name "
                 + networkDevice.getServiceName() + " added to database");
 
     }
@@ -143,18 +148,18 @@ public class NetworkDeviceManager {
 
         NetworkDeviceRepository repository = new NetworkDeviceRepository(context);
         try {
-            NetworkDevice connection = repository.findConnection(null, null, serviceName);
+            NetworkDevice connection = repository.findDevice(null, null, serviceName);
 
             if (connection != null){
                 repository.delete(connection);
-                Log.i(TAG, "Connection with service name " + serviceName + " removed from database");
+                Log.d(TAG, "Connection with service name " + serviceName + " removed from database");
             }
             else
-                Log.i(TAG, "Connection with service name " + serviceName + " not found in database");
+                Log.d(TAG, "Connection with service name " + serviceName + " not found in database");
 
         }
         catch (Exception e) {
-            Log.v(TAG, "Cannot manage lost device with service name " + serviceName);
+            Log.d(TAG, "Cannot manage lost device with service name " + serviceName);
         }
     }
 }

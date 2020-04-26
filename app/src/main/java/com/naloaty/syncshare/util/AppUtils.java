@@ -118,7 +118,7 @@ public class AppUtils {
 
     public static SSDevice getLocalDevice(Context context)
     {
-        SSDevice device = new SSDevice(getDeviceSerial(context), AppConfig.APP_VERSION);
+        SSDevice device = new SSDevice(getDeviceId(context), AppConfig.APP_VERSION);
 
         device.setBrand(Build.BRAND);
         device.setModel(Build.MODEL);
@@ -129,11 +129,9 @@ public class AppUtils {
         return device;
     }
 
-    public static String getDeviceSerial(Context context)
+    public static String getDeviceId(Context context)
     {
-        return Build.VERSION.SDK_INT < 26
-                ? Build.SERIAL
-                : (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED ? Build.getSerial() : null);
+        return EncryptionUtils.calculateDeviceId(context);
     }
 
     public static String getLocalDeviceName()

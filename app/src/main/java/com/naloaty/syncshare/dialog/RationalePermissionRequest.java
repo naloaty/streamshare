@@ -67,7 +67,7 @@ public class RationalePermissionRequest extends AlertDialog.Builder
             setNegativeButton(R.string.btn_close, null);
     }
 
-    //This method will show dialog if permission not granted
+    //This method will show dialog if permission is not granted
     public static AlertDialog requestIfNecessary(SSActivity SSActivity,
                                                  PermissionRequest permissionQueue,
                                                  boolean killActivityOtherwise)
@@ -77,7 +77,7 @@ public class RationalePermissionRequest extends AlertDialog.Builder
                 : new RationalePermissionRequest(SSActivity, permissionQueue, killActivityOtherwise).show();
     }
 
-    //This inner class contains information that will be shown in dialog
+    //This inner class contains information that will be shown in the dialog
     public static class PermissionRequest
     {
         public String permission;

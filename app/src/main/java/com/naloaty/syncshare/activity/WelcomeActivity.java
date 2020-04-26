@@ -30,6 +30,7 @@ public class WelcomeActivity extends SSActivity {
         setContentView(R.layout.activity_welcome);
         setSkipPermissionRequest(true);
         setWelcomePageDisallowed(true);
+        setSkipStuffGeneration(true);
 
         final FloatingActionButton nextButton = findViewById(R.id.activity_welcome_view_next);
         final AppCompatImageView previousButton = findViewById(R.id.activity_welcome_view_previous);

@@ -14,7 +14,7 @@ public class DetectiveJobService extends JobService {
     private boolean jobCanceled = false;
 
     /*
-     * This job periodically looking for next types of devices
+     * This job periodically looks for the following types of devices
      * 1)Device marked as Unknown (could connect with handshake)
      *
      * So this Detective Job solves that situation
@@ -38,7 +38,7 @@ public class DetectiveJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
         Log.d(TAG, "Detective is canceled");
-        //true - we want to reschedule job if it was interrupted by system
+        //true - we want to reschedule a job if it was interrupted by the system
         //!not necessary for periodic job
         jobCanceled = true;
         return false;

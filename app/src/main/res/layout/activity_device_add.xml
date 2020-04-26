@@ -7,18 +7,18 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/collapsing_app_bar_height"
-        android:id="@+id/pair_device_app_bar_layout">
+        android:id="@+id/add_device_app_bar_layout">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/pair_device_toolbar_layout"
+            android:id="@+id/add_device_toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="@color/colorPrimary"
-            app:toolbarId="@id/pair_device_toolbar">
+            app:toolbarId="@id/add_device_toolbar">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/pair_device_toolbar"
+                android:id="@+id/add_device_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"/>
@@ -28,7 +28,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
-        android:id="@+id/pair_device_fragment_placeholder"
+        android:id="@+id/add_device_fragment_placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -130,7 +130,7 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
                 activeConnection.reply(new JSONObject()
                         .put(Keyword.HANDSHAKE_REQUIRED, true)
                         .put(Keyword.HANDSHAKE_ONLY, handshakeOnly)
-                        .put(Keyword.DEVICE_INFO_SERIAL, AppUtils.getDeviceSerial(getContext())).toString());
+                        .put(Keyword.DEVICE_INFO_SERIAL, AppUtils.getDeviceId(mContext)).toString());
             } catch (JSONException e) {
                 throw new CommunicationException("Failed to open connection between devices");
             }
@@ -143,7 +143,7 @@ public abstract class CommunicationBridge implements CoolSocket.Client.Connectio
                 throw new IOException("Ping test before connection to the address has failed");
 
             /*
-             * This class extends from CoolSocket.Client and use it's method
+             * This class extends from CoolSocket.Client and uses it's method
              * CoolSocket.Client.connect(SocketAddress socketAddress, int operationTimeout) throws IOException
              */
             return super.connect(new InetSocketAddress(address, AppConfig.SERVER_PORT), AppConfig.SOCKET_TIMEOUT);

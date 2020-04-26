@@ -73,7 +73,7 @@ public class MainFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mCategoryAdapter);
 
-        networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
+        /*networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
             @Override
             public void onChanged(List<NetworkDevice> networkDevices) {
                 mList = new ArrayList<>();
@@ -81,15 +81,12 @@ public class MainFragment extends Fragment {
                 Category category = new Category(new DefaultHeader(R.string.text_nearbyArea));
 
                 for(NetworkDevice connection: networkDevices) {
-                    if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
-                        continue;
-
                     category.addItem(new DiscoveredDevice(connection.getDeviceId(), "1.0", R.drawable.ic_phone_android_24dp));
                 }
 
                 mList.add(category);
                 mCategoryAdapter.setItems(mList);
             }
-        });
+        });*/
     }
 }

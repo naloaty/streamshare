@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,11 +15,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.adapter.CategoryAdapter;
+import com.naloaty.syncshare.adapter.base.BodyItem;
 import com.naloaty.syncshare.adapter.base.Category;
 import com.naloaty.syncshare.adapter.custom.DefaultHeader;
+import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
 import com.naloaty.syncshare.adapter.custom.MyDevice;
 import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.NetworkDeviceRepository;
 import com.naloaty.syncshare.database.NetworkDeviceViewModel;
+import com.naloaty.syncshare.database.SSDevice;
+import com.naloaty.syncshare.database.SSDeviceRepository;
+import com.naloaty.syncshare.database.SSDeviceViewModel;
+import com.naloaty.syncshare.dialog.MyDeviceDetailsDialog;
+import com.naloaty.syncshare.util.AddDeviceHelper;
 import com.naloaty.syncshare.widget.RecyclerViewEmptySupport;
 
 import java.util.ArrayList;
@@ -29,13 +38,13 @@ public class MyDevicesFragment extends Fragment {
     private ArrayList<Category> mList;
     private RecyclerViewEmptySupport mRecyclerView;
     private CategoryAdapter mCategoryAdapter;
-    private NetworkDeviceViewModel networkDeviceViewModel;
+    private SSDeviceViewModel ssDeviceViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        networkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
+        ssDeviceViewModel = new ViewModelProvider(this).get(SSDeviceViewModel.class);
     }
 
     @Nullable
@@ -49,6 +58,20 @@ public class MyDevicesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        BodyItem.OnItemClickListener clickListener = new BodyItem.OnItemClickListener() {
+            @Override
+            public void onItemClick(BodyItem item) {
+                SSDeviceRepository repository = new SSDeviceRepository(getContext());
+
+                MyDevice device = (MyDevice)item;
+                SSDevice ssDevice = repository.findDevice(device.getDeviceId());
+
+                MyDeviceDetailsDialog details = new MyDeviceDetailsDialog(getContext());
+                details.setSSDevice(ssDevice);
+                details.show();
+            }
+        };
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mCategoryAdapter = new CategoryAdapter();
 
@@ -57,24 +80,47 @@ public class MyDevicesFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mCategoryAdapter);
 
-        networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
+        ssDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<SSDevice>>() {
             @Override
-            public void onChanged(List<NetworkDevice> networkDevices) {
+            public void onChanged(List<SSDevice> ssDevices) {
+                NetworkDeviceRepository repository = new NetworkDeviceRepository(getContext());
 
                 mList = new ArrayList<>();
                 Category myDevices = new Category(new DefaultHeader(R.string.text_myDevices));
 
-                for(NetworkDevice connection: networkDevices) {
-                    if (connection.isLocalDevice() || connection.getDeviceId().contentEquals("-"))
-                        continue;
+                for(SSDevice device: ssDevices) {
+                    NetworkDevice networkDevice = repository.findDevice(null, device.getDeviceId(), null);
 
-                    myDevices.addItem(new MyDevice(connection.getDeviceId(), connection.getIpAddress(), R.drawable.ic_phone_android_24dp));
+                    int imageResource = R.drawable.ic_warning_24dp;
+                    int colorResource = R.color.colorNotVerified;
+                    String generalInfo = getString(R.string.text_unverifiedDevice);
+                    String extraInfo = getString(R.string.text_seeDetailedInformation);
+
+                    if (device.isVerified()) {
+                        generalInfo = device.getNickname();
+                        if (networkDevice != null){
+                            imageResource = R.drawable.ic_phone_android_24dp;
+                            colorResource = R.color.colorOnline;
+                            extraInfo = networkDevice.getIpAddress();
+                        }
+                        else
+                        {
+                            imageResource = R.drawable.ic_phone_android_24dp;
+                            colorResource = R.color.colorOffline;
+                            extraInfo = getString(R.string.text_unknownAddress);
+                        }
+                    }
+
+                    MyDevice myDevice = new MyDevice(device.getDeviceId(), generalInfo, extraInfo, imageResource);
+                    myDevice.setImageTint(getContext(), colorResource);
+                    myDevice.setOnItemClickListener(clickListener);
+                    myDevices.addItem(myDevice);
                 }
 
-                if (myDevices.getItemsCount() > 0) {
+                if (myDevices.getItemsCount() > 0)
                     mList.add(myDevices);
-                    mCategoryAdapter.setItems(mList);
-                }
+
+                mCategoryAdapter.setItems(mList);
             }
         });
     }

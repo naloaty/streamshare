@@ -95,7 +95,7 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        //We want do action after drawer completely closed (for better looking)
+        //We want to do action after drawer is completely closed (for better user experience)
         //See doDrawerAction()
 
         //Used by doDrawerAction()

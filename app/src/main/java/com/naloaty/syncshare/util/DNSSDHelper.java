@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.github.druk.dnssd.BrowseListener;
 import com.github.druk.dnssd.DNSSD;
@@ -14,8 +15,10 @@ import com.github.druk.dnssd.DNSSDService;
 import com.github.druk.dnssd.QueryListener;
 import com.github.druk.dnssd.RegisterListener;
 import com.github.druk.dnssd.ResolveListener;
+import com.github.druk.dnssd.TXTRecord;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.SSDevice;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -29,6 +32,11 @@ import java.util.Map;
 public class DNSSDHelper {
 
     private static final String TAG = "DNSSDHelper";
+
+    private static final String
+                    TXT_RECORD_DEVICE_ID = "deviceId",
+                    TXT_RECORD_DEVICE_NICKNAME = "deviceName",
+                    TXT_RECORD_APP_VERSION = "appVersion";
 
     private DNSSD mDNSSD;
     private Handler mHandler;
@@ -101,18 +109,12 @@ public class DNSSDHelper {
                         //BonjourService.Builder builder = new BonjourService.Builder(flags, ifIndex, serviceName, regType, domain).dnsRecords(txtRecord).port(port).hostname(hostName);
                         try {
                             InetAddress address = InetAddress.getByAddress(rdata);
-                            /*if (address instanceof Inet4Address) {
-                                builder.inet4Address((Inet4Address) address);
-                            } else if (address instanceof Inet6Address) {
-                                builder.inet6Address((Inet6Address) address);
-                            }*/
 
-                            //TODO: At some reason it is trying to connect to ipv6 LOCALDEVICE address
                             NetworkDevice device = new NetworkDevice(address.getHostAddress(), serviceName);
-                            device.setDeviceName("-");
-                            device.setDeviceId("-");
+                            device.setDeviceName(txtRecord.get(TXT_RECORD_DEVICE_NICKNAME));
+                            device.setDeviceId(txtRecord.get(TXT_RECORD_DEVICE_ID));
+                            device.setAppVersion(txtRecord.get(TXT_RECORD_APP_VERSION));
                             NetworkDeviceManager.manageDevice(mContext, device);
-
 
                         } catch (UnknownHostException e) {
                             e.printStackTrace();
@@ -126,7 +128,10 @@ public class DNSSDHelper {
 
                 }
             };
+            //ip v4 query
             mDNSSD.queryRecord(0, ifIndex, hostName, 1, 1, listener);
+
+            //ip v6 query
             //mDNSSD.queryRecord(0, ifIndex, hostName, 28, 1, listener);
         } catch (DNSSDException e) {
             e.printStackTrace();
@@ -144,7 +149,13 @@ public class DNSSDHelper {
         try {
             mServiceName = AppConfig.NSD_SERVICE_NAME + "_" + AppUtils.getUniqueNumber();
 
-            mRegisterService = mDNSSD.register(mServiceName, AppConfig.NSD_SERVICE_TYPE, AppConfig.SERVER_PORT, new RegisterListener() {
+            TXTRecord extraData = new TXTRecord();
+            extraData.set(TXT_RECORD_DEVICE_ID, AppUtils.getDeviceId(mContext));
+            extraData.set(TXT_RECORD_DEVICE_NICKNAME, AppUtils.getLocalDeviceName());
+            extraData.set(TXT_RECORD_APP_VERSION, AppConfig.APP_VERSION);
+
+            //mServiceName, AppConfig.NSD_SERVICE_TYPE, AppConfig.SERVER_PORT
+            mRegisterService = mDNSSD.register(0, 0, mServiceName, AppConfig.NSD_SERVICE_TYPE, null, null, AppConfig.SERVER_PORT, extraData,  new RegisterListener() {
                 @Override
                 public void serviceRegistered(DNSSDRegistration registration, int flags, String serviceName, String regType, String domain) {
                     Log.d(TAG, "Register successfully " + serviceName);

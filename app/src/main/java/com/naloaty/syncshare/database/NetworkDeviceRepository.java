@@ -38,7 +38,7 @@ public class NetworkDeviceRepository {
         new DeleteAllDevicesAT(networkDeviceDao).execute();
     }
 
-    public NetworkDevice findConnection(String ipAddress, String deviceId, String serviceName) {
+    public NetworkDevice findDevice(String ipAddress, String deviceId, String serviceName) {
         try {
             return new FindDeviceAT(networkDeviceDao).execute(ipAddress, deviceId, serviceName).get();
         }
@@ -71,6 +71,8 @@ public class NetworkDeviceRepository {
         protected List<NetworkDevice> doInBackground(Void... voids) {
             return networkDeviceDao.getUnknown();
         }
+
+
     }
 
     public static class InsertDeviceAT extends AsyncTask<NetworkDevice, Void, Void> {

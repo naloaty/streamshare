@@ -6,6 +6,11 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "ss_devices_table")
 public class SSDevice {
 
+    public static final int
+                PLATFORM_MOBILE = 0,
+                PLATFORM_DESKTOP = 1,
+                PLATFORM_UNKNOWN = 2;
+
     @PrimaryKey(autoGenerate = true)
     private int id;
 
@@ -20,6 +25,12 @@ public class SSDevice {
     private long lastUsageTime;
 
     private String appVersion;
+
+    private boolean verified;
+
+    private boolean accessAllowed;
+
+    private int appPlatform;
 
     public SSDevice(String deviceId, String appVersion) {
         this.deviceId = deviceId;
@@ -81,5 +92,29 @@ public class SSDevice {
     }
     public void setAppVersion(String appVersion) {
         this.appVersion = appVersion;
+    }
+
+    //verified
+    public boolean isVerified() {
+        return verified;
+    }
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    //accessAllowed
+    public boolean isAccessAllowed() {
+        return accessAllowed;
+    }
+    public void setAccessAllowed(boolean accessAllowed) {
+        this.accessAllowed = accessAllowed;
+    }
+
+    //appPlatform
+    public int getAppPlatform() {
+        return appPlatform;
+    }
+    public void setAppPlatform(int appPlatform) {
+        this.appPlatform = appPlatform;
     }
 }

@@ -1,11 +1,21 @@
 package com.naloaty.syncshare.util;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Debug;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.app.SSActivity;
 
 import org.apache.commons.codec.binary.Base32;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -47,16 +57,16 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Date;
 import java.util.Scanner;
-import java.util.Vector;
+import java.util.Set;
 
 /*
  * Based on https://medium.com/@abel.suviri.payan/create-rsa-key-on-android-for-sign-and-verify-9debbb566541
@@ -70,8 +80,13 @@ public class EncryptionUtils {
             KEY_SIZE = 2048,
             CERTIFICATE_VALID_FOR_DAYS = 365;
 
+    public static final int
+            STUFF_GENERATION_STARTED = 0,
+            STUFF_GENERATION_FINISHED = 1,
+            STUFF_GENERATION_FAILED = 2;
+
     private static final String
-            //TODO: maybe we should to use AndroidKeystore instead?
+            //TODO: maybe it should use AndroidKeystore instead?
             KEYSTORE_PROVIDER = "BC",
             KEY_ALIAS = "SyncShareRSAKeypair",
             SS_KEY_FILENAME = "key.pem",
@@ -80,32 +95,84 @@ public class EncryptionUtils {
             SS_CERTIFICATE_SUBJECT = "SyncShare",
             SS_CERTIFICATE_SIGNATURE_ALGORITHM = "SHA256withRSA";
 
+    public static void initKeyStoreProvider() {
+        //https://stackoverflow.com/questions/6488658/can-i-use-latest-bouncycastle-provider-on-android
+        Security.removeProvider("BC");
+        Security.insertProviderAt(new BouncyCastleProvider(), 0);
+    }
 
-    public static void generateStuff(Context context) {
+    public static void generateStuff(final Context context, final StuffGeneratorCallback callback) {
+        Handler handler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message message) {
+                switch (message.what) {
+                    case EncryptionUtils.STUFF_GENERATION_STARTED:
+                        callback.onStart();
+                        break;
 
-        Log.d(TAG, "Generating stuff...");
+                    case EncryptionUtils.STUFF_GENERATION_FINISHED:
+                        callback.onFinish();
+                        break;
 
-        try
+                    case EncryptionUtils.STUFF_GENERATION_FAILED:
+                        callback.onFail();
+                        break;
+                }
+            }
+        };
+
+        new Thread()
         {
-            KeyPair keyPair = generateKeyPair(context);
-            X509Certificate certificate = generateCertificate(keyPair);
+            @Override
+            public void run()
+            {
+                super.run();
 
-            if (keyPair == null)
-                return;
+                Log.d(TAG, "Generating stuff...");
 
-            if (certificate == null)
-                return;
+                handler.obtainMessage(EncryptionUtils.STUFF_GENERATION_STARTED).sendToTarget();
 
-            File key = new File(context.getFilesDir(), SS_KEY_FILENAME);
-            File cert = new File(context.getFilesDir(), SS_CERTIFICATE_FILENAME);
+                try
+                {
+                    KeyPair keyPair = generateKeyPair(context);
+                    X509Certificate certificate = generateCertificate(keyPair);
 
-            saveStuff(key, keyPair.getPrivate());
-            saveStuff(cert, certificate);
-        }
-        finally
-        {
-            Log.d(TAG, "Generating stuff... DONE!");
-        }
+                    if (keyPair == null)
+                        throw new StuffGeneratingException("Key pair generation failed");
+
+                    if (certificate == null)
+                        throw new StuffGeneratingException("Certificate generation failed");
+
+                    File key = new File(context.getFilesDir(), SS_KEY_FILENAME);
+                    File cert = new File(context.getFilesDir(), SS_CERTIFICATE_FILENAME);
+
+                    saveStuff(key, keyPair.getPrivate());
+                    saveStuff(cert, certificate);
+                }
+                catch (Exception e) {
+                    Log.d(TAG, "Generating stuff... FAIL!");
+                    e.printStackTrace();
+                    handler.obtainMessage(EncryptionUtils.STUFF_GENERATION_FAILED).sendToTarget();
+                }
+                finally
+                {
+                    Log.d(TAG, "Generating stuff... DONE!");
+                    handler.obtainMessage(EncryptionUtils.STUFF_GENERATION_FINISHED).sendToTarget();
+                }
+            }
+        }.start();
+
+    }
+
+    public static void deleteStuff(Context context) {
+        File key = new File(context.getFilesDir(), SS_KEY_FILENAME);
+        File cert = new File(context.getFilesDir(), SS_CERTIFICATE_FILENAME);
+
+        if (key.exists())
+            key.delete();
+
+        if (cert.exists())
+            cert.delete();
     }
 
     private static void saveStuff(File file, Object stuff) {
@@ -172,10 +239,8 @@ public class EncryptionUtils {
          * Generator of self-signed X509 v3 certificate
          * Based on: https://www.programcreek.com/java-api-examples/?api=org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
          * BC doc: https://www.bouncycastle.org/docs/pkixdocs1.5on/index.html
-         * Orientation on https://docs.syncthing.net/dev/device-ids.html
+         * Inspired on https://docs.syncthing.net/dev/device-ids.html
          */
-
-        Security.addProvider(new BouncyCastleProvider());
 
         try
         {
@@ -423,5 +488,19 @@ public class EncryptionUtils {
             sign.initVerify(certificate);
             Boolean isValid = sign.verify(signature);
         }
+    }
+
+    public static class StuffGeneratingException extends Exception
+    {
+        public StuffGeneratingException(String desc)
+        {
+            super(desc);
+        }
+    }
+
+    public interface StuffGeneratorCallback {
+        void onStart();
+        void onFinish();
+        void onFail();
     }
 }

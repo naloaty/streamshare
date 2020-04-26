@@ -25,9 +25,9 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
-import com.naloaty.syncshare.dialog.EnterIpAddressDialog;
+import com.naloaty.syncshare.dialog.EnterDeviceIdDialog;
 import com.naloaty.syncshare.dialog.SingleTextInputDialog;
-import com.naloaty.syncshare.fragment.ConnectionInfoFragment;
+import com.naloaty.syncshare.fragment.DeviceInfoFragment;
 import com.naloaty.syncshare.fragment.OptionFragment;
 import com.naloaty.syncshare.fragment.AddOptionsFragment;
 import com.naloaty.syncshare.util.AddDeviceHelper;
@@ -49,7 +49,7 @@ public class AddDeviceActivity extends SSActivity {
     private Toolbar mToolBar;
 
     private AddOptionsFragment mAddOptionsFragment;
-    private ConnectionInfoFragment mConnectionInfoFragment ;
+    private DeviceInfoFragment mConnectionInfoFragment ;
 
     private final IntentFilter mFilter = new IntentFilter();
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -57,23 +57,28 @@ public class AddDeviceActivity extends SSActivity {
         public void onReceive(Context context, Intent intent) {
 
             if (ACTION_CHANGE_FRAGMENT.equals(intent.getAction())
-                && intent.hasExtra(EXTRA_TARGET_FRAGMENT)) {
+                    && intent.hasExtra(EXTRA_TARGET_FRAGMENT)) {
 
                 //OptionFragment is enum
                 OptionFragment targetFragment = OptionFragment.valueOf(intent.getStringExtra(EXTRA_TARGET_FRAGMENT));
 
                 switch (targetFragment){
 
-                    case EnterIP:
+                    case EnterDeviceId:
 
                         SingleTextInputDialog.OnEnteredListener listener = new SingleTextInputDialog.OnEnteredListener() {
                             @Override
                             public void onEntered(String text) {
-                                AddDeviceHelper.proccessDevice(text);
+                                Boolean isAdded = AddDeviceHelper.proccessDevice(AddDeviceActivity.this, text);
+
+                                if (isAdded) {
+                                    Toast.makeText(AddDeviceActivity.this, R.string.toast_successfullyAdded, Toast.LENGTH_SHORT).show();
+                                    AddDeviceActivity.this.onBackPressed();
+                                }
                             }
                         };
 
-                        new EnterIpAddressDialog(AddDeviceActivity.this, listener).show();
+                        new EnterDeviceIdDialog(AddDeviceActivity.this, listener).show();
                         break;
 
                     case ScanQR:
@@ -92,14 +97,14 @@ public class AddDeviceActivity extends SSActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_device_pair);
+        setContentView(R.layout.activity_device_add);
 
         //======== Init collapsing toolbar ==========
-        mAppBarLayout = findViewById(R.id.pair_device_app_bar_layout);
-        mToolBarLayout = findViewById(R.id.pair_device_toolbar_layout);
-        mToolBar = findViewById(R.id.pair_device_toolbar);
+        mAppBarLayout = findViewById(R.id.add_device_app_bar_layout);
+        mToolBarLayout = findViewById(R.id.add_device_toolbar_layout);
+        mToolBar = findViewById(R.id.add_device_toolbar);
 
-        mToolBarLayout.setTitle(getString(R.string.title_pairDevice));
+        mToolBarLayout.setTitle(getString(R.string.title_addDevice));
         mAppBarLayout.setExpanded(true, true);
 
         //Important to call this BEFORE setNavigationOnClickListener()
@@ -119,7 +124,7 @@ public class AddDeviceActivity extends SSActivity {
 
         //======== Init fragments =========
         mAddOptionsFragment = new AddOptionsFragment();
-        mConnectionInfoFragment = new ConnectionInfoFragment();
+        mConnectionInfoFragment = new DeviceInfoFragment();
 
         setFragment(OptionFragment.Options);
 
@@ -144,7 +149,7 @@ public class AddDeviceActivity extends SSActivity {
     @Override
     public void onBackPressed() {
 
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.pair_device_fragment_placeholder);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.add_device_fragment_placeholder);
 
         if (currentFragment instanceof AddOptionsFragment)
             super.onBackPressed();
@@ -173,7 +178,7 @@ public class AddDeviceActivity extends SSActivity {
     }
 
     private void openCodeScanner() {
-        boolean locationGranted = PermissionHelper.checkLocationPermission(this);
+        /*boolean locationGranted = PermissionHelper.checkLocationPermission(this);
         boolean locationServiceEnabled = PermissionHelper.checkLocationService(this);
 
         if (!locationGranted){
@@ -184,7 +189,7 @@ public class AddDeviceActivity extends SSActivity {
         if (!locationServiceEnabled) {
             PermissionHelper.requestLocationService(this);
             return;
-        }
+        }*/
 
         //TODO: it definitely should be replaced with customized scanner (with toolbar)
         /*
@@ -205,35 +210,26 @@ public class AddDeviceActivity extends SSActivity {
             return;
 
         try {
-            JSONObject codeNetwork = new JSONObject(qrCodeContents);
-            JSONObject localNetwork = NetworkStateMonitor.getCurrentWfifInfo(this);
+            JSONObject codeDevice = new JSONObject(qrCodeContents);
 
-            if (localNetwork == null) {
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.title_cannotVerify)
-                        .setMessage(R.string.text_notConnected)
-                        .setPositiveButton(R.string.btn_close, null)
-                        .show();
+            if (!codeDevice.has(DeviceInfoFragment.QR_CODE_DEVICE_NICKNAME))
+                throw new Exception("Device nickname is missing");
 
-                return;
+            if (!codeDevice.has(DeviceInfoFragment.QR_CODE_APP_VERSION))
+                throw new Exception("App version is missing");
+
+            if (!codeDevice.has(DeviceInfoFragment.QR_CODE_DEVICE_ID))
+                throw new Exception("Device ID is missing");
+
+            Boolean isAdded = AddDeviceHelper.proccessDevice(this,
+                    codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_NICKNAME),
+                    codeDevice.getString(DeviceInfoFragment.QR_CODE_APP_VERSION),
+                    codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_ID));
+
+            if (isAdded) {
+                Toast.makeText(this, R.string.toast_successfullyAdded, Toast.LENGTH_SHORT).show();
+                onBackPressed();
             }
-
-            if (!codeNetwork.has(NetworkStateMonitor.JSON_WIFI_BSSID))
-                throw new Exception("Unrecognized code");
-
-            if (!codeNetwork.getString(NetworkStateMonitor.JSON_WIFI_BSSID)
-                    .equals(localNetwork.getString(NetworkStateMonitor.JSON_WIFI_BSSID))){
-
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.title_differentNetwork)
-                        .setMessage(R.string.text_connectToSameNetwork)
-                        .setPositiveButton(R.string.btn_close, null)
-                        .show();
-
-                return;
-            }
-
-            AddDeviceHelper.proccessDevice(codeNetwork.getString(NetworkStateMonitor.JSON_WIFI_IP_ADDRESS));
 
         }
         catch (Exception e) {
@@ -254,12 +250,12 @@ public class AddDeviceActivity extends SSActivity {
                 candidate = mAddOptionsFragment;
                 break;
 
-            case ConnectionInfo:
+            case DeviceInfo:
                 candidate = mConnectionInfoFragment;
                 break;
         }
 
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.pair_device_fragment_placeholder);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.add_device_fragment_placeholder);
 
         if (currentFragment == null ||  currentFragment != candidate) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -272,7 +268,7 @@ public class AddDeviceActivity extends SSActivity {
             else
                 transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
 
-            transaction.add(R.id.pair_device_fragment_placeholder, candidate);
+            transaction.add(R.id.add_device_fragment_placeholder, candidate);
             transaction.commit();
 
             setToolbar(targetFragment);
@@ -286,16 +282,16 @@ public class AddDeviceActivity extends SSActivity {
 
         switch (fragment) {
             case Options:
-                titleResource = R.string.title_pairDevice;
+                titleResource = R.string.title_addDevice;
                 isOptions = true;
                 break;
 
-            case ConnectionInfo:
-                titleResource = R.string.title_connectionInfo;
+            case DeviceInfo:
+                titleResource = R.string.title_deviceInfo;
                 break;
 
             default:
-                titleResource = R.string.title_pairDevice;
+                titleResource = R.string.title_addDevice;
         }
 
         if (fragment.equals(OptionFragment.Options))

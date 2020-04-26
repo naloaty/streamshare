@@ -37,7 +37,7 @@
                 android:textSize="@dimen/font_size_primary" />
 
             <TextView
-                android:id="@+id/discovered_device_ip_address"
+                android:id="@+id/discovered_device_extra_information"
                 style="@style/TextAppearance.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -1,17 +1,28 @@
 package com.naloaty.syncshare.app;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.WelcomeActivity;
 import com.naloaty.syncshare.dialog.RationalePermissionRequest;
+import com.naloaty.syncshare.dialog.SSProgressDialog;
+import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.EncryptionUtils;
+
 
 
 public class SSActivity extends AppCompatActivity {
@@ -22,10 +33,13 @@ public class SSActivity extends AppCompatActivity {
     private AlertDialog mOngoingRequest;
     private boolean mSkipPermissionRequest = false;
     private boolean mWelcomePageDisallowed = false;
+    private boolean mSkipStuffGeneration = false;
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        EncryptionUtils.initKeyStoreProvider();
 
         if (!hasWelcomeScreenShown() && !mWelcomePageDisallowed) {
             startActivity(new Intent(this, WelcomeActivity.class));
@@ -36,33 +50,81 @@ public class SSActivity extends AppCompatActivity {
                 requestRequiredPermissions(true);
         }
         else if (!EncryptionUtils.checkStuff(this)) {
-            EncryptionUtils.generateStuff(this);
+            if (mSkipStuffGeneration)
+                return;
+
+            generateStuff();
         }
 
-        Log.d("SSActivity", "Direct: " + EncryptionUtils.calculateDeviceId(this));
-        String cert = EncryptionUtils.loadCertificateAsString(this);
+    }
 
-        Log.d("SSActivity", "From string: " + EncryptionUtils.calculateDeviceId(cert));
+    private void generateStuff() {
+        final SSProgressDialog ssDialog = new SSProgressDialog(SSActivity.this);
 
-        /*else {
-            Log.i("BASE_Activity", "onResume() -> start service");
-            startService(new Intent(this, CommunicationService.class)
-                        .setAction("kostyl")); //TODO: kostyl
-        }*/
+        ssDialog.setMessage(R.string.text_generatingInProgress);
+
+        //In case only one file is missing
+        EncryptionUtils.deleteStuff(SSActivity.this);
+
+        EncryptionUtils.StuffGeneratorCallback callback = new EncryptionUtils.StuffGeneratorCallback() {
+            @Override
+            public void onStart() {
+                ssDialog.show();
+            }
+
+            @Override
+            public void onFinish() {
+                if (ssDialog.isShowing()){
+                    ssDialog.dismiss();
+                    Toast.makeText(SSActivity.this, getText(R.string.toast_keysCreationSuccess), Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onFail() {
+                if (ssDialog.isShowing())
+                    ssDialog.dismiss();
+
+                DialogInterface.OnClickListener tryAgain = new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        generateStuff();
+                    }
+                };
+
+                DialogInterface.OnClickListener exit = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        exitApp();
+                    }
+                };
+
+                new AlertDialog.Builder(SSActivity.this)
+                        .setTitle(R.string.title_generationFailed)
+                        .setMessage(R.string.text_generationFailed)
+                        .setNegativeButton(R.string.btn_exitApp, exit)
+                        .setPositiveButton(R.string.btn_tryAgain, tryAgain)
+                        .show();
+            }
+        };
+
+        EncryptionUtils.generateStuff(this, callback);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        /*if (AppUtils.checkRunningConditions(this)) {
-            Log.i("BASE_Activity", "onPause() -> delete connections");
-
-            AppUtils.startForegroundService(this,
-                    new Intent(this, CommunicationService.class)
-                            .setAction(CommunicationService.ACTION_STOP_DISCOVERING));
-        }*/
     }
+
+    public void exitApp()
+    {
+        stopService(new Intent(this, CommunicationService.class));
+        finish();
+    }
+
 
 
     protected SharedPreferences getDefaultSharedPreferences() {
@@ -91,14 +153,6 @@ public class SSActivity extends AppCompatActivity {
         if (!AppUtils.checkRunningConditions(this))
             requestRequiredPermissions(!mSkipPermissionRequest);
 
-        /*if (AppUtils.checkRunningConditions(this)){
-            Log.i("BASE_Activity", "onRequestPermissionsResult() -> start service");
-            startService(new Intent(this, CommunicationService.class)
-                            .setAction("kostyl")); //TODO: kostyl
-        }
-        else
-            requestRequiredPermissions(!mSkipPermissionRequest);*/
-
     }
 
     public boolean hasWelcomeScreenShown() {
@@ -115,4 +169,7 @@ public class SSActivity extends AppCompatActivity {
         mWelcomePageDisallowed = disallow;
     }
 
+    public void setSkipStuffGeneration(boolean mSkipStuffGeneration) {
+        this.mSkipStuffGeneration = mSkipStuffGeneration;
+    }
 }

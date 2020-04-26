@@ -27,10 +27,10 @@
     <string name="text_batteryOptimization">Battery optimization</string>
     <string name="btn_requestDisableBO">Disable</string>
 
-    <!-- enter ip address dialog -->
-    <string name="title_enterIpAdress">Enter IP Address</string>
-    <string name="btn_connect">Connect</string>
-    <string name="msg_wrongIpAddressFormat">Wrong format\n(enter like 192.168.1.2)</string>
+    <!-- enter device id dialog -->
+    <string name="title_enterDeviceId">Enter Device ID</string>
+    <string name="btn_add">Add</string>
+    <string name="msg_wrongDeviceId">Wrong Device ID\n(should be 9 groups)</string>
     
     <!-- process qr code -->
     <string name="title_unrecognizedCode">Unrecognized code</string>
@@ -71,21 +71,21 @@
     <string name="btn_addDevices">Add device</string>
 
     <!-- pair device activity -->
-    <string name="title_pairDevice">Pair device</string>
-    <string name="title_connectionInfo">Connection information</string>
+    <string name="title_addDevice">Add device</string>
+    <string name="title_deviceInfo">Device information</string>
 
-    <string name="text_pairDeviceHelp">Choose an option to connect to other device. </string>
-    <string name="btn_showConnectionInfo">Show connection information</string>
+    <string name="text_addDeviceHelp">Choose the option to determinate the ID of another device</string>
+    <string name="btn_showDeviceInfo">Device information</string>
     <string name="btn_scanQrCode">Scan QR Code</string>
-    <string name="btn_enterIpManually">Enter IP Manually</string>
-    <string name="text_pairWithDiscoveredDevices">Pair with discovered devices</string>
+    <string name="btn_enterIdManually">Enter Device ID manually</string>
+    <string name="text_useDiscoveredDevices">Use discovered devices</string>
     <string name="text_discoveringDevices">Searching nearby devices</string>
 
-    <!-- connection info fragment -->
-    <string name="text_connectionInfoHelp">Scan this if both devices are on the same network. You also can manually enter ip address of this device on other</string>
+    <!-- device info fragment -->
+    <string name="text_deviceInfoHelp">Scan this qr code on another device. You can also manually enter the ID of this device on another</string>
 
-    <string name="text_wifiNetworkUnavailable">Connect to Wi-Fi network to continue</string>
-    <string name="btn_openWifiSettings">Wi-Fi</string>
+    <string name="text_myDeviceInfo">My device</string>
+    <string name="text_noDeviceIdError">For some reason, SyncShare did not find information about this device. To solve this, restart SyncShare. If this is not the first time you have seen this message, then please contact the developer</string>
 
     <string name="text_locationServiceDisabled">Turn on location service to continue</string>
     <string name="btn_enableLocationService">Enable</string>
@@ -101,4 +101,31 @@
     <!-- main activity toolbar menu -->
     <string name="menu_stopSharing">Stop sharing</string>
     <string name="menu_startSharing">Start sharing</string>
+
+    <!-- stuff (secret keys) generation dialog -->
+    <!-- Идет создание секретных ключей. Это может занять несколько минут. Пожалуйста, подождите. -->
+    <string name="text_generatingInProgress">Secret keys are being created. This may take several minutes. Please wait.</string>
+    <string name="title_generationFailed">Creation failed</string>
+    <string name="text_generationFailed">Failed to create secret keys. Please try again. If this is not the first time you have received this message, then please contact the developer</string>
+    <string name="btn_tryAgain">Try again</string>
+    <string name="btn_exitApp">Exit</string>
+    <string name="toast_keysCreationSuccess">Secret keys created with success</string>
+
+    <string name="toast_alreadyAdded">Device already added</string>
+    <string name="toast_successfullyAdded">Device successfully added</string>
+
+    <string name="text_unknownAddress">No known address for the device</string>
+    <string name="text_unverifiedDevice">Unverified device</string>
+    <string name="text_seeDetailedInformation">Tap for detail</string>
+
+    <!-- my device details -->
+    <string name="text_deviceName">Device name</string>
+    <string name="text_appVersion">Version</string>
+    <string name="switch_allowAccess">Allow access</string>
+    <string name="text_deviceId">Device ID</string>
+    <string name="text_deviceNamePlaceholder">%s %s</string>
+    <string name="text_notVerifiedHelp">To verify the device, click on the notification on it and follow the instructions. If there is no notification, connect the devices to the same Wi-Fi network</string>
+    <string name="btn_remove">Remove</string>
+    <string name="text_confirmRemoval">Are you sure you want to remove the device?</string>
+    <string name="btn_cancel">Cancel</string>
 </resources>

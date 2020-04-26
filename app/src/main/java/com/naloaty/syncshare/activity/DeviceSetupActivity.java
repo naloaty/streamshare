@@ -10,6 +10,6 @@ public class DeviceSetupActivity extends SSActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_device_pair);
+        setContentView(R.layout.activity_device_add);
     }
 }

@@ -9,23 +9,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.adapter.CategoryAdapter;
 import com.naloaty.syncshare.adapter.base.BodyItem;
 
 public class DiscoveredDevice extends BodyItem {
 
     private int iconResource;
     private String deviceName;
-    private String ipAddress;
+    private String appVersion;
+    private String deviceId;
 
-    public DiscoveredDevice(String deviceName, String ipAddress, int iconResource) {
+    public DiscoveredDevice(String deviceName, String appVersion, String deviceId, int iconResource) {
         this.deviceName = deviceName;
-        this.ipAddress = ipAddress;
+        this.appVersion = appVersion;
+        this.deviceId = deviceId;
         this.iconResource = iconResource;
+    }
+
+    public String getDeviceId () {
+        return deviceId;
     }
 
     public int getIconResource() {
@@ -36,8 +40,8 @@ public class DiscoveredDevice extends BodyItem {
         return deviceName;
     }
 
-    public String getIpAddress() {
-        return ipAddress;
+    public String getAppVersion() {
+        return appVersion;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class DiscoveredDevice extends BodyItem {
 
             holder.deviceIcon.setImageResource(getIconResource());
             holder.deviceName.setText(getDeviceName());
-            holder.ipAddress.setText(getIpAddress());
+            holder.appVersion.setText(getAppVersion());
         }
     }
 
@@ -63,7 +67,7 @@ public class DiscoveredDevice extends BodyItem {
 
         ImageView deviceIcon;
         TextView deviceName;
-        TextView ipAddress;
+        TextView appVersion;
         RelativeLayout layout;
 
         OnItemClickListener onItemClickListener;
@@ -73,7 +77,7 @@ public class DiscoveredDevice extends BodyItem {
 
             deviceIcon = itemView.findViewById(R.id.discovered_device_icon);
             deviceName = itemView.findViewById(R.id.discovered_device_name);
-            ipAddress = itemView.findViewById(R.id.discovered_device_ip_address);
+            appVersion = itemView.findViewById(R.id.discovered_device_extra_information);
             layout = itemView.findViewById(R.id.discovered_device_layout);
             onItemClickListener = listener;
 

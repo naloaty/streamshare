@@ -19,7 +19,7 @@ public class DeviceManageActivity extends SSActivity {
 
         Toolbar toolBar = findViewById(R.id.activity_device_manage_toolbar);
 
-        //Important to call this BEFORE setNavigationOnClickListener()
+        //Important to call this function BEFORE setNavigationOnClickListener()
         setSupportActionBar(toolBar);
 
         //To make "close" animation (this instead of using "parent activity")

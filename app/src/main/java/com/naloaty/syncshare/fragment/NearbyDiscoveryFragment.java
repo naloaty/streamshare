@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -88,7 +89,13 @@ public class NearbyDiscoveryFragment extends Fragment {
             @Override
             public void onItemClick(BodyItem item) {
                 DiscoveredDevice device = (DiscoveredDevice)item;
-                AddDeviceHelper.proccessDevice(device.getIpAddress());
+                Boolean isAdded = AddDeviceHelper.proccessDevice(getContext(), device.getDeviceName(), device.getAppVersion(), device.getDeviceId());
+
+                if (isAdded){
+                    Toast.makeText(getContext(), R.string.toast_successfullyAdded, Toast.LENGTH_SHORT).show();
+                    getActivity().onBackPressed();
+                }
+
             }
         };
 
@@ -101,10 +108,12 @@ public class NearbyDiscoveryFragment extends Fragment {
                 Category category = new Category(null);
 
                 for(NetworkDevice networkDevice: networkDevices) {
-                    if (networkDevice.isLocalDevice() || networkDevice.getDeviceId().contentEquals("-"))
-                        continue;
+                    DiscoveredDevice device = new DiscoveredDevice(
+                            networkDevice.getDeviceName(),
+                            networkDevice.getIpAddress(),
+                            networkDevice.getDeviceId(),
+                            R.drawable.ic_phone_android_24dp);
 
-                    DiscoveredDevice device = new DiscoveredDevice(networkDevice.getDeviceName(), networkDevice.getIpAddress(), R.drawable.ic_phone_android_24dp);
                     device.setOnItemClickListener(clickListener);
                     category.addItem(device);
                 }

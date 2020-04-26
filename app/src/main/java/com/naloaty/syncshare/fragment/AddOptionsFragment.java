@@ -35,13 +35,13 @@ public class AddOptionsFragment extends Fragment {
             {
                 switch (v.getId()) {
                     case R.id.add_option_connection_info:
-                        changeFragment(OptionFragment.ConnectionInfo);
+                        changeFragment(OptionFragment.DeviceInfo);
                         break;
                     case R.id.add_option_scan_qr:
                         changeFragment(OptionFragment.ScanQR);
                         break;
                     case R.id.add_option_enter_ip:
-                        changeFragment(OptionFragment.EnterIP);
+                        changeFragment(OptionFragment.EnterDeviceId);
                         break;
                 }
             }
