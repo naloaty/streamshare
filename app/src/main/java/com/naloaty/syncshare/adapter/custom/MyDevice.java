@@ -58,7 +58,7 @@ public class MyDevice extends BodyItem {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.my_device, parent, false);
 
-        return new ViewHolder(view, getOnItemClickListener());
+        return new ViewHolder(view, getOnItemClickListener(), this);
     }
 
     @Override
@@ -69,6 +69,8 @@ public class MyDevice extends BodyItem {
             holder.deviceIcon.setImageResource(getIconResource());
             holder.deviceName.setText(getDeviceName());
             holder.appVersion.setText(getIpAddress());
+            holder.onItemClickListener = getOnItemClickListener();
+            holder.myDevice = this;
 
             if (imageTint != 0)
                 holder.setImageTint(imageTint);
@@ -81,30 +83,34 @@ public class MyDevice extends BodyItem {
         TextView deviceName;
         TextView appVersion;
         RelativeLayout layout;
+        ImageView actionButton;
 
         OnItemClickListener onItemClickListener;
+        MyDevice myDevice;
 
-        public ViewHolder(@NonNull View itemView, OnItemClickListener listener) {
+        public ViewHolder(@NonNull View itemView, OnItemClickListener listener, MyDevice device) {
             super(itemView);
 
-            deviceIcon = itemView.findViewById(R.id.my_device_icon);
-            deviceName = itemView.findViewById(R.id.my_device_name);
-            appVersion = itemView.findViewById(R.id.my_device_current_address);
-            layout = itemView.findViewById(R.id.my_device_layout);
-            onItemClickListener = listener;
+            this.deviceIcon = itemView.findViewById(R.id.online_device_icon);
+            this.deviceName = itemView.findViewById(R.id.my_device_name);
+            this.appVersion = itemView.findViewById(R.id.my_device_current_address);
+            this.layout = itemView.findViewById(R.id.online_device_layout);
+            this.actionButton = itemView.findViewById(R.id.my_device_info_btn);
+            this.onItemClickListener = listener;
+            this.myDevice = device;
 
-            layout.setOnClickListener(this);
+            this.layout.setOnClickListener(this);
+            this.actionButton.setOnClickListener(this);
         }
 
         public void setImageTint(int tintColor) {
             ImageViewCompat.setImageTintList(deviceIcon, ColorStateList.valueOf(tintColor));
         }
-
         @Override
         public void onClick(View v) {
             Log.d("MyDevice", "OnClick");
             if (onItemClickListener != null)
-                onItemClickListener.onItemClick(MyDevice.this);
+                onItemClickListener.onItemClick(myDevice);
         }
     }
 }

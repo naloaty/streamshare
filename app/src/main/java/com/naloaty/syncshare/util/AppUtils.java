@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,19 +13,23 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.Keyword;
-import com.naloaty.syncshare.database.NetworkDevice;
 import com.naloaty.syncshare.database.SSDevice;
 import com.naloaty.syncshare.dialog.RationalePermissionRequest;
+import com.naloaty.syncshare.config.KeyConfig;
+import com.naloaty.syncshare.security.SecurityUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,14 +129,18 @@ public class AppUtils {
         device.setModel(Build.MODEL);
         device.setNickname(AppUtils.getLocalDeviceName());
 
-        //TODO: add app version info
-
         return device;
     }
 
     public static String getDeviceId(Context context)
     {
-        return EncryptionUtils.calculateDeviceId(context);
+        File certFile = new File(context.getFilesDir(), KeyConfig.CERTIFICATE_FILENAME);
+        X509Certificate myCert = SecurityUtils.loadCertificate(KeyConfig.CRYPTO_PROVIDER, certFile);
+
+        Log.w(TAG, "My device id: " + SecurityUtils.calculateDeviceId(myCert));
+        //Log.w(TAG, "My certificate: " + myCert.toString());
+
+        return SecurityUtils.calculateDeviceId(myCert);
     }
 
     public static String getLocalDeviceName()
@@ -155,8 +164,8 @@ public class AppUtils {
     /*
      * Copied from https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android/5921190#5921190
      */
-    public static boolean isServiceRunning(Application application, Class<?> serviceClass) {
-        final ActivityManager activityManager = (ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE);
+    public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
 
         for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
@@ -167,13 +176,31 @@ public class AppUtils {
         return false;
     }
 
-    /*public static void startForegroundService(Context context, Intent intent)
-    {
-        if (Build.VERSION.SDK_INT >= 26)
-            context.startForegroundService(intent);
-        else
-            context.startService(intent);
+    /*
+     * Copied from https://tips.androidhive.info/2015/04/android-how-to-check-if-the-app-is-in-background-or-foreground/
+     */
+    public static boolean isAppIsInBackground(Context context) {
+        boolean isInBackground = true;
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+                if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    for (String activeProcess : processInfo.pkgList) {
+                        if (activeProcess.equals(context.getPackageName())) {
+                            isInBackground = false;
+                        }
+                    }
+                }
+            }
+        } else {
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+            ComponentName componentInfo = taskInfo.get(0).topActivity;
+            if (componentInfo.getPackageName().equals(context.getPackageName())) {
+                isInBackground = false;
+            }
+        }
 
-        Log.i(TAG, "Starting service");
-    }*/
+        return isInBackground;
+    }
 }

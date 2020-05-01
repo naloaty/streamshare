@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -25,11 +28,13 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
+import com.naloaty.syncshare.database.SSDevice;
 import com.naloaty.syncshare.dialog.EnterDeviceIdDialog;
 import com.naloaty.syncshare.dialog.SingleTextInputDialog;
 import com.naloaty.syncshare.fragment.DeviceInfoFragment;
 import com.naloaty.syncshare.fragment.OptionFragment;
 import com.naloaty.syncshare.fragment.AddOptionsFragment;
+import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AddDeviceHelper;
 import com.naloaty.syncshare.util.NetworkStateMonitor;
 import com.naloaty.syncshare.util.PermissionHelper;
@@ -51,6 +56,74 @@ public class AddDeviceActivity extends SSActivity {
     private AddOptionsFragment mAddOptionsFragment;
     private DeviceInfoFragment mConnectionInfoFragment ;
 
+    private final AddDeviceHelper.AddDeviceCallback callback = new AddDeviceHelper.AddDeviceCallback() {
+        @Override
+        public void onSuccessfullyAdded() {
+            DialogInterface.OnClickListener btnClose = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    onBackPressed();
+                }
+            };
+
+            new AlertDialog.Builder(AddDeviceActivity.this)
+                    .setMessage(R.string.text_onSuccessfullyAdded)
+                    .setPositiveButton(R.string.btn_close, btnClose)
+                    .setTitle(R.string.title_success)
+                    .show();
+        }
+
+        @Override
+        public void onException(int errorCode) {
+
+            Log.w(TAG, "Device added with exception. Error code is " + errorCode);
+
+            DialogInterface.OnClickListener btnClose = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    onBackPressed();
+                }
+            };
+
+            int helpResource = R.string.text_defaultValue;
+            int titleResource = R.string.text_defaultValue;
+
+            switch (errorCode) {
+                case AddDeviceHelper.ERROR_ALREADY_ADDED:
+                    Toast.makeText(AddDeviceActivity.this, R.string.toast_alreadyAdded, Toast.LENGTH_LONG).show();
+                    return;
+
+                case AddDeviceHelper.ERROR_UNTRUSTED_DEVICE:
+                    break;
+
+                case AddDeviceHelper.ERROR_DEVICE_OFFLINE:
+                    helpResource = R.string.text_offlineDevice;
+                    break;
+
+                case AddDeviceHelper.ERROR_BAD_RESPONSE:
+                case AddDeviceHelper.ERROR_HANDSHAKE_EXCEPTION:
+                    helpResource = R.string.text_handShakeException;
+                    titleResource = R.string.title_step2;
+                    break;
+
+                case AddDeviceHelper.ERROR_REQUEST_FAILED:
+                case AddDeviceHelper.ERROR_SENDING_FAILED:
+                    helpResource = R.string.text_oExchangeFailed;
+                    break;
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(AddDeviceActivity.this)
+                    .setMessage(helpResource)
+                    .setPositiveButton(R.string.btn_close, btnClose);
+
+            if (titleResource != R.string.text_defaultValue)
+                builder.setTitle(titleResource);
+
+            builder.show();
+
+        }
+    };
+
     private final IntentFilter mFilter = new IntentFilter();
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -69,12 +142,11 @@ public class AddDeviceActivity extends SSActivity {
                         SingleTextInputDialog.OnEnteredListener listener = new SingleTextInputDialog.OnEnteredListener() {
                             @Override
                             public void onEntered(String text) {
-                                Boolean isAdded = AddDeviceHelper.proccessDevice(AddDeviceActivity.this, text);
+                                SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
+                                ssDevice.setDeviceId(text);
 
-                                if (isAdded) {
-                                    Toast.makeText(AddDeviceActivity.this, R.string.toast_successfullyAdded, Toast.LENGTH_SHORT).show();
-                                    AddDeviceActivity.this.onBackPressed();
-                                }
+                                AddDeviceHelper helper = new AddDeviceHelper(AddDeviceActivity.this, ssDevice, callback);
+                                helper.processDevice();
                             }
                         };
 
@@ -90,6 +162,10 @@ public class AddDeviceActivity extends SSActivity {
                 }
 
 
+            }
+            else if (intent.getAction().equals(CommunicationService.SERVICE_STATE_CHANGED)) {
+                if (mAddOptionsFragment != null)
+                    mAddOptionsFragment.setServiceState(intent.getBooleanExtra(CommunicationService.EXTRA_SERVICE_SATE, false));
             }
         }
     };
@@ -130,20 +206,21 @@ public class AddDeviceActivity extends SSActivity {
 
         //======= Init broadcast =========
         mFilter.addAction(ACTION_CHANGE_FRAGMENT);
+        mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        registerReceiver(mReceiver, mFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mFilter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -178,19 +255,6 @@ public class AddDeviceActivity extends SSActivity {
     }
 
     private void openCodeScanner() {
-        /*boolean locationGranted = PermissionHelper.checkLocationPermission(this);
-        boolean locationServiceEnabled = PermissionHelper.checkLocationService(this);
-
-        if (!locationGranted){
-            PermissionHelper.requestLocationPermission(this, REQUEST_LOCATION_BY_CODE_SCANNER);
-            return;
-        }
-
-        if (!locationServiceEnabled) {
-            PermissionHelper.requestLocationService(this);
-            return;
-        }*/
-
         //TODO: it definitely should be replaced with customized scanner (with toolbar)
         /*
          * Since I don’t have enough time to create customized scanner,
@@ -221,15 +285,14 @@ public class AddDeviceActivity extends SSActivity {
             if (!codeDevice.has(DeviceInfoFragment.QR_CODE_DEVICE_ID))
                 throw new Exception("Device ID is missing");
 
-            Boolean isAdded = AddDeviceHelper.proccessDevice(this,
-                    codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_NICKNAME),
-                    codeDevice.getString(DeviceInfoFragment.QR_CODE_APP_VERSION),
-                    codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_ID));
 
-            if (isAdded) {
-                Toast.makeText(this, R.string.toast_successfullyAdded, Toast.LENGTH_SHORT).show();
-                onBackPressed();
-            }
+            SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
+            ssDevice.setDeviceId(codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_ID));
+            ssDevice.setNickname(codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_NICKNAME));
+            ssDevice.setAppVersion(codeDevice.getString(DeviceInfoFragment.QR_CODE_APP_VERSION));
+
+            AddDeviceHelper helper = new AddDeviceHelper(this, ssDevice, callback);
+            helper.processDevice();
 
         }
         catch (Exception e) {

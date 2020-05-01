@@ -26,6 +26,14 @@ public class NetworkDeviceViewModel extends AndroidViewModel {
         return mContext;
     }
 
+    public Integer getDeviceCount() {
+        return repository.getDeviceCount();
+    }
+
+    public List<NetworkDevice> getAllDevicesList(){
+        return repository.getAllDevicesList();
+    }
+
     public LiveData<List<NetworkDevice>> getAllDevices() {
         return allDevices;
     }

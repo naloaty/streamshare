@@ -34,6 +34,14 @@ public class SSDeviceViewModel extends AndroidViewModel {
         repository.delete(device);
     }
 
+    public SSDevice findDevice(String deviceId) {
+        return repository.findDevice(deviceId);
+    }
+
+    public Integer getDeviceCount() {
+        return repository.getDeviceCount();
+    }
+
     public LiveData<List<SSDevice>> getAllDevices () {
         return allDevices;
     }

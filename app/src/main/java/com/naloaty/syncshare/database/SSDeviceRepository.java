@@ -27,12 +27,44 @@ public class SSDeviceRepository {
         new InsertDeviceAT(ssDeviceDao).execute(device);
     }
 
+    public void update(SSDevice device) {
+        new UpdateDeviceAT(ssDeviceDao).execute(device);
+    }
+
+    //Decides whether to add or update
+    public void publish(SSDevice device) {
+        SSDevice foundedDevice = findDevice(device.getDeviceId());
+
+        if (foundedDevice != null){
+            device.setId(foundedDevice.getId());
+            device.setTrusted(foundedDevice.isTrusted());
+            device.setAccessAllowed(foundedDevice.isAccessAllowed());
+            update(device);
+        }
+        else
+        {
+            insert(device);
+        }
+    }
+
     public void delete(SSDevice device) {
         new DeleteDeviceAT(ssDeviceDao).execute(device);
     }
 
     public LiveData<List<SSDevice>> getAllDevices () {
         return allDevices;
+    }
+
+    public int getDeviceCount() {
+        try
+        {
+            return new GetDeviceCountAT(ssDeviceDao).execute().get();
+        }
+        catch (Exception e) {
+            Log.d(TAG, "getDeviceCount() exception: " + e.getMessage());
+            return new Integer(0);
+        }
+
     }
 
     public SSDevice findDevice(String deviceId) {
@@ -56,6 +88,21 @@ public class SSDeviceRepository {
         @Override
         protected Void doInBackground(SSDevice... ssDevices) {
             ssDeviceDao.insert(ssDevices[0]);
+            return null;
+        }
+    }
+
+    public static class UpdateDeviceAT extends AsyncTask<SSDevice, Void, Void> {
+
+        private SSDeviceDao ssDeviceDao;
+
+        public UpdateDeviceAT(SSDeviceDao ssDeviceDao) {
+            this.ssDeviceDao = ssDeviceDao;
+        }
+
+        @Override
+        protected Void doInBackground(SSDevice... ssDevices) {
+            ssDeviceDao.update(ssDevices[0]);
             return null;
         }
     }
@@ -86,6 +133,20 @@ public class SSDeviceRepository {
         @Override
         protected SSDevice doInBackground(String... strings) {
             return ssDeviceDao.findDevice(strings[0]);
+        }
+    }
+
+    public static class GetDeviceCountAT extends AsyncTask<Void, Void, Integer> {
+
+        private SSDeviceDao ssDeviceDao;
+
+        public GetDeviceCountAT(SSDeviceDao ssDeviceDao) {
+            this.ssDeviceDao = ssDeviceDao;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return ssDeviceDao.getDeviceCount();
         }
     }
 }

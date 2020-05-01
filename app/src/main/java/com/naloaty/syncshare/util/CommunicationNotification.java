@@ -47,6 +47,7 @@ public class CommunicationNotification {
         return notification.show();
     }
 
+
     public void cancelNotification() {
         notificationUtils.cancelNotification(SERVICE_NOTIFICATION_ID);
     }

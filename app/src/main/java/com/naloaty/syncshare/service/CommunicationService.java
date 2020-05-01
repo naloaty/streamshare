@@ -5,39 +5,32 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.genonbeta.CoolSocket.CoolSocket;
 import com.naloaty.syncshare.app.SSService;
 import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.config.Keyword;
 import com.naloaty.syncshare.database.NetworkDeviceRepository;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.CommunicationNotification;
 import com.naloaty.syncshare.util.DNSSDHelper;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
 public class CommunicationService extends SSService {
 
     private static final String TAG = "CommunicationService";
-    public static final String
-            ACTION_STOP_SHARING = "stopSharing",
-            ACTION_STOP_DISCOVERING = "stopDiscovering",
-            EXTRA_STATUS_RUNNING = "statusRunning";
-            //PREFERNCE_SERVICE_RUNNING = "communicationServiceRunning";
 
+    public static final String ACTION_STOP_SHARING = "com.naloaty.intent.action.STOP_SHARING";
+    public static final String EXTRA_SERVICE_SATE = "serviceState";
+    public static final String SERVICE_STATE_CHANGED = "com.naloaty.intent.state.SERVICE_STATE_CHANGED";
 
-    private CommunicationServer mCommunicationServer;
     private CommunicationNotification mNotification;
-    //private NsdHelper mNsdHelper;
     private DNSSDHelper mDNSSDHelper;
+    private MediaServer mMediaServer;
 
     @Nullable
     @Override
@@ -49,29 +42,34 @@ public class CommunicationService extends SSService {
     public void onCreate() {
         super.onCreate();
 
-        mCommunicationServer = new CommunicationServer(AppConfig.SERVER_PORT);
-        //mNsdHelper = new NsdHelper(getApplicationContext());
-        //mNsdHelper.registerService();
+        Log.d(TAG, "Starting and registering DNSSD");
+
         mDNSSDHelper = AppUtils.getDNSSDHelper(getApplicationContext());
         mDNSSDHelper.register();
+        mDNSSDHelper.startBrowse();
 
         mNotification = new CommunicationNotification(getNotificationUtils());
 
-        if (!AppUtils.checkRunningConditions(this) || !mCommunicationServer.start()){
+        if (!AppUtils.checkRunningConditions(this)){
             Log.i(TAG, "Aborting CommunicationService");
             stopSelf();
         }
 
-        /*startForeground(CommunicationNotification.SERVICE_NOTIFICATION_ID,
-                mNotification.getServiceNotification().build());*/
+        Log.d(TAG, "Starting MediaServer");
+        mMediaServer = new MediaServer(this);
+
+        try { mMediaServer.start(); }
+        catch (Exception e) {
+            Log.d(TAG, "Cannot start MediaServer: ");
+            e.printStackTrace();
+        }
 
         mNotification.getServiceNotification().build();
 
-        /*AppUtils.getDefaultSharedPreferences(this)
-                .edit()
-                .putBoolean(PREFERNCE_SERVICE_RUNNING, true)
-                .apply();*/
+        Intent intent = new Intent(SERVICE_STATE_CHANGED);
+        intent.putExtra(EXTRA_SERVICE_SATE, true);
 
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         Log.i(TAG, "Communication service started");
     }
 
@@ -88,20 +86,6 @@ public class CommunicationService extends SSService {
                 Log.d(TAG, "User stopped service");
                 stopSelf();
             }
-            else if (intent.getAction().contentEquals(ACTION_STOP_DISCOVERING)) {
-
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable()
-                {
-                    @Override
-                    public void run() {
-                        {
-                            Log.d(TAG, "onStartCommand(): deleting connections");
-                            NetworkDeviceRepository repository = new NetworkDeviceRepository(getApplicationContext());
-                            repository.deleteAllConnections();
-                        }
-                    }
-                }, 3000);
-            }
         }
 
         return START_STICKY;
@@ -111,89 +95,31 @@ public class CommunicationService extends SSService {
     public void onDestroy() {
         super.onDestroy();
 
-        Log.d(TAG, "Stopping and unregistering NSD");
-        mCommunicationServer.stop();
-        //mNsdHelper.unregisterService();
+        Log.d(TAG, "Stopping and unregistering DNSSD");
+        mDNSSDHelper.stopBrowse();
         mDNSSDHelper.unregister();
 
-        /*Log.d(TAG, "Deleting all connections");
-        NetworkDeviceRepository repository = AppUtils.getDeviceConnectionRepository(getApplicationContext());
-        repository.deleteAllDevices();*/
-
-        /*AppUtils.getDefaultSharedPreferences(this)
-                .edit()
-                .putBoolean(PREFERNCE_SERVICE_RUNNING, false)
-                .apply();*/
+        try
+        {
+            mMediaServer.stop();
+        }
+        catch (Exception e) {
+            Log.d(TAG, "Cannot stop MediaServer: ");
+            e.printStackTrace();
+        }
 
         mNotification.cancelNotification();
+
+        NetworkDeviceRepository repository = new NetworkDeviceRepository(this);
+        repository.deleteAllConnections();
+
+        Intent intent = new Intent(SERVICE_STATE_CHANGED);
+        intent.putExtra(EXTRA_SERVICE_SATE, false);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
         Log.d(TAG, "Destroy :(");
     }
 
-    public class CommunicationServer extends CoolSocket {
 
-        public CommunicationServer(int port) {
-            super(port);
-        }
-
-        @Override
-        protected void onConnected(ActiveConnection activeConnection) {
-            //Limit clients amount
-            if (getConnectionCountByAddress(activeConnection.getAddress()) > 3)
-                return;
-
-            //Can produce JSONException, TimeoutException, IOException
-            try {
-                ActiveConnection.Response clientRequest = activeConnection.receive();
-                JSONObject responseJSON = analyzeResponse(clientRequest);
-                JSONObject replyJSON = new JSONObject();
-
-                AppUtils.applyDeviceToJSON(CommunicationService.this, replyJSON);
-                String remoteDeviceSerial = null;
-
-                //Handshake exchange between devices
-                if (responseJSON.has(Keyword.HANDSHAKE_REQUIRED) && responseJSON.getBoolean(Keyword.HANDSHAKE_REQUIRED)) {
-                    pushReply(activeConnection, replyJSON, true);
-
-                    /*
-                     * "handshakeOnly" means that devices will only exchange information
-                     * about each other and nothing else
-                     */
-
-                    if (!responseJSON.has(Keyword.HANDSHAKE_ONLY) || !responseJSON.getBoolean(Keyword.HANDSHAKE_ONLY)) {
-                        if (responseJSON.has(Keyword.DEVICE_INFO_SERIAL))
-                            remoteDeviceSerial = responseJSON.getString(Keyword.DEVICE_INFO_SERIAL);
-
-                        clientRequest = activeConnection.receive();
-                        responseJSON = analyzeResponse(clientRequest);
-                    } else {
-                        Log.i(TAG, "Disconnecting client due handshake only");
-                        activeConnection.getSocket().close();
-                        return;
-                    }
-                }
-
-                //Client wants to connect
-                if (remoteDeviceSerial != null) {
-                    //TODO: NetworkDevice should be restored from database
-                }
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-
-        }
-
-        public JSONObject analyzeResponse(ActiveConnection.Response response) throws JSONException
-        {
-            return response.totalLength > 0 ? new JSONObject(response.response) : new JSONObject();
-        }
-
-        public void pushReply(ActiveConnection activeConnection, JSONObject reply, boolean result) throws JSONException, TimeoutException, IOException
-        {
-            activeConnection.reply(reply
-                    .put(Keyword.RESULT, result)
-                    .toString());
-        }
-    }
 
 }

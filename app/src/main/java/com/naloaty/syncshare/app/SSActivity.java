@@ -1,13 +1,8 @@
 package com.naloaty.syncshare.app;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,14 +14,15 @@ import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.WelcomeActivity;
 import com.naloaty.syncshare.dialog.RationalePermissionRequest;
 import com.naloaty.syncshare.dialog.SSProgressDialog;
+import com.naloaty.syncshare.security.KeyTool;
+import com.naloaty.syncshare.security.SecurityUtils;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
-import com.naloaty.syncshare.util.EncryptionUtils;
-
 
 
 public class SSActivity extends AppCompatActivity {
 
+    private static final String TAG = "SSActivity";
     public static final int REQUEST_PERMISSION_ALL = 1;
     public static final String WELCOME_SHOWN = "welcome_shown";
 
@@ -39,8 +35,6 @@ public class SSActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        EncryptionUtils.initKeyStoreProvider();
-
         if (!hasWelcomeScreenShown() && !mWelcomePageDisallowed) {
             startActivity(new Intent(this, WelcomeActivity.class));
             finish();
@@ -49,31 +43,30 @@ public class SSActivity extends AppCompatActivity {
             if (!mSkipPermissionRequest)
                 requestRequiredPermissions(true);
         }
-        else if (!EncryptionUtils.checkStuff(this)) {
+        else if (!SecurityUtils.checkSecurityStuff(getFilesDir(), true)) {
             if (mSkipStuffGeneration)
                 return;
 
-            generateStuff();
+            generateSecurityStuff();
         }
 
     }
 
-    private void generateStuff() {
+    private void generateSecurityStuff() {
         final SSProgressDialog ssDialog = new SSProgressDialog(SSActivity.this);
 
         ssDialog.setMessage(R.string.text_generatingInProgress);
 
-        //In case only one file is missing
-        EncryptionUtils.deleteStuff(SSActivity.this);
-
-        EncryptionUtils.StuffGeneratorCallback callback = new EncryptionUtils.StuffGeneratorCallback() {
+        KeyTool.KeyGeneratorCallback callback = new KeyTool.KeyGeneratorCallback() {
             @Override
             public void onStart() {
+                Log.i(TAG, "Creation of security stuff is started");
                 ssDialog.show();
             }
 
             @Override
             public void onFinish() {
+                Log.i(TAG, "Creation of security stuff is finished");
                 if (ssDialog.isShowing()){
                     ssDialog.dismiss();
                     Toast.makeText(SSActivity.this, getText(R.string.toast_keysCreationSuccess), Toast.LENGTH_LONG).show();
@@ -83,6 +76,8 @@ public class SSActivity extends AppCompatActivity {
 
             @Override
             public void onFail() {
+                Log.i(TAG, "Creation of security stuff is failed");
+
                 if (ssDialog.isShowing())
                     ssDialog.dismiss();
 
@@ -91,7 +86,7 @@ public class SSActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        generateStuff();
+                        generateSecurityStuff();
                     }
                 };
 
@@ -111,7 +106,7 @@ public class SSActivity extends AppCompatActivity {
             }
         };
 
-        EncryptionUtils.generateStuff(this, callback);
+        KeyTool.createSecurityStuff(getFilesDir(), callback);
     }
 
     @Override

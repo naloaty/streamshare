@@ -27,7 +27,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <fragment
-                android:id="@+id/devicesFragment"
+                android:id="@+id/device_manage_fragment"
                 android:name="com.naloaty.syncshare.fragment.MyDevicesFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>

@@ -11,7 +11,7 @@ import com.naloaty.syncshare.config.Keyword;
 import com.naloaty.syncshare.database.NetworkDevice;
 import com.naloaty.syncshare.database.NetworkDeviceRepository;
 import com.naloaty.syncshare.database.SSDevice;
-import com.naloaty.syncshare.service.DetectiveJobService;
+import com.naloaty.syncshare.database.SSDeviceRepository;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,14 +22,7 @@ public class NetworkDeviceManager {
 
     public static final int JOB_DETECTIVE_ID = 43123;
 
-    /*
-     * [NsdHelper]                               [NetworkDeviceManager]
-     * onServiceResolved(); --------------------> manageDevice(db, ip);
-     */
-
-
     public static void manageDevice(Context context, NetworkDevice networkDevice) {
-        //manageDevice(context, networkDevice, false);
         String myId = AppUtils.getDeviceId(context);
 
         if (networkDevice.getDeviceId().equals(myId))
@@ -38,86 +31,8 @@ public class NetworkDeviceManager {
         processDevice(context, networkDevice);
     }
 
-    public static CommunicationBridge.Client manageDevice(final Context context, final NetworkDevice networkDevice, boolean useCurrentThread) {
-
-        CommunicationBridge.Client.ConnectionHandler connectionHandler =
-                new CommunicationBridge.Client.ConnectionHandler() {
-                    @Override
-                    public void onConnect(CommunicationBridge.Client client) {
-                        try {
-                            SSDevice device = client.handleDevice(networkDevice.getIpAddress());
-                            client.setDevice(device);
-
-                            if (device.getDeviceId() != null) {
-
-                                SSDevice localDevice = AppUtils.getLocalDevice(context);
-
-                                /*if (localDevice.getDeviceId().contentEquals(device.getDeviceId()))
-                                    networkDevice.setLocalDevice(true);
-                                else
-                                {
-                                    networkDevice.setDeviceId(device.getDeviceId());
-                                    networkDevice.setDeviceName(device.getNickname());
-                                    networkDevice.setLastCheckedDate(System.currentTimeMillis());
-                                }
-
-
-                                processDevice(context, networkDevice);*/
-                            }
-                        } catch (Exception e) {
-                            Log.i(TAG, "Could not connect to device " + networkDevice.getIpAddress() + ": " + e.getMessage());
-                            processDevice(context, networkDevice);
-                        }
-                    }
-                };
-
-       Log.i(TAG, "Connecting to " + networkDevice.getIpAddress());
-       return CommunicationBridge.connect(context, useCurrentThread, connectionHandler);
-    }
-
-    public static void scheduleDetective(final Context context) {
-
-        ComponentName componentName = new ComponentName(context, DetectiveJobService.class);
-        /*
-         * See useful methods here
-         * https://developer.android.com/reference/android/app/job/JobInfo.Builder.html
-         */
-        JobInfo jobInfo = new JobInfo.Builder(JOB_DETECTIVE_ID, componentName)
-                .setMinimumLatency(10 * 1000) //10 sec
-                .build();
-
-        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        int resultCode = scheduler.schedule(jobInfo);
-
-        if (resultCode == JobScheduler.RESULT_SUCCESS)
-            Log.d(TAG, "Detective scheduled with success");
-        else
-            Log.d(TAG, "Detective scheduling fail");
-
-    }
-
-    public static boolean isJobServiceOn(Context context, int jobId) {
-        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE) ;
-
-        boolean hasBeenScheduled = false ;
-
-        for (JobInfo jobInfo : scheduler.getAllPendingJobs()) {
-            if (jobInfo.getId() == jobId) {
-                hasBeenScheduled = true ;
-                break ;
-            }
-        }
-
-        return hasBeenScheduled ;
-    }
-
-
     public static void processDevice(Context context, NetworkDevice networkDevice)
     {
-        /*if (networkDevice.getDeviceId().equals("-"))
-            if (!isJobServiceOn(context, JOB_DETECTIVE_ID))
-                scheduleDetective(context);*/
-
         NetworkDeviceRepository repository = new NetworkDeviceRepository(context);
         NetworkDevice entry = repository.findDevice(networkDevice.getIpAddress(), networkDevice.getDeviceId(), networkDevice.getServiceName());
 

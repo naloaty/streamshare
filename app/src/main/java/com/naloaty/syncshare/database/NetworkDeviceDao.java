@@ -21,8 +21,14 @@ public interface NetworkDeviceDao {
     @Query("SELECT * FROM network_devices_table")
     LiveData<List<NetworkDevice>> getAllDevices();
 
+    @Query("SELECT * FROM network_devices_table")
+    List<NetworkDevice> getAllDevicesList();
+
     @Query("DELETE FROM network_devices_table")
     void deleteAllDevices();
+
+    @Query("SELECT COUNT(*) FROM network_devices_table")
+    Integer getDeviceCount();
 
     @Query("SELECT * FROM network_devices_table WHERE ipAddress=:ipAddress OR deviceId=:deviceId OR serviceName=:serviceName")
     NetworkDevice findDevice(String ipAddress, String deviceId, String serviceName);

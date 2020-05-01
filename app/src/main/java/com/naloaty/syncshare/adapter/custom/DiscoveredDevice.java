@@ -49,7 +49,7 @@ public class DiscoveredDevice extends BodyItem {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.discovered_device, parent, false);
 
-        return new ViewHolder(view, getOnItemClickListener());
+        return new ViewHolder(view, getOnItemClickListener(), this);
     }
 
     @Override
@@ -59,7 +59,11 @@ public class DiscoveredDevice extends BodyItem {
 
             holder.deviceIcon.setImageResource(getIconResource());
             holder.deviceName.setText(getDeviceName());
-            holder.appVersion.setText(getAppVersion());
+
+            String[] appVersion = getAppVersion().split("::");
+            holder.appVersion.setText(appVersion[0]);
+            holder.onItemClickListener = getOnItemClickListener();
+            holder.discoveredDevice = this;
         }
     }
 
@@ -71,8 +75,9 @@ public class DiscoveredDevice extends BodyItem {
         RelativeLayout layout;
 
         OnItemClickListener onItemClickListener;
+        DiscoveredDevice discoveredDevice;
 
-        public ViewHolder(@NonNull View itemView, OnItemClickListener listener) {
+        public ViewHolder(@NonNull View itemView, OnItemClickListener listener, DiscoveredDevice device) {
             super(itemView);
 
             deviceIcon = itemView.findViewById(R.id.discovered_device_icon);
@@ -80,6 +85,7 @@ public class DiscoveredDevice extends BodyItem {
             appVersion = itemView.findViewById(R.id.discovered_device_extra_information);
             layout = itemView.findViewById(R.id.discovered_device_layout);
             onItemClickListener = listener;
+            discoveredDevice = device;
 
             layout.setOnClickListener(this);
         }
@@ -87,8 +93,9 @@ public class DiscoveredDevice extends BodyItem {
         @Override
         public void onClick(View v) {
             Log.d("DiscoveredDevice", "OnClick");
+
             if (onItemClickListener != null)
-                onItemClickListener.onItemClick(DiscoveredDevice.this);
+                onItemClickListener.onItemClick(discoveredDevice);
         }
     }
 }

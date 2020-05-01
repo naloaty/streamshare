@@ -7,7 +7,14 @@
     <item
         android:id="@+id/action_toggle_sharing"
         android:orderInCategory="1"
-        android:title="Stop sharing"
+        android:icon="@drawable/ic_service_on_24dp"
+        android:title="@string/text_defaultValue"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_open_device_info"
+        android:orderInCategory="1"
+        android:title="@string/menu_openDeviceInfo"
         app:showAsAction="never" />
 
 </menu>

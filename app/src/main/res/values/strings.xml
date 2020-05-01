@@ -47,11 +47,6 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
-    <!-- online devices list -->
-    <string name="text_localDevice">Local Device</string>
-    <string name="text_localArea">Local area</string>
-    <string name="text_nearbyArea">Nearby devices</string>
-
     <!-- notification channels -->
     <string name="text_ncHighPriority">High priority</string>
     <string name="text_ncHighPriorityDescription">SyncShare high priority notifications</string>
@@ -79,7 +74,7 @@
     <string name="btn_scanQrCode">Scan QR Code</string>
     <string name="btn_enterIdManually">Enter Device ID manually</string>
     <string name="text_useDiscoveredDevices">Use discovered devices</string>
-    <string name="text_discoveringDevices">Searching nearby devices</string>
+    <string name="text_discoveringDevices">No nearby devices found</string>
 
     <!-- device info fragment -->
     <string name="text_deviceInfoHelp">Scan this qr code on another device. You can also manually enter the ID of this device on another</string>
@@ -111,12 +106,28 @@
     <string name="btn_exitApp">Exit</string>
     <string name="toast_keysCreationSuccess">Secret keys created with success</string>
 
+    <string name="text_onRequestDeviceInfo">Requesting device information</string>
+    <string name="text_onSendingDeviceInfo">Sending device information</string>
     <string name="toast_alreadyAdded">Device already added</string>
-    <string name="toast_successfullyAdded">Device successfully added</string>
+
+    <string name="text_offlineDevice">The device you are trying to add is offline. To complete the setup, connect both devices to the same Wi-Fi network and either follow the add procedure on the second device, or delete it and repeat the steps on this device</string>
+    <string name="text_handShakeException">Repeat the adding procedure on the second device to complete the setup</string>
+    <string name="text_onSuccessfullyAdded">Both devices have been successfully configured</string>
+    <string name="text_oExchangeFailed">Failed to communicate the second device. To complete the setup, connect both devices to the same Wi-Fi network, delete the device you just added and repeat the adding procedure</string>
+
+    <string name="title_success">Success</string>
+    <string name="title_step2">Step 2</string>
+    <string name="title_trustQuestion">Do you trust this device?</string>
+    <string name="text_trustQuestionHelp">Does the following device identifier match what is on the second device in the Device Information section?\n\n%s</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
+    <string name="title_verification">Device verification</string>
+    <string name="text_verificationHelp">Does the following code match what you see on the second device?\n\n%s</string>
+
 
     <string name="text_unknownAddress">No known address for the device</string>
-    <string name="text_unverifiedDevice">Unverified device</string>
-    <string name="text_seeDetailedInformation">Tap for detail</string>
+    <string name="text_unknownDevice">Unknown device</string>
+    <string name="text_unknownState">Device state is unknown</string>
 
     <!-- my device details -->
     <string name="text_deviceName">Device name</string>
@@ -128,4 +139,19 @@
     <string name="btn_remove">Remove</string>
     <string name="text_confirmRemoval">Are you sure you want to remove the device?</string>
     <string name="btn_cancel">Cancel</string>
+
+    <string name="text_serviceNotStarted">SyncShare service\nis not started</string>
+    <string name="btn_start">Start</string>
+
+    <string name="menu_openDeviceInfo">Add device</string>
+
+    <string name="text_localDevice">This device</string>
+    <string name="header_onlineDevices">Online devices</string>
+
+    <string name="text_noDevicesAdded">No devices added</string>
+    <string name="text_noOnlineDevices">All devices are offline</string>
+    <string name="btn_addDevice">Add device</string>
+    <string name="btn_manageDevices">Manage devices</string>
+
+    <string name="text_localDeviceHelp">Here you can choose which albums will be available to other devices</string>
 </resources>

@@ -32,8 +32,6 @@ public class NotificationUtils {
                             NotificationManager.IMPORTANCE_HIGH);
             channelHigh.setDescription(context.getString(R.string.text_ncHighPriorityDescription));
 
-            /*channelHigh.enableLights(true);
-            channelHigh.enableVibration(true);*/
             notificationManager.createNotificationChannel(channelHigh);
 
             NotificationChannel channelLow =

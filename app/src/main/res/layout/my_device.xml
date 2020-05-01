@@ -7,7 +7,7 @@
     app:cardUseCompatPadding="true">
 
     <RelativeLayout
-        android:id="@+id/my_device_layout"
+        android:id="@+id/online_device_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
@@ -15,7 +15,7 @@
         android:clickable="true">
 
         <ImageView
-            android:id="@+id/my_device_icon"
+            android:id="@+id/online_device_icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginRight="16dp"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/my_device_icon"
+            android:layout_toEndOf="@id/online_device_icon"
             android:layout_toStartOf="@id/my_device_info_btn">
 
             <TextView

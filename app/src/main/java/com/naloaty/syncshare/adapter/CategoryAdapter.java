@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.naloaty.syncshare.adapter.base.BodyItem;
 import com.naloaty.syncshare.adapter.base.Category;
 import com.naloaty.syncshare.adapter.base.ListItem;
 
@@ -28,8 +29,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyDataSetChanged();
     }
 
-    //TODO: kostyl
-    //viewType is not viewType. It is item position
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return mItems.get(viewType).getViewHolder(parent);
@@ -42,7 +41,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        //TODO: Kostyl
+
+        //Every item can be unique, so it is itself view type
         return position;
     }
 

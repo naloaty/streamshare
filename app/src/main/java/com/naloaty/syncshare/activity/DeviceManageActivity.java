@@ -49,10 +49,10 @@ public class DeviceManageActivity extends SSActivity {
         super.onBackPressed();
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate(R.menu.toolbar_menu_device_manage, menu);
         return true;
-    }
+    }*/
 }

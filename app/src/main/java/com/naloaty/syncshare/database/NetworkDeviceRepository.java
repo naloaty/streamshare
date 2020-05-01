@@ -59,6 +59,30 @@ public class NetworkDeviceRepository {
 
     }
 
+    public int getDeviceCount() {
+        try
+        {
+            return new GetDeviceCountAT(networkDeviceDao).execute().get();
+        }
+        catch (Exception e) {
+            Log.d(TAG, "getDeviceCount() exception: " + e.getMessage());
+            return new Integer(0);
+        }
+
+    }
+
+    public List<NetworkDevice> getAllDevicesList() {
+        try
+        {
+            return new GetAllDevicesListAT(networkDeviceDao).execute().get();
+        }
+        catch (Exception e) {
+            Log.d(TAG, "getAllDevicesList() exception: " + e.getMessage());
+            return null;
+        }
+
+    }
+
     public static class GetUnknownAT extends AsyncTask<Void, Void, List<NetworkDevice>> {
 
         private NetworkDeviceDao networkDeviceDao;
@@ -127,6 +151,33 @@ public class NetworkDeviceRepository {
         @Override
         protected NetworkDevice doInBackground(String... strings) {
             return networkDeviceDao.findDevice(strings[0], strings[1], strings[2]);
+        }
+    }
+
+    public static class GetDeviceCountAT extends AsyncTask<Void, Void, Integer> {
+
+        private NetworkDeviceDao networkDeviceDao;
+
+        public GetDeviceCountAT(NetworkDeviceDao networkDeviceDao) {
+            this.networkDeviceDao = networkDeviceDao;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return networkDeviceDao.getDeviceCount();
+        }
+    }
+
+    public static class GetAllDevicesListAT extends AsyncTask<Void, Void, List<NetworkDevice>> {
+        private NetworkDeviceDao networkDeviceDao;
+
+        public GetAllDevicesListAT(NetworkDeviceDao networkDeviceDao) {
+            this.networkDeviceDao = networkDeviceDao;
+        }
+
+        @Override
+        protected List<NetworkDevice> doInBackground(Void... voids) {
+            return networkDeviceDao.getAllDevicesList();
         }
     }
 }

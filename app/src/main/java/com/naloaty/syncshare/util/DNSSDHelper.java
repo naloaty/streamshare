@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.github.druk.dnssd.BrowseListener;
 import com.github.druk.dnssd.DNSSD;
@@ -18,7 +17,6 @@ import com.github.druk.dnssd.ResolveListener;
 import com.github.druk.dnssd.TXTRecord;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.database.NetworkDevice;
-import com.naloaty.syncshare.database.SSDevice;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -35,7 +33,7 @@ public class DNSSDHelper {
 
     private static final String
                     TXT_RECORD_DEVICE_ID = "deviceId",
-                    TXT_RECORD_DEVICE_NICKNAME = "deviceName",
+                    TXT_RECORD_DEVICE_NICKNAME = "deviceNickname",
                     TXT_RECORD_APP_VERSION = "appVersion";
 
     private DNSSD mDNSSD;
@@ -56,7 +54,7 @@ public class DNSSDHelper {
     public void startBrowse() {
         Log.d(TAG, "Start browse");
         try {
-            mBrowseService = mDNSSD.browse(AppConfig.NSD_SERVICE_TYPE, new BrowseListener() {
+            mBrowseService = mDNSSD.browse(AppConfig.DNSSD_SERVICE_TYPE, new BrowseListener() {
                 @Override
                 public void serviceFound(DNSSDService browser, int flags, int ifIndex, final String serviceName, String regType, String domain) {
                     Log.d(TAG, "Found " + serviceName);
@@ -147,15 +145,15 @@ public class DNSSDHelper {
     public void register() {
         Log.d(TAG, "register");
         try {
-            mServiceName = AppConfig.NSD_SERVICE_NAME + "_" + AppUtils.getUniqueNumber();
+            mServiceName = AppConfig.DNSSD_SERVICE_NAME + "_" + AppUtils.getUniqueNumber();
 
             TXTRecord extraData = new TXTRecord();
             extraData.set(TXT_RECORD_DEVICE_ID, AppUtils.getDeviceId(mContext));
             extraData.set(TXT_RECORD_DEVICE_NICKNAME, AppUtils.getLocalDeviceName());
             extraData.set(TXT_RECORD_APP_VERSION, AppConfig.APP_VERSION);
 
-            //mServiceName, AppConfig.NSD_SERVICE_TYPE, AppConfig.SERVER_PORT
-            mRegisterService = mDNSSD.register(0, 0, mServiceName, AppConfig.NSD_SERVICE_TYPE, null, null, AppConfig.SERVER_PORT, extraData,  new RegisterListener() {
+            //mServiceName, AppConfig.DNSSD_SERVICE_TYPE, AppConfig.DNSSD_SERVER_PORT
+            mRegisterService = mDNSSD.register(0, 0, mServiceName, AppConfig.DNSSD_SERVICE_TYPE, null, null, AppConfig.DNSSD_SERVER_PORT, extraData,  new RegisterListener() {
                 @Override
                 public void serviceRegistered(DNSSDRegistration registration, int flags, String serviceName, String regType, String domain) {
                     Log.d(TAG, "Register successfully " + serviceName);

@@ -11,6 +11,7 @@
         android:padding="16dp"/>
 
     <include
+        android:id="@+id/my_devices_empty_placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

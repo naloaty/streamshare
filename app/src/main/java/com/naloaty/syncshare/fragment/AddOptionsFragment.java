@@ -6,17 +6,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.AddDeviceActivity;
+import com.naloaty.syncshare.service.CommunicationService;
+import com.naloaty.syncshare.util.AppUtils;
 
 public class AddOptionsFragment extends Fragment {
 
     private static final String TAG = "AddOptionsFragment";
+
+    private ProgressBar mProgressBar;
 
     @Nullable
     @Override
@@ -25,9 +31,22 @@ public class AddOptionsFragment extends Fragment {
         return view;
     }
 
+    public void setServiceState(boolean serviceStarted) {
+        if (mProgressBar != null)
+            mProgressBar.setVisibility(serviceStarted ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onResume() {
+        setServiceState(AppUtils.isServiceRunning(getContext(), CommunicationService.class));
+        super.onResume();
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mProgressBar = view.findViewById(R.id.progressBar);
 
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
@@ -55,7 +74,8 @@ public class AddOptionsFragment extends Fragment {
     private void changeFragment(OptionFragment targetFragment) {
 
         Log.d(TAG, "Sending broadcast");
-        getContext().sendBroadcast(new Intent(AddDeviceActivity.ACTION_CHANGE_FRAGMENT)
+        LocalBroadcastManager.getInstance(getContext())
+                .sendBroadcast(new Intent(AddDeviceActivity.ACTION_CHANGE_FRAGMENT)
                 .putExtra(AddDeviceActivity.EXTRA_TARGET_FRAGMENT, targetFragment.toString()));
     }
 }

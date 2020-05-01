@@ -1,7 +1,10 @@
 package com.naloaty.syncshare.activity;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +18,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.naloaty.syncshare.R;
@@ -32,6 +36,37 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private MenuItem mSelectedDrawerItem;
+    private MenuItem mServiceToggle;
+
+    private final IntentFilter mFilter = new IntentFilter();
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equals(CommunicationService.SERVICE_STATE_CHANGED)) {
+                setServiceState(intent.getBooleanExtra(CommunicationService.EXTRA_SERVICE_SATE, false));
+            }
+        }
+    };
+
+    private void setServiceState(boolean serviceStarted) {
+
+        if (mServiceToggle == null)
+            return;
+
+        if (serviceStarted) {
+            mServiceToggle.setTitle(R.string.menu_stopSharing);
+            mServiceToggle.setIcon(R.drawable.ic_service_off_24dp);
+        }
+        else
+        {
+            mServiceToggle.setTitle(R.string.menu_startSharing);
+            mServiceToggle.setIcon(R.drawable.ic_service_on_24dp);
+        }
+
+    }
+
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -47,6 +82,8 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         getSupportActionBar().setHomeButtonEnabled(true);
 
         setUpNavigationDrawer();
+
+        mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
 
     }
 
@@ -138,6 +175,10 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
                 toggleCommunicationService();
                 return true;
 
+            case R.id.action_open_device_info:
+                startActivity(new Intent(this, AddDeviceActivity.class));
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -156,36 +197,47 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        getMenuInflater().inflate(R.menu.toolbar_menu_main, menu);
-        return true;
+    protected void onResume() {
+        setServiceState(AppUtils.isServiceRunning(this, CommunicationService.class));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mFilter);
+        super.onResume();
     }
 
     @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
+        super.onPause();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.toolbar_menu_main, menu);
+
+        mServiceToggle = menu.findItem(R.id.action_toggle_sharing);
+        return true;
+    }
+
+    /*@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
         MenuItem serviceToggle = menu.findItem(R.id.action_toggle_sharing);
-
-        /*boolean serviceRunning = getDefaultSharedPreferences()
-                .getBoolean(CommunicationService.PREFERNCE_SERVICE_RUNNING, false);*/
 
         boolean serviceRunning = AppUtils.isServiceRunning(getApplication(), CommunicationService.class);
 
         if (serviceRunning) {
             Log.d(TAG, "Service running");
             serviceToggle.setTitle(R.string.menu_stopSharing);
-            serviceToggle.setIcon(R.drawable.ic_pause_24dp);
+            serviceToggle.setIcon(R.drawable.ic_service_off_24dp);
         }
         else
         {
             Log.d(TAG, "Service NOT running");
             serviceToggle.setTitle(R.string.menu_startSharing);
-            serviceToggle.setIcon(R.drawable.ic_play_arrow_24dp);
+            serviceToggle.setIcon(R.drawable.ic_service_on_24dp);
         }
-
         return super.onPrepareOptionsMenu(menu);
-    }
+    }*/
 
     private void toggleCommunicationService() {
 

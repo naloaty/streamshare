@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.naloaty.syncshare.widget.RecyclerViewEmptySupport
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/nearby_discovery_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,11 +13,9 @@
         android:paddingBottom="16dp"/>
 
     <include
-        android:id="@+id/nearby_discovery_empty_placeholder"
-        android:layout_width="match_parent"
+        android:id="@+id/message_placeholder"
         android:layout_height="match_parent"
+        android:layout_width="match_parent"
         android:visibility="gone"
-        android:layout_gravity="center"
-        layout="@layout/discovered_devices_empty"/>
-
+        layout="@layout/view_message" />
 </LinearLayout>

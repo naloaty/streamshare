@@ -1,11 +1,10 @@
 package com.naloaty.syncshare.dialog;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.database.SSDevice;
 import com.naloaty.syncshare.database.SSDeviceRepository;
 
@@ -54,11 +54,25 @@ public class MyDeviceDetailsDialog extends ManualDismissDialog {
             }
         });
 
+        mAllowAccess.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setAccessAllowed(isChecked);
+            }
+        });
+
         setView(mView);
         mContext = context;
     }
 
-    public void removeDevice() {
+    private void setAccessAllowed(boolean accessAllowed) {
+        mSSDevice.setAccessAllowed(accessAllowed);
+
+        SSDeviceRepository repository = new SSDeviceRepository(mContext);
+        repository.update(mSSDevice);
+    }
+
+    private void removeDevice() {
 
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
         {
@@ -88,39 +102,32 @@ public class MyDeviceDetailsDialog extends ManualDismissDialog {
 
         mSSDevice = device;
 
-        int iconResource = 0;
-        switch (device.getAppPlatform()) {
+        int iconResource;
+        String[] appVersion = device.getAppVersion().split("::");;
+        switch (appVersion[1]) {
 
-            case SSDevice.PLATFORM_MOBILE:
+            case AppConfig.PLATFORM_MOBILE:
                 iconResource = R.drawable.ic_phone_android_24dp;
                 break;
 
-            case SSDevice.PLATFORM_DESKTOP:
+            case AppConfig.PLATFORM_DESKTOP:
                 iconResource = R.drawable.ic_desktop_windows_24dp;
                 break;
 
-            case SSDevice.PLATFORM_UNKNOWN:
+            default:
                 iconResource = R.drawable.ic_warning_24dp;
                 break;
         }
 
-        if (!device.isVerified()) {
-            iconResource = R.drawable.ic_warning_24dp;
-            mDeviceNickname.setText(R.string.text_notVerifiedHelp);
-            mDeviceNickname.setTextColor(ContextCompat.getColor(mContext, R.color.colorNotVerified));
-            mAllowAccess.setEnabled(false);
-        }
-        else
-            mDeviceNickname.setText(device.getNickname());
+        mDeviceNickname.setText(device.getNickname());
 
         mDeviceIcon.setImageResource(iconResource);
-
         mDeviceId.setText(device.getDeviceId());
 
         String namePlaceholder = mContext.getString(R.string.text_deviceNamePlaceholder);
         mDeviceName.setText(String.format(namePlaceholder, device.getBrand(), device.getModel()));
 
-        mAppVersion.setText(device.getAppVersion());
+        mAppVersion.setText(appVersion[0]);
         mAllowAccess.setChecked(device.isAccessAllowed());
     }
 
