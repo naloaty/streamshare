@@ -16,7 +16,7 @@ import com.github.druk.dnssd.RegisterListener;
 import com.github.druk.dnssd.ResolveListener;
 import com.github.druk.dnssd.TXTRecord;
 import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.database.NetworkDevice;
+import com.naloaty.syncshare.database.device.NetworkDevice;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

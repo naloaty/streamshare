@@ -1,4 +1,4 @@
-package com.naloaty.syncshare.database;
+package com.naloaty.syncshare.database.device;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -6,11 +6,20 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
+import com.naloaty.syncshare.database.SSDatabase;
+
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class SSDeviceRepository {
 
     private static final String TAG = "SSDeviceRepo";
+
+    /*
+     * TODO: AsyncTask get() method DOES NOT asynchronous
+     * it is block UI, so it should be replaced by callback
+     */
 
     private SSDeviceDao ssDeviceDao;
     private LiveData<List<SSDevice>> allDevices;
@@ -33,7 +42,7 @@ public class SSDeviceRepository {
 
     //Decides whether to add or update
     public void publish(SSDevice device) {
-        SSDevice foundedDevice = findDevice(device.getDeviceId());
+        SSDevice foundedDevice = findDeviceDep(device.getDeviceId());
 
         if (foundedDevice != null){
             device.setId(foundedDevice.getId());
@@ -67,14 +76,19 @@ public class SSDeviceRepository {
 
     }
 
-    public SSDevice findDevice(String deviceId) {
+    @Deprecated
+    public SSDevice findDeviceDep(String deviceId) {
         try{
             return new FindDeviceAT(ssDeviceDao).execute(deviceId).get();
         }
         catch (Exception e) {
-            Log.d(TAG, "findDevice() exception: " + e.getMessage());
+            Log.d(TAG, "findDeviceDep() exception: " + e.getMessage());
             return null;
         }
+    }
+
+    public Single<SSDevice> findDevice(String deviceId) {
+        return ssDeviceDao.findDevice(deviceId);
     }
 
     public static class InsertDeviceAT extends AsyncTask<SSDevice, Void, Void> {
@@ -132,7 +146,7 @@ public class SSDeviceRepository {
 
         @Override
         protected SSDevice doInBackground(String... strings) {
-            return ssDeviceDao.findDevice(strings[0]);
+            return ssDeviceDao.findDeviceDep(strings[0]);
         }
     }
 

@@ -2,20 +2,14 @@ package com.naloaty.syncshare.service;
 
 
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.naloaty.syncshare.app.SSService;
-import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.database.NetworkDeviceRepository;
+import com.naloaty.syncshare.database.device.NetworkDeviceRepository;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.CommunicationNotification;
 import com.naloaty.syncshare.util.DNSSDHelper;
@@ -42,7 +36,10 @@ public class CommunicationService extends SSService {
     public void onCreate() {
         super.onCreate();
 
-        Log.d(TAG, "Starting and registering DNSSD");
+        Log.d(TAG, "Registering DNSSD");
+
+        NetworkDeviceRepository repository = new NetworkDeviceRepository(this);
+        repository.deleteAllConnections();
 
         mDNSSDHelper = AppUtils.getDNSSDHelper(getApplicationContext());
         mDNSSDHelper.register();
@@ -95,9 +92,9 @@ public class CommunicationService extends SSService {
     public void onDestroy() {
         super.onDestroy();
 
-        Log.d(TAG, "Stopping and unregistering DNSSD");
-        mDNSSDHelper.stopBrowse();
+        Log.d(TAG, "Unregistering DNSSD");
         mDNSSDHelper.unregister();
+        mDNSSDHelper.stopBrowse();
 
         try
         {

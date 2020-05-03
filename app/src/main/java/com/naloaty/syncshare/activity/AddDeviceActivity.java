@@ -1,17 +1,14 @@
 package com.naloaty.syncshare.activity;
 
 
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,7 +25,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
-import com.naloaty.syncshare.database.SSDevice;
+import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.dialog.EnterDeviceIdDialog;
 import com.naloaty.syncshare.dialog.SingleTextInputDialog;
 import com.naloaty.syncshare.fragment.DeviceInfoFragment;
@@ -36,7 +33,6 @@ import com.naloaty.syncshare.fragment.OptionFragment;
 import com.naloaty.syncshare.fragment.AddOptionsFragment;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AddDeviceHelper;
-import com.naloaty.syncshare.util.NetworkStateMonitor;
 import com.naloaty.syncshare.util.PermissionHelper;
 
 import org.json.JSONObject;

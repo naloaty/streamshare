@@ -1,6 +1,6 @@
 package com.naloaty.syncshare.communication;
 
-import com.naloaty.syncshare.database.SSDevice;
+import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.config.MediaServerKeyword;
 
 import retrofit2.Call;

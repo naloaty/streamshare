@@ -1,4 +1,4 @@
-package com.naloaty.syncshare.database;
+package com.naloaty.syncshare.database.device;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -9,6 +9,8 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 @Dao
 public interface SSDeviceDao {
@@ -28,6 +30,11 @@ public interface SSDeviceDao {
     @Query("SELECT * FROM ss_devices_table")
     LiveData<List<SSDevice>> getAllDevices();
 
+    @Deprecated
     @Query("SELECT * FROM ss_devices_table WHERE deviceId=:deviceId")
-    SSDevice findDevice(String deviceId);
+    SSDevice findDeviceDep(String deviceId);
+
+    @Query("SELECT * FROM ss_devices_table WHERE deviceId=:deviceId")
+    Single<SSDevice> findDevice(String deviceId);
+
 }

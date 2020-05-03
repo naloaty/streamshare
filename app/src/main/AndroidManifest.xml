@@ -47,6 +47,9 @@
             android:name=".activity.LocalDeviceActivity">
         </activity>
 
+        <activity
+            android:name=".activity.RemoteViewActivity">
+        </activity>
 
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"

@@ -1,4 +1,4 @@
-package com.naloaty.syncshare.database;
+package com.naloaty.syncshare.database.device;
 
 import android.app.Application;
 import android.content.Context;
@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class SSDeviceViewModel extends AndroidViewModel {
 
@@ -34,7 +36,12 @@ public class SSDeviceViewModel extends AndroidViewModel {
         repository.delete(device);
     }
 
-    public SSDevice findDevice(String deviceId) {
+    @Deprecated
+    public SSDevice findDeviceDep(String deviceId) {
+        return repository.findDeviceDep(deviceId);
+    }
+
+    public Single<SSDevice> findDevice(String deviceId) {
         return repository.findDevice(deviceId);
     }
 
@@ -45,5 +52,6 @@ public class SSDeviceViewModel extends AndroidViewModel {
     public LiveData<List<SSDevice>> getAllDevices () {
         return allDevices;
     }
+
 }
 

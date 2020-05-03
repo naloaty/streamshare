@@ -14,10 +14,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.naloaty.syncshare.R;
 
-/*
- * Collapsing toolbar based on https://stackoverflow.com/questions/32883693/collapsingtoolbarlayout-with-a-custom-view#44567849
- */
-
 public class LocalDeviceActivity extends SSActivity {
 
     /* Collapsing toolbar */

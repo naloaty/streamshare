@@ -7,7 +7,14 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {NetworkDevice.class, SSDevice.class}, version = 1)
+import com.naloaty.syncshare.database.device.NetworkDevice;
+import com.naloaty.syncshare.database.device.NetworkDeviceDao;
+import com.naloaty.syncshare.database.device.SSDevice;
+import com.naloaty.syncshare.database.device.SSDeviceDao;
+import com.naloaty.syncshare.database.media.Album;
+import com.naloaty.syncshare.database.media.AlbumDao;
+
+@Database(entities = {NetworkDevice.class, SSDevice.class, Album.class}, version = 1)
 public abstract class SSDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "syncshare_db";
@@ -28,5 +35,7 @@ public abstract class SSDatabase extends RoomDatabase {
     public abstract NetworkDeviceDao NetworkDeviceDao();
 
     public abstract SSDeviceDao ssDeviceDao();
+
+    public abstract AlbumDao albumDao();
 
 }

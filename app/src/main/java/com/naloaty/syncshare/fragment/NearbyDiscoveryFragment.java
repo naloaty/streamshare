@@ -29,22 +29,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.activity.AddDeviceActivity;
-import com.naloaty.syncshare.activity.DeviceManageActivity;
-import com.naloaty.syncshare.adapter.CategoryAdapter;
-import com.naloaty.syncshare.adapter.base.BodyItem;
-import com.naloaty.syncshare.adapter.base.Category;
-import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
-import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.database.NetworkDevice;
-import com.naloaty.syncshare.database.NetworkDeviceViewModel;
-import com.naloaty.syncshare.database.SSDevice;
-import com.naloaty.syncshare.dialog.EnterDeviceIdDialog;
-import com.naloaty.syncshare.dialog.SingleTextInputDialog;
+import com.naloaty.syncshare.adapter.DiscoveredDevicesAdapter;
+import com.naloaty.syncshare.adapter.OnRVClickListener;
+import com.naloaty.syncshare.database.device.NetworkDevice;
+import com.naloaty.syncshare.database.device.NetworkDeviceViewModel;
+import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AddDeviceHelper;
 import com.naloaty.syncshare.util.AppUtils;
-import com.naloaty.syncshare.widget.RecyclerViewEmptySupport;
+import com.naloaty.syncshare.util.DNSSDHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,28 +46,15 @@ public class NearbyDiscoveryFragment extends Fragment {
 
     private static final String TAG = "NearbyDiscoveryFragment";
     
-    private ArrayList<Category> mList;
+    private List<NetworkDevice> mList = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    private CategoryAdapter mCategoryAdapter;
+    private DiscoveredDevicesAdapter mRVAdapter;
     private NetworkDeviceViewModel networkDeviceViewModel;
 
-    /* Message view */
-    private ImageView mMessageIcon;
-    private TextView mMessageText;
-    private AppCompatButton mMessageActionBtn;
-    private LinearLayout mMessageBtnLayout;
-    private ViewGroup mMessagePlaceholder;
-
-    private UIState currentUIState;
-    private boolean isServiceRunning = false;
-
-    private enum UIState {
-        OnlineShown,
-        NoDevicesFound,
-        ServiceNotRunning;
-    }
+    private DNSSDHelper mDNSSDHelper;
 
     private final IntentFilter mFilter = new IntentFilter();
+
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -90,149 +70,12 @@ public class NearbyDiscoveryFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-       // this.mDNSSDHelper = AppUtils.getDNSSDHelper(getActivity().getApplicationContext());
-        this.networkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
+        mDNSSDHelper = new DNSSDHelper(getContext());
 
+        this.networkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
         mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
     }
 
-    private void setServiceState(boolean serviceStarted) {
-        isServiceRunning = serviceStarted;
-        setUIState(getRequiredState());
-    }
-
-    private UIState getRequiredState() {
-        if (isServiceRunning) {
-            boolean hasDevices = networkDeviceViewModel.getDeviceCount() > 0;
-
-            if (hasDevices)
-                return UIState.OnlineShown;
-            else
-                return UIState.NoDevicesFound;
-        }
-        else
-            return UIState.ServiceNotRunning;
-    }
-
-    private void setUIState(UIState uiState) {
-        if (currentUIState == uiState)
-            return;
-
-        switch (uiState) {
-            case OnlineShown:
-                toggleMessage(false);
-                break;
-
-            case NoDevicesFound:
-                setMessageAnim(R.drawable.ic_devices_24dp, R.string.text_discoveringDevices, 0, null);
-                toggleMessage(true);
-                break;
-
-            case ServiceNotRunning:
-                View.OnClickListener startService = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getContext(), CommunicationService.class);
-                        //TODO: kostyl
-                        intent.setAction("kostyl");
-                        getActivity().startService(intent);
-                    }
-                };
-
-                setMessageAnim(R.drawable.ic_service_off_24dp, R.string.text_serviceNotStarted, R.string.btn_start, startService);
-                toggleMessage(true);
-
-                break;
-        }
-
-        currentUIState = uiState;
-    }
-
-    private void setMessageAnim(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
-
-        int currState = mMessagePlaceholder.getVisibility();
-
-        if (currState == View.VISIBLE) {
-            mMessagePlaceholder
-                    .animate()
-                    .setDuration(300)
-                    .alpha(0)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            setMessage(iconResource, textResource, btnResource, listener);
-                        }
-                    });
-        }
-        else
-        {
-            setMessage(iconResource, textResource, btnResource, listener);
-        }
-    }
-
-    private void setMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
-        mMessageIcon.setImageResource(iconResource);
-        mMessageText.setText(textResource);
-
-        if (listener == null) {
-            mMessageBtnLayout.setVisibility(View.GONE);
-        }
-        else
-        {
-            mMessageBtnLayout.setVisibility(View.VISIBLE);
-            mMessageActionBtn.setText(btnResource);
-            mMessageActionBtn.setOnClickListener(listener);
-        }
-
-        int currSate = mMessagePlaceholder.getVisibility();
-
-        if (mMessagePlaceholder.getAlpha() < 1 && currSate == View.VISIBLE) {
-            mMessagePlaceholder
-                    .animate()
-                    .setDuration(300)
-                    .alpha(1)
-                    .setListener(null);
-        }
-    }
-
-    private void toggleMessage(boolean isVisible) {
-        //mMessagePlaceholder.setVisibility(isVisible ? View.VISIBLE : View.GONE);
-
-        int curentState = mMessagePlaceholder.getVisibility();
-
-        if (isVisible) {
-            if (curentState == View.VISIBLE)
-                return;
-
-            mRecyclerView.setVisibility(View.GONE);
-            mMessagePlaceholder.setAlpha(0);
-            mMessagePlaceholder.setVisibility(View.VISIBLE);
-            mMessagePlaceholder.animate()
-                    .alpha(1)
-                    .setDuration(150)
-                    .setListener(null);
-        }
-        else
-        {
-            if (curentState == View.GONE)
-                return;
-
-            mMessagePlaceholder.setVisibility(View.VISIBLE);
-            mMessagePlaceholder.setAlpha(1);
-            mMessagePlaceholder.animate()
-                    .alpha(0)
-                    .setDuration(150)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            mMessagePlaceholder.setVisibility(View.GONE);
-                            mRecyclerView.setVisibility(View.VISIBLE);
-                        }
-                    });
-        }
-    }
 
     @Override
     public void onResume()
@@ -249,7 +92,6 @@ public class NearbyDiscoveryFragment extends Fragment {
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mReceiver);
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -261,25 +103,13 @@ public class NearbyDiscoveryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /* View Message*/
-        mMessageIcon = view.findViewById(R.id.message_icon);
-        mMessageText = view.findViewById(R.id.message_text);
-        mMessageActionBtn = view.findViewById(R.id.message_action_button);
-        mMessageBtnLayout = view.findViewById(R.id.message_btn_layout);
-        mMessagePlaceholder = view.findViewById(R.id.message_placeholder);
+        initMessage(view.findViewById(R.id.message_placeholder));
 
         mRecyclerView = view.findViewById(R.id.nearby_discovery_recycler_view);
-
         setupRecyclerView();
     }
 
     private void setupRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mCategoryAdapter = new CategoryAdapter();
-
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mCategoryAdapter);
-
         final AddDeviceHelper.AddDeviceCallback callback = new AddDeviceHelper.AddDeviceCallback() {
             @Override
             public void onSuccessfullyAdded() {
@@ -346,10 +176,10 @@ public class NearbyDiscoveryFragment extends Fragment {
             }
         };
 
-        BodyItem.OnItemClickListener clickListener = new BodyItem.OnItemClickListener() {
+        final OnRVClickListener clickListener = new OnRVClickListener() {
             @Override
-            public void onItemClick(BodyItem item) {
-                DiscoveredDevice device = (DiscoveredDevice)item;
+            public void onClick(int itemIndex) {
+                NetworkDevice device = mList.get(itemIndex);
 
                 SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
                 ssDevice.setDeviceId(device.getDeviceId());
@@ -361,48 +191,189 @@ public class NearbyDiscoveryFragment extends Fragment {
             }
         };
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRVAdapter = new DiscoveredDevicesAdapter(clickListener);
+
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setAdapter(mRVAdapter);
+
         networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
+
             @Override
             public void onChanged(List<NetworkDevice> networkDevices) {
-
-                mList = new ArrayList<>();
-
-                Category category = new Category(null);
-
-                for(NetworkDevice networkDevice: networkDevices) {
-                    int iconResource = 0;
-                    String platform = networkDevice.getAppVersion().split("::")[1];
-                    switch (platform) {
-
-                        case AppConfig.PLATFORM_MOBILE:
-                            iconResource = R.drawable.ic_phone_android_24dp;
-                            break;
-
-                        case AppConfig.PLATFORM_DESKTOP:
-                            iconResource = R.drawable.ic_desktop_windows_24dp;
-                            break;
-
-                        default:
-                            iconResource = R.drawable.ic_warning_24dp;
-                            break;
-                    }
-
-                    DiscoveredDevice device = new DiscoveredDevice(
-                            networkDevice.getDeviceName(),
-                            networkDevice.getAppVersion(),
-                            networkDevice.getDeviceId(),
-                            iconResource);
-
-                    device.setOnItemClickListener(clickListener);
-                    category.addItem(device);
-                }
-
-                if (category.getItemsCount() > 0)
-                    mList.add(category);
-
-                setUIState(getRequiredState());
-                mCategoryAdapter.setItems(mList);
+                mList = networkDevices;
+                mRVAdapter.setDevicesList(networkDevices);
+                updateUIState();
             }
         });
+    }
+
+    /*
+     * UI State Machine
+     */
+
+    /* Message view */
+    private ImageView mMessageIcon;
+    private TextView mMessageText;
+    private AppCompatButton mMessageActionBtn;
+    private LinearLayout mMessageBtnLayout;
+    private ViewGroup mMessageHolder;
+
+    private UIState currentUIState;
+    private boolean isServiceRunning = false;
+
+    private void initMessage(ViewGroup messageHolder) {
+        mMessageIcon = messageHolder.findViewById(R.id.message_icon);
+        mMessageText = messageHolder.findViewById(R.id.message_text);
+        mMessageActionBtn = messageHolder.findViewById(R.id.message_action_button);
+        mMessageBtnLayout = messageHolder.findViewById(R.id.message_btn_layout);
+        mMessageHolder = messageHolder;
+    }
+
+    private enum UIState {
+        OnlineShown,
+        NoDevicesFound,
+        ServiceNotRunning;
+    }
+
+    private void updateUIState() {
+        setUIState(getRequiredState());
+    }
+
+    private void setServiceState(boolean serviceStarted) {
+        isServiceRunning = serviceStarted;
+        updateUIState();
+    }
+
+    private UIState getRequiredState() {
+        if (isServiceRunning) {
+            boolean hasItems = mList.size() > 0;
+
+            if (hasItems)
+                return UIState.OnlineShown;
+            else
+                return UIState.NoDevicesFound;
+        }
+        else
+            return UIState.ServiceNotRunning;
+    }
+
+    private void setUIState(UIState state)
+    {
+        if (currentUIState == state)
+            return;
+
+        switch (state) {
+            case OnlineShown:
+                toggleMessage(false);
+                break;
+
+            case NoDevicesFound:
+                replaceMessage(R.drawable.ic_devices_24dp, R.string.text_discoveringDevices);
+                toggleMessage(true);
+                break;
+
+            case ServiceNotRunning:
+                View.OnClickListener listener = (v -> {
+                    Intent intent = new Intent(getContext(), CommunicationService.class);
+                    getActivity().startService(intent);
+                });
+
+                replaceMessage(R.drawable.ic_service_off_24dp, R.string.text_serviceNotStarted, R.string.btn_start, listener);
+                toggleMessage(true);
+                break;
+
+        }
+
+        currentUIState = state;
+    }
+
+    private void replaceMessage(int iconResource, int textResource) {
+        replaceMessage(iconResource, textResource, 0, null);
+    }
+
+    private void replaceMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
+
+        int currState = mMessageHolder.getVisibility();
+
+        if (currState == View.VISIBLE) {
+            mMessageHolder
+                    .animate()
+                    .setDuration(300)
+                    .alpha(0)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            setMessage(iconResource, textResource, btnResource, listener);
+                        }
+                    });
+        }
+        else
+        {
+            setMessage(iconResource, textResource, btnResource, listener);
+        }
+    }
+
+    private void setMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
+        mMessageIcon.setImageResource(iconResource);
+        mMessageText.setText(textResource);
+
+        if (listener == null) {
+            mMessageBtnLayout.setVisibility(View.GONE);
+        }
+        else
+        {
+            mMessageBtnLayout.setVisibility(View.VISIBLE);
+            mMessageActionBtn.setText(btnResource);
+            mMessageActionBtn.setOnClickListener(listener);
+        }
+
+        int currSate = mMessageHolder.getVisibility();
+
+        if (mMessageHolder.getAlpha() < 1 && currSate == View.VISIBLE) {
+            mMessageHolder
+                    .animate()
+                    .setDuration(300)
+                    .alpha(1)
+                    .setListener(null);
+        }
+    }
+
+    private void toggleMessage(boolean isVisible) {
+
+        int currentState = mMessageHolder.getVisibility();
+
+        if (isVisible) {
+            if (currentState == View.VISIBLE)
+                return;
+
+            mRecyclerView.setVisibility(View.GONE);
+            mMessageHolder.setAlpha(0);
+            mMessageHolder.setVisibility(View.VISIBLE);
+            mMessageHolder.animate()
+                    .alpha(1)
+                    .setDuration(150)
+                    .setListener(null);
+        }
+        else
+        {
+            if (currentState == View.GONE)
+                return;
+
+            mMessageHolder.setVisibility(View.VISIBLE);
+            mMessageHolder.setAlpha(1);
+            mMessageHolder.animate()
+                    .alpha(0)
+                    .setDuration(150)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            mMessageHolder.setVisibility(View.GONE);
+                            mRecyclerView.setVisibility(View.VISIBLE);
+                        }
+                    });
+        }
     }
 }

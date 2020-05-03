@@ -1,4 +1,4 @@
-package com.naloaty.syncshare.database;
+package com.naloaty.syncshare.database.device;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -8,17 +8,11 @@ public class NetworkDevice {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-
     private String ipAddress;
-
     private String deviceId;
-
     private String deviceName;
-
     private Long lastCheckedDate;
-
     private String serviceName;
-
     private String appVersion;
 
 

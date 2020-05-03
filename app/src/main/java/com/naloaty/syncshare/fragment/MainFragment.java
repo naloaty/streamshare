@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,21 +25,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.activity.AddDeviceActivity;
 import com.naloaty.syncshare.activity.DeviceManageActivity;
 import com.naloaty.syncshare.activity.LocalDeviceActivity;
-import com.naloaty.syncshare.adapter.CategoryAdapter;
-import com.naloaty.syncshare.adapter.base.BodyItem;
-import com.naloaty.syncshare.adapter.base.Category;
-import com.naloaty.syncshare.adapter.custom.ActionMessage;
-import com.naloaty.syncshare.adapter.custom.DefaultHeader;
-import com.naloaty.syncshare.adapter.custom.DiscoveredDevice;
-import com.naloaty.syncshare.adapter.custom.OnlineDevice;
-import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.database.NetworkDevice;
-import com.naloaty.syncshare.database.NetworkDeviceViewModel;
-import com.naloaty.syncshare.database.SSDevice;
-import com.naloaty.syncshare.database.SSDeviceViewModel;
+import com.naloaty.syncshare.activity.RemoteViewActivity;
+import com.naloaty.syncshare.adapter.OnRVClickListener;
+import com.naloaty.syncshare.adapter.OnlineDevicesAdapter;
+import com.naloaty.syncshare.database.device.NetworkDevice;
+import com.naloaty.syncshare.database.device.NetworkDeviceViewModel;
+import com.naloaty.syncshare.database.device.SSDevice;
+import com.naloaty.syncshare.database.device.SSDeviceViewModel;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 
@@ -49,35 +42,17 @@ import java.util.List;
 
 public class MainFragment extends Fragment {
 
-    private ArrayList<Category> mList;
+    private ArrayList<SSDevice> mList = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    private CategoryAdapter mCategoryAdapter;
+    private OnlineDevicesAdapter mRVAdapter;
     private NetworkDeviceViewModel mNetworkDeviceViewModel;
     private SSDeviceViewModel mSSDeviceViewModel;
-
-    /* Message view */
-    private ImageView mMessageIcon;
-    private TextView mMessageText;
-    private AppCompatButton mMessageActionBtn;
-    private LinearLayout mMessageBtnLayout;
-    private ViewGroup mMessagePlaceholder;
 
     /* Local device */
     private TextView mAlbums;
     private TextView mPhotos;
     private TextView mVideos;
     private LinearLayout mLocalDeviceLayout;
-
-    private UIState currentUIState;
-
-    private enum UIState {
-        OnlineShown,
-        NoOnlineDevices,
-        ServiceNotRunning,
-        NoDevicesAdded;
-    }
-
-    private boolean isServiceRunning = false;
 
     private final IntentFilter mFilter = new IntentFilter();
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -127,123 +102,171 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /* View Message*/
-        mMessageIcon = view.findViewById(R.id.message_icon);
-        mMessageText = view.findViewById(R.id.message_text);
-        mMessageActionBtn = view.findViewById(R.id.message_action_button);
-        mMessageBtnLayout = view.findViewById(R.id.message_btn_layout);
-        mMessagePlaceholder = view.findViewById(R.id.message_placeholder);
-
         /* Local device */
         mAlbums = view.findViewById(R.id.local_device_albums);
         mPhotos = view.findViewById(R.id.local_device_photos);
         mVideos = view.findViewById(R.id.local_device_videos);
         mLocalDeviceLayout = view.findViewById(R.id.local_device_layout);
 
-        mLocalDeviceLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getContext(), LocalDeviceActivity.class));
-            }
-        });
+        initMessage(view.findViewById(R.id.message_placeholder));
 
-        /* RecyclerView */
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mCategoryAdapter = new CategoryAdapter();
+        mLocalDeviceLayout.setOnClickListener((v -> startActivity(new Intent(getContext(), LocalDeviceActivity.class))));
 
         mRecyclerView = view.findViewById(R.id.main_fragment_devices_online);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mCategoryAdapter);
-
         setupRecyclerView();
     }
 
-    private UIState getRequiredState() {
-        if (isServiceRunning) {
 
-            boolean hasDevices = mSSDeviceViewModel.getDeviceCount() > 0;
 
-            if (!hasDevices)
-                return UIState.NoDevicesAdded;
+    private void setupRecyclerView() {
 
-            boolean hasOnline = mNetworkDeviceViewModel.getDeviceCount() > 0;
+        OnRVClickListener clickListener = new OnRVClickListener() {
+            @Override
+            public void onClick(int itemIndex) {
+                Intent intent = new Intent(getContext(), RemoteViewActivity.class);
+                intent.putExtra(RemoteViewActivity.EXTRA_DEVICE_ID, mList.get(itemIndex).getDeviceId());
+                intent.putExtra(RemoteViewActivity.EXTRA_DEVICE_NICKNAME, mList.get(itemIndex).getNickname());
+                startActivity(intent);
+            }
+        };
 
-            if (hasOnline)
-            {
-                List<NetworkDevice> list = mNetworkDeviceViewModel.getAllDevicesList();
-                if (list == null)
-                    return UIState.NoOnlineDevices;
+        /* RecyclerView */
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRVAdapter = new OnlineDevicesAdapter(clickListener);
 
-                for (NetworkDevice netDevice: list) {
-                    SSDevice device = mSSDeviceViewModel.findDevice(netDevice.getDeviceId());
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setAdapter(mRVAdapter);
 
-                    if (device != null)
-                        return UIState.OnlineShown;
+        mNetworkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
+            @Override
+            public void onChanged(List<NetworkDevice> networkDevices) {
+
+                mList = new ArrayList<>();
+
+                for (NetworkDevice networkDevice : networkDevices) {
+                    String deviceId = networkDevice.getDeviceId();
+                    SSDevice foundedDevice = mSSDeviceViewModel.findDeviceDep(deviceId);
+
+                    if (foundedDevice == null)
+                        continue;
+
+                    mList.add(foundedDevice);
                 }
 
-                return UIState.NoOnlineDevices;
+                mRVAdapter.setDevicesList(mList);
+                updateUIState();
             }
-            else
-                return UIState.NoOnlineDevices;
-        }
-        else
-        {
-            return UIState.ServiceNotRunning;
-        }
+        });
     }
 
-    private void setUIState(UIState uiState) {
-        if (currentUIState == uiState)
+    /*
+     * UI State Machine
+     */
+
+    /* Message view */
+    private ImageView mMessageIcon;
+    private TextView mMessageText;
+    private AppCompatButton mMessageActionBtn;
+    private LinearLayout mMessageBtnLayout;
+    private ViewGroup mMessageHolder;
+
+    private UIState currentUIState;
+    private boolean isServiceRunning = false;
+
+    private void initMessage(ViewGroup messageHolder) {
+        mMessageIcon = messageHolder.findViewById(R.id.message_icon);
+        mMessageText = messageHolder.findViewById(R.id.message_text);
+        mMessageActionBtn = messageHolder.findViewById(R.id.message_action_button);
+        mMessageBtnLayout = messageHolder.findViewById(R.id.message_btn_layout);
+        mMessageHolder = messageHolder;
+    }
+
+    private enum UIState {
+        OnlineShown,
+        NoOnlineDevices,
+        NoDevicesAdded,
+        ServiceNotStarted
+    }
+
+    private void updateUIState() {
+        setUIState(getRequiredState());
+    }
+
+    private UIState getRequiredState() {
+
+        if (isServiceRunning) {
+            boolean hasDevices = mSSDeviceViewModel.getDeviceCount() > 0;
+
+            if (hasDevices) {
+                boolean hasOnlineDevices = mList.size() > 0;
+
+                if (hasOnlineDevices)
+                    return UIState.OnlineShown;
+                else
+                    return UIState.NoOnlineDevices;
+            }
+            else
+                return UIState.NoDevicesAdded;
+        }
+        else
+            return UIState.ServiceNotStarted;
+
+    }
+
+    private void setServiceState(boolean serviceStarted) {
+        isServiceRunning = serviceStarted;
+        updateUIState();
+    }
+
+    private void setUIState(UIState state)
+    {
+        if (currentUIState == state)
             return;
 
-        switch (uiState) {
+        switch (state) {
             case OnlineShown:
                 toggleMessage(false);
                 break;
 
             case NoOnlineDevices:
-                setMessageAnim(R.drawable.ic_wifi_24dp, R.string.text_noOnlineDevices, 0, null);
+                replaceMessage(R.drawable.ic_wifi_24dp, R.string.text_noOnlineDevices);
                 toggleMessage(true);
                 break;
 
-            case ServiceNotRunning:
-                View.OnClickListener startService = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getContext(), CommunicationService.class);
-                        //TODO: kostyl
-                        intent.setAction("kostyl");
-                        getActivity().startService(intent);
-                    }
-                };
+            case ServiceNotStarted:
+                View.OnClickListener startService = (v -> {
+                    Intent intent = new Intent(getContext(), CommunicationService.class);
+                    getActivity().startService(intent);
+                });
 
-                setMessageAnim(R.drawable.ic_service_off_24dp, R.string.text_serviceNotStarted, R.string.btn_start, startService);
+                replaceMessage(R.drawable.ic_service_off_24dp, R.string.text_serviceNotStarted, R.string.btn_start, startService);
 
                 toggleMessage(true);
                 break;
 
             case NoDevicesAdded:
-                View.OnClickListener manageDevices = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startActivity(new Intent(getContext(), DeviceManageActivity.class));
-                    }
-                };
+                View.OnClickListener manageDevices = (v -> {
+                    startActivity(new Intent(getContext(), DeviceManageActivity.class));
+                });
 
-                setMessageAnim(R.drawable.ic_devices_24dp, R.string.text_noDevicesAdded, R.string.btn_manageDevices, manageDevices);
+                replaceMessage(R.drawable.ic_devices_24dp, R.string.text_noDevicesAdded, R.string.btn_manageDevices, manageDevices);
                 toggleMessage(true);
                 break;
         }
 
-        currentUIState = uiState;
+        currentUIState = state;
     }
 
-    private void setMessageAnim(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
+    private void replaceMessage(int iconResource, int textResource) {
+        replaceMessage(iconResource, textResource, 0, null);
+    }
 
-        int currState = mMessagePlaceholder.getVisibility();
+    private void replaceMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
+
+        int currState = mMessageHolder.getVisibility();
 
         if (currState == View.VISIBLE) {
-            mMessagePlaceholder
+            mMessageHolder
                     .animate()
                     .setDuration(300)
                     .alpha(0)
@@ -275,10 +298,10 @@ public class MainFragment extends Fragment {
             mMessageActionBtn.setOnClickListener(listener);
         }
 
-        int currSate = mMessagePlaceholder.getVisibility();
+        int currSate = mMessageHolder.getVisibility();
 
-        if (mMessagePlaceholder.getAlpha() < 1 && currSate == View.VISIBLE) {
-            mMessagePlaceholder
+        if (mMessageHolder.getAlpha() < 1 && currSate == View.VISIBLE) {
+            mMessageHolder
                     .animate()
                     .setDuration(300)
                     .alpha(1)
@@ -286,108 +309,40 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void setServiceState(boolean serviceStarted) {
-
-        isServiceRunning = serviceStarted;
-        setUIState(getRequiredState());
-    }
-
     private void toggleMessage(boolean isVisible) {
-        //mMessagePlaceholder.setVisibility(isVisible ? View.VISIBLE : View.GONE);
 
-        int curentState = mMessagePlaceholder.getVisibility();
+        int currentState = mMessageHolder.getVisibility();
 
         if (isVisible) {
-            if (curentState == View.VISIBLE)
+            if (currentState == View.VISIBLE)
                 return;
 
             mRecyclerView.setVisibility(View.GONE);
-            mMessagePlaceholder.setAlpha(0);
-            mMessagePlaceholder.setVisibility(View.VISIBLE);
-            mMessagePlaceholder.animate()
+            mMessageHolder.setAlpha(0);
+            mMessageHolder.setVisibility(View.VISIBLE);
+            mMessageHolder.animate()
                     .alpha(1)
                     .setDuration(150)
                     .setListener(null);
         }
         else
         {
-            if (curentState == View.GONE)
+            if (currentState == View.GONE)
                 return;
 
-            mMessagePlaceholder.setVisibility(View.VISIBLE);
-            mMessagePlaceholder.setAlpha(1);
-            mMessagePlaceholder.animate()
+            mMessageHolder.setVisibility(View.VISIBLE);
+            mMessageHolder.setAlpha(1);
+            mMessageHolder.animate()
                     .alpha(0)
                     .setDuration(150)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
-                            mMessagePlaceholder.setVisibility(View.GONE);
+                            mMessageHolder.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);
                         }
                     });
         }
-    }
-
-    private void setupRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mCategoryAdapter = new CategoryAdapter();
-
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mCategoryAdapter);
-
-        final BodyItem.OnItemClickListener localDeviceListener = new BodyItem.OnItemClickListener() {
-            @Override
-            public void onItemClick(BodyItem item) {
-
-            }
-        };
-
-        mNetworkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
-            @Override
-            public void onChanged(List<NetworkDevice> networkDevices) {
-
-                mList = new ArrayList<>();
-
-                /* Online devices */
-                Category onlineDevices = new Category(null);
-
-                for (NetworkDevice networkDevice : networkDevices) {
-                    String deviceId = networkDevice.getDeviceId();
-                    SSDevice foundedDevice = mSSDeviceViewModel.findDevice(deviceId);
-
-                    if (foundedDevice == null)
-                        continue;
-
-                    int iconResource;
-                    String[] appVersion = foundedDevice.getAppVersion().split("::");
-                    switch (appVersion[1]) {
-
-                        case AppConfig.PLATFORM_MOBILE:
-                            iconResource = R.drawable.ic_phone_android_24dp;
-                            break;
-
-                        case AppConfig.PLATFORM_DESKTOP:
-                            iconResource = R.drawable.ic_desktop_windows_24dp;
-                            break;
-
-                        default:
-                            iconResource = R.drawable.ic_warning_24dp;
-                            break;
-                    }
-
-                    OnlineDevice onlineDevice = new OnlineDevice(deviceId, foundedDevice.getNickname(), "somedata", iconResource);
-                    onlineDevices.addItem(onlineDevice);
-                }
-
-                if (onlineDevices.getItemsCount() > 0)
-                    mList.add(onlineDevices);
-
-
-                setUIState(getRequiredState());
-                mCategoryAdapter.setItems(mList);
-            }
-        });
     }
 }

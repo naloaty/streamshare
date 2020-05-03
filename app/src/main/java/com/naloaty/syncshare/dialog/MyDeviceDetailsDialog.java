@@ -11,12 +11,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.database.SSDevice;
-import com.naloaty.syncshare.database.SSDeviceRepository;
+import com.naloaty.syncshare.database.device.SSDevice;
+import com.naloaty.syncshare.database.device.SSDeviceRepository;
 
 public class MyDeviceDetailsDialog extends ManualDismissDialog {
 

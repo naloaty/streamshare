@@ -3,8 +3,8 @@ package com.naloaty.syncshare.security;
 import android.content.Context;
 import android.util.Log;
 
-import com.naloaty.syncshare.database.SSDevice;
-import com.naloaty.syncshare.database.SSDeviceRepository;
+import com.naloaty.syncshare.database.device.SSDevice;
+import com.naloaty.syncshare.database.device.SSDeviceRepository;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -13,27 +13,32 @@ public class SecurityManager {
 
     private static final String TAG = "SecurityManager";
 
+    public static final String UNTRUSTED_DEVICE = "noTrust";
+    public static final String ACCESS_DENIED = "accessDenied";
+
     private final SSDeviceRepository mDeviceRepo;
-    private final Context mContext;
 
     public SecurityManager(final Context context) {
         mDeviceRepo = new SSDeviceRepository(context);
-        mContext = context;
     }
 
-    public void checkCertificate(X509Certificate certificate) throws CertificateException {
+    void checkCertificate(X509Certificate certificate) throws CertificateException {
         String deviceID = SecurityUtils.calculateDeviceId(certificate);
-        SSDevice foundedDevice = mDeviceRepo.findDevice(deviceID);
+        SSDevice foundedDevice = mDeviceRepo.findDeviceDep(deviceID);
 
-        Log.w(TAG, "Remote device id: " + deviceID);
-        //Log.w(TAG, "Remote device: " + certificate.toString());
+        Log.i(TAG, String.format("New connection with DevId: %s, isTrusted: %s, isAccessAllowed: %s",
+                deviceID, foundedDevice.isTrusted(), foundedDevice.isAccessAllowed()));
 
-        if (foundedDevice != null && foundedDevice.isTrusted()){
-            Log.i(TAG, "Trust approved for " + deviceID);
-            return;
-        }
+        if (foundedDevice == null)
+            throw new CertificateException(UNTRUSTED_DEVICE);
 
-        Log.i(TAG, "Not trusted " + deviceID);
-        throw new CertificateException("Untrusted device!");
+        if (!foundedDevice.isTrusted())
+            throw new CertificateException(UNTRUSTED_DEVICE);
+
+        if (!foundedDevice.isAccessAllowed())
+            throw new CertificateException(ACCESS_DENIED);
+
+
+        Log.i(TAG, "Trust and access approved for " + deviceID);
     }
 }

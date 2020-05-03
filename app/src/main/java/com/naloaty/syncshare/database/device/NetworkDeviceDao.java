@@ -1,4 +1,4 @@
-package com.naloaty.syncshare.database;
+package com.naloaty.syncshare.database.device;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -6,17 +6,26 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
+
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 @Dao
 public interface NetworkDeviceDao {
 
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(NetworkDevice networkDevice);
+    Completable insert(NetworkDevice networkDevice);
+
+    @Update
+    Completable update(NetworkDevice networkDevice);
 
     @Delete
-    void delete(NetworkDevice networkDevice);
+    Completable delete(NetworkDevice networkDevice);
 
     @Query("SELECT * FROM network_devices_table")
     LiveData<List<NetworkDevice>> getAllDevices();
@@ -30,9 +39,10 @@ public interface NetworkDeviceDao {
     @Query("SELECT COUNT(*) FROM network_devices_table")
     Integer getDeviceCount();
 
+    @Deprecated
     @Query("SELECT * FROM network_devices_table WHERE ipAddress=:ipAddress OR deviceId=:deviceId OR serviceName=:serviceName")
-    NetworkDevice findDevice(String ipAddress, String deviceId, String serviceName);
+    NetworkDevice findDeviceDep(String ipAddress, String deviceId, String serviceName);
 
-    @Query("SELECT * FROM network_devices_table WHERE deviceId='-'")
-    List<NetworkDevice> getUnknown();
+    @Query("SELECT * FROM network_devices_table WHERE ipAddress=:ipAddress OR deviceId=:deviceId OR serviceName=:serviceName")
+    Single<NetworkDevice> findDevice(String ipAddress, String deviceId, String serviceName);
 }

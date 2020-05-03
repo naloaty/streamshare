@@ -1,7 +1,5 @@
 package com.naloaty.syncshare.config;
 
-import com.naloaty.syncshare.database.SSDevice;
-
 public class AppConfig {
     public static final String
         APP_VERSION = "1.0 indev::mobile",

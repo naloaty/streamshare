@@ -1,4 +1,4 @@
-package com.naloaty.syncshare.database;
+package com.naloaty.syncshare.database.device;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -12,21 +12,13 @@ public class SSDevice {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-
     private String brand;
-
     private String model;
-
     private String nickname;
-
     private String deviceId;
-
     private long lastUsageTime;
-
     private String appVersion;
-
     private boolean trusted;
-
     private boolean accessAllowed;
 
     public SSDevice(String deviceId, String appVersion) {

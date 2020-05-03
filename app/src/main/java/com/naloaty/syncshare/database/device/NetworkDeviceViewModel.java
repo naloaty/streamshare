@@ -1,4 +1,4 @@
-package com.naloaty.syncshare.database;
+package com.naloaty.syncshare.database.device;
 
 import android.app.Application;
 import android.content.Context;
@@ -8,6 +8,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class NetworkDeviceViewModel extends AndroidViewModel {
 
@@ -36,5 +39,9 @@ public class NetworkDeviceViewModel extends AndroidViewModel {
 
     public LiveData<List<NetworkDevice>> getAllDevices() {
         return allDevices;
+    }
+
+    public Single<NetworkDevice> findDevice(String ipAddress, String deviceId, String serviceName) {
+        return repository.findDevice(ipAddress, deviceId, serviceName);
     }
 }

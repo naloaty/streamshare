@@ -154,4 +154,27 @@
     <string name="btn_manageDevices">Manage devices</string>
 
     <string name="text_localDeviceHelp">Here you can choose which albums will be available to other devices</string>
+    <string name="text_myDevicesHelp">Here you can manage your devices. For example, you can deny access to media for specific device</string>
+    <string name="text_remoteAlbumsHelp">Here you can find %s albums that you have granted access to in the This Device tab</string>
+
+    <string name="text_loadingAlbums">Loading albums</string>
+    <string name="text_noAlbumsFound">No albums found</string>
+    <string name="text_cannotLoadAlbums">Cannot load albums\nPlease restart SyncShare</string>
+
+    <string name="text_loadingMedia">Loading media</string>
+    <string name="text_noMediaFound">No media found</string>
+    <string name="text_cannotLoadMedia">Cannot load media\nPlease restart SyncShare</string>
+
+    <string name="title_error">Error</string>
+    <string name="text_internalAppError">An internal SyncShare error occurred (code %s). Restart the application and try again. If this is not the first time you have seen this message, please contact the developer</string>
+
+    <string name="title_deviceOffline">Offline</string>
+    <string name="text_deviceOffline">Device is offline and cannot be reached</string>
+
+    <string name="progress_checkingOnline">Checking online</string>
+    <string name="progress_loadingDevice">Loading device</string>
+    <string name="progress_requestingAlbums">Requesting albums list</string>
+
+    <string name="title_securityException">Security exception</string>
+    <string name="text_securityException">Unable to connect to device. There are two reasons for this. The first is that you did not add this device to %s. The second is that you have denied access for this device</string>
 </resources>

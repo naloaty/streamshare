@@ -1,20 +1,22 @@
 package com.naloaty.syncshare.util;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.util.Log;
 
 
 import com.naloaty.syncshare.config.Keyword;
-import com.naloaty.syncshare.database.NetworkDevice;
-import com.naloaty.syncshare.database.NetworkDeviceRepository;
-import com.naloaty.syncshare.database.SSDevice;
-import com.naloaty.syncshare.database.SSDeviceRepository;
+import com.naloaty.syncshare.database.device.NetworkDevice;
+import com.naloaty.syncshare.database.device.NetworkDeviceRepository;
+import com.naloaty.syncshare.database.device.SSDevice;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class NetworkDeviceManager {
 
@@ -31,18 +33,29 @@ public class NetworkDeviceManager {
         processDevice(context, networkDevice);
     }
 
-    public static void processDevice(Context context, NetworkDevice networkDevice)
+    public static void processDevice(final Context context, final NetworkDevice netDevice)
     {
         NetworkDeviceRepository repository = new NetworkDeviceRepository(context);
-        NetworkDevice entry = repository.findDevice(networkDevice.getIpAddress(), networkDevice.getDeviceId(), networkDevice.getServiceName());
+        //NetworkDevice entry = repository.findDeviceDep(networkDevice.getIpAddress(), networkDevice.getDeviceId(), networkDevice.getServiceName());
 
-        if (entry != null)
-            repository.delete(entry);
+        Single<NetworkDevice> netDeviceSingle = repository.findDevice(netDevice.getIpAddress(), netDevice.getDeviceId(), netDevice.getServiceName());
 
-        repository.insert(networkDevice);
+        Disposable disposable = netDeviceSingle
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(new DisposableSingleObserver<NetworkDevice>() {
+                    @Override
+                    public void onSuccess(NetworkDevice networkDevice) {
+                        netDevice.setId(networkDevice.getId());
+                        repository.update(netDevice);
+                    }
 
-        Log.d(TAG, "Device with ip " + networkDevice.getIpAddress() + " and service name "
-                + networkDevice.getServiceName() + " added to database");
+                    @Override
+                    public void onError(Throwable e) {
+                        repository.insert(netDevice);
+                    }
+                });
+
+        //disposable.dispose();
 
     }
 
@@ -62,19 +75,21 @@ public class NetworkDeviceManager {
     public static void manageLostDevice(Context context, String serviceName) {
 
         NetworkDeviceRepository repository = new NetworkDeviceRepository(context);
-        try {
-            NetworkDevice connection = repository.findDevice(null, null, serviceName);
 
-            if (connection != null){
-                repository.delete(connection);
-                Log.d(TAG, "Connection with service name " + serviceName + " removed from database");
-            }
-            else
-                Log.d(TAG, "Connection with service name " + serviceName + " not found in database");
+        Single<NetworkDevice> netDeviceSingle = repository.findDevice(null, null, serviceName);
 
-        }
-        catch (Exception e) {
-            Log.d(TAG, "Cannot manage lost device with service name " + serviceName);
-        }
+        Disposable disposable = netDeviceSingle
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(new DisposableSingleObserver<NetworkDevice>() {
+                    @Override
+                    public void onSuccess(NetworkDevice networkDevice) {
+                        repository.delete(networkDevice);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, String.format("Network device SN: %s not found in database", serviceName));
+                    }
+                });
     }
 }

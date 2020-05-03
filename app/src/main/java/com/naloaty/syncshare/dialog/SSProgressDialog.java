@@ -29,11 +29,7 @@ public class SSProgressDialog extends AlertDialog.Builder {
     @Override
     public SSProgressDialog setMessage(int messageId) {
 
-        if (isShowing())
-            mDialog.setMessage(getContext().getString(messageId));
-        else
-            mTextView.setText(messageId);
-
+        mTextView.setText(messageId);
         return this;
     }
 

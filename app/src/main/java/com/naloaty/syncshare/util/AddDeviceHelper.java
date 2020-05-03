@@ -9,10 +9,10 @@ import androidx.appcompat.app.AlertDialog;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.communication.SimpleServerResponse;
-import com.naloaty.syncshare.database.NetworkDevice;
-import com.naloaty.syncshare.database.NetworkDeviceRepository;
-import com.naloaty.syncshare.database.SSDevice;
-import com.naloaty.syncshare.database.SSDeviceRepository;
+import com.naloaty.syncshare.database.device.NetworkDevice;
+import com.naloaty.syncshare.database.device.NetworkDeviceRepository;
+import com.naloaty.syncshare.database.device.SSDevice;
+import com.naloaty.syncshare.database.device.SSDeviceRepository;
 import com.naloaty.syncshare.dialog.SSProgressDialog;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -51,7 +51,7 @@ public class AddDeviceHelper {
             ssDeviceRepo.publish(mSSDevice);
 
         final NetworkDeviceRepository netDeviceRepo = new NetworkDeviceRepository(mContext);
-        NetworkDevice onlineDevice = netDeviceRepo.findDevice(null, mSSDevice.getDeviceId(), null);
+        NetworkDevice onlineDevice = netDeviceRepo.findDeviceDep(null, mSSDevice.getDeviceId(), null);
 
         if (onlineDevice != null) {
             Log.d(TAG, "Device online");
@@ -137,7 +137,7 @@ public class AddDeviceHelper {
 
     public void processDevice() {
         final SSDeviceRepository ssDeviceRepo = new SSDeviceRepository(mContext);
-        SSDevice existentDevice = ssDeviceRepo.findDevice(mSSDevice.getDeviceId());
+        SSDevice existentDevice = ssDeviceRepo.findDeviceDep(mSSDevice.getDeviceId());
 
         if (existentDevice != null) {
             Log.d(TAG, "Already added");
