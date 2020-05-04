@@ -1,44 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/welcome_page_3_title"
+        android:id="@+id/textView"
         style="@style/TextAppearance.Primary.Big"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/text_batteryOptimization"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/container"
-        android:gravity="center"
-        android:textSize="@dimen/font_size_title"/>
-
-    <FrameLayout
-        android:id="@+id/container"
         android:layout_width="wrap_content"
-        android:layout_height="72dp"
-        android:layout_marginTop="24dp"
-        android:layout_centerInParent="true">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/welcome_page_3_perm_ok_img"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_check_24dp"
-            android:tint="@color/colorAccent"/>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/welcome_page_3_request_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/btn_requestDisableBO" />
-
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/title_batteryOptimization"
+        android:textSize="@dimen/font_size_title"
+        app:layout_constraintBottom_toTopOf="@+id/welcome_page_3_request_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.31" />
 
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/textView2"
+        style="@style/TextAppearance.Primary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        android:gravity="center"
+        android:text="@string/text_batteryOptimizationHelp"
+        app:layout_constraintBottom_toTopOf="@+id/welcome_page_3_perm_ok_img"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/welcome_page_3_perm_ok_img"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:tint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/welcome_page_3_request_btn"
+        app:layout_constraintEnd_toEndOf="@+id/welcome_page_3_request_btn"
+        app:layout_constraintStart_toStartOf="@+id/welcome_page_3_request_btn"
+        app:layout_constraintTop_toTopOf="@+id/welcome_page_3_request_btn"
+        app:srcCompat="@drawable/ic_check_24dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/welcome_page_3_request_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_disable"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.72" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

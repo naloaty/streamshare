@@ -6,9 +6,6 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
-/*
- * Copied from http://www.androidhive.info/2016/04/android-glide-image-library-building-image-gallery-app/
- */
 public class SquareLayout extends RelativeLayout {
 
     public SquareLayout(Context context) {
@@ -30,7 +27,6 @@ public class SquareLayout extends RelativeLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // Set a square layout.
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
     }
 }

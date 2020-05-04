@@ -74,7 +74,7 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         setContentView(R.layout.activity_main);
 
         Toolbar toolBar = findViewById(R.id.activity_main_toolbar);
-        enableOptionMenuIcons(toolBar);
+        //enableOptionMenuIcons(toolBar);
 
         setSupportActionBar(toolBar);
 
@@ -89,14 +89,15 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
 
     /*
      * Hack to display option menu icons
+     * TODO: not used anymore
      * Copied from https://stackoverflow.com/questions/30076392/how-does-this-strange-condition-happens-when-show-menu-item-icon-in-toolbar-over/30337653#30337653
      */
 
-    @SuppressLint("RestrictedApi")
+    /*@SuppressLint("RestrictedApi")
     public void enableOptionMenuIcons(Toolbar toolbar){
         MenuBuilder menuBuilder = (MenuBuilder) toolbar.getMenu();
         menuBuilder.setOptionalIconsVisible(true);
-    }
+    }*/
 
     private void setUpNavigationDrawer() {
         mDrawerLayout = findViewById(R.id.activity_main_drawer_layout);
@@ -156,11 +157,11 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
                 mSelectedDrawerItem = null;
                 break;
 
-            case R.id.menu_main_preferences:
+            /*case R.id.menu_main_preferences:
                 break;
 
             case R.id.menu_main_about:
-                break;
+                break;*/
         }
     }
 
@@ -254,11 +255,7 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         else
         {
             Log.d(TAG, "Starting CommunicationService");
-
             Intent intent = new Intent(this, CommunicationService.class);
-            //TODO: kostyl
-            intent.setAction("kostyl");
-
             startService(intent);
         }
 

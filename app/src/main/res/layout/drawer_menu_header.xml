@@ -11,13 +11,12 @@
     <ImageView
         android:layout_width="108dp"
         android:layout_height="108dp"
-        app:srcCompat="@drawable/ic_share_24dp"
-        android:tint="@color/colorAccent"/>
+        app:srcCompat="@drawable/ic_syncshare" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:gravity="center"
         android:orientation="vertical">
 

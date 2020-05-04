@@ -17,8 +17,7 @@ public class SSDeviceRepository {
     private static final String TAG = "SSDeviceRepo";
 
     /*
-     * TODO: AsyncTask get() method DOES NOT asynchronous
-     * it is block UI, so it should be replaced by callback
+     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by rx)
      */
 
     private SSDeviceDao ssDeviceDao;

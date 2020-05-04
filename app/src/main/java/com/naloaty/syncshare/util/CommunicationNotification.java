@@ -35,7 +35,7 @@ public class CommunicationNotification {
 
         //------------------------
 
-        notification.setSmallIcon(R.drawable.ic_share_24dp)
+        notification.setSmallIcon(R.drawable.ic_syncshare_wb_full)
                 .setContentTitle(titleContent)
                 .setContentText(textContent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -31,32 +31,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_localDevice"
-                android:textSize="24sp"
-                android:layout_marginBottom="8dp"/>
+                android:textSize="24sp" />
 
-            <TextView
+            <!--TextView
                 android:id="@+id/local_device_albums"
                 android:textColor="@color/colorWhiteBlueTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_defaultValue"
-                android:textSize="14sp"/>
+                android:textSize="14sp"/-->
 
-            <TextView
+            <!--TextView
                 android:id="@+id/local_device_photos"
                 android:textColor="@color/colorWhiteBlueTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_defaultValue"
-                android:textSize="14sp"/>
+                android:textSize="14sp"/-->
 
-            <TextView
+            <!--TextView
                 android:id="@+id/local_device_videos"
                 android:textColor="@color/colorWhiteBlueTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_defaultValue"
-                android:textSize="14sp"/>
+                android:textSize="14sp"/-->
 
         </LinearLayout>
 

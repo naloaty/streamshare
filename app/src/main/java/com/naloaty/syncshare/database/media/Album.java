@@ -39,9 +39,9 @@ public class Album {
 
         String lastItemPath = cursor.getString(2);
         String lastItemId = cursor.getString(5);
-        String lastItemExtension = lastItemPath.substring(lastItemPath.lastIndexOf('.') + 1);
+        String lastItemExtension = lastItemPath.substring(lastItemPath.lastIndexOf('.'));
 
-        this.lastItemFilename = lastItemId + "." + lastItemExtension;
+        this.lastItemFilename = lastItemId + lastItemExtension;
         this.accessAllowed = accessAllowed;
     }
 
@@ -96,8 +96,7 @@ public class Album {
     }
 
     public static String[] getProjection() {
-        return new String[]
-        {
+        return new String[]{
             MediaStore.Files.FileColumns.PARENT,           //albumId
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME,   //name
             MediaStore.Images.Media.DATA,                  //path

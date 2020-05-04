@@ -246,8 +246,9 @@ public class AddDeviceActivity extends SSActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_LOCATION_BY_CODE_SCANNER)
-            if (PermissionHelper.checkLocationPermission(this))
-                openCodeScanner();
+            openCodeScanner();
+            //if (PermissionHelper.checkLocationPermission(this))
+
     }
 
     private void openCodeScanner() {

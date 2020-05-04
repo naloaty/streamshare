@@ -23,7 +23,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 
 /*
- * Copied from library example app
+ * Based on library example app
  * https://github.com/andriydruk/RxDNSSD/
  */
 

@@ -12,18 +12,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.WelcomeActivity;
-import com.naloaty.syncshare.dialog.RationalePermissionRequest;
+import com.naloaty.syncshare.dialog.PermissionRequest;
 import com.naloaty.syncshare.dialog.SSProgressDialog;
 import com.naloaty.syncshare.security.KeyTool;
 import com.naloaty.syncshare.security.SecurityUtils;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
+import com.naloaty.syncshare.util.PermissionHelper;
 
 
 public class SSActivity extends AppCompatActivity {
 
     private static final String TAG = "SSActivity";
-    public static final int REQUEST_PERMISSION_ALL = 1;
+    public static final int PERMISSION_REQUEST = 1;
     public static final String WELCOME_SHOWN = "welcome_shown";
 
     private AlertDialog mOngoingRequest;
@@ -39,7 +40,7 @@ public class SSActivity extends AppCompatActivity {
             startActivity(new Intent(this, WelcomeActivity.class));
             finish();
         }
-        else if (!AppUtils.checkRunningConditions(this)) {
+        else if (!PermissionHelper.checkRequiredPermissions(this)) {
             if (!mSkipPermissionRequest)
                 requestRequiredPermissions(true);
         }
@@ -109,18 +110,11 @@ public class SSActivity extends AppCompatActivity {
         KeyTool.createSecurityStuff(getFilesDir(), callback);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     public void exitApp()
     {
         stopService(new Intent(this, CommunicationService.class));
         finish();
     }
-
-
 
     protected SharedPreferences getDefaultSharedPreferences() {
         return AppUtils.getDefaultSharedPreferences(this);
@@ -130,10 +124,12 @@ public class SSActivity extends AppCompatActivity {
         if (mOngoingRequest != null && mOngoingRequest.isShowing())
             return false;
 
-        //Если permission not granted, тогда функция вернёт false и других диалоговых окон паказно не будет
-        //Если пользователь нажал Ask, то следующее диалоговое окно будет показано by onRequestPermissionsResult
-        for (RationalePermissionRequest.PermissionRequest request : AppUtils.getRequiredPermissions(this)){
-            if ((mOngoingRequest = RationalePermissionRequest.requestIfNecessary(this, request, killActivityOtherwise)) != null)
+        for (PermissionHelper.Permission permission: PermissionHelper.getRequiredPermissions()){
+
+            mOngoingRequest = PermissionHelper.requestIfNotGranted(this, permission, killActivityOtherwise);
+
+            /* next dialog will be shown by onRequestPermissionsResult() */
+            if (mOngoingRequest != null)
                 return false;
         }
 
@@ -145,7 +141,7 @@ public class SSActivity extends AppCompatActivity {
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (!AppUtils.checkRunningConditions(this))
+        if (!PermissionHelper.checkRequiredPermissions(this))
             requestRequiredPermissions(!mSkipPermissionRequest);
 
     }

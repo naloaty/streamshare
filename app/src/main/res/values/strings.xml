@@ -1,71 +1,62 @@
+<!DOCTYPE resources [
+    <!ENTITY appname "StreamShare">
+    <!ENTITY author "Naloaty">
+    ]>
+
 <resources>
-    <string name="text_appName">SyncShare</string>
+    <string name="text_appName">&appname;</string>
 
     <string name="text_defaultValue">Unknown</string>
 
-    <!-- welcome activity -->
     <string name="text_welcome">Welcome</string>
-    <string name="text_setUpPermissions">Set up permissions</string>
+    <string name="title_setUpPermissions">Set up permissions</string>
     <string name="btn_setUp">Set up</string>
     <string name="text_allSet">All set!</string>
 
-    <!-- permissions request -->
     <string name="btn_settings">Settings</string>
     <string name="btn_ask">Ask</string>
     <string name="btn_reject">Reject</string>
     <string name="btn_close">Close</string>
 
-    <string name="text_requestPermissionStorage">Storage permission</string>
-    <string name="text_requestPermissionStorageSummary">This permission allows SyncShare to read and write to your device\'s storage for receiving and sharing files.</string>
+    <string name="text_permissionsHelp">&appname; requires some permissions to work properly</string>
+    <string name="text_batteryOptimizationHelp">Android may stop the media server after some time. To prevent this, turn off battery optimization</string>
 
-    <string name="text_requestPermissionReadPhoneState">Permission to read phone state</string>
-    <string name="text_requestPermissionReadPhoneStateSummary">SyncShare needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you.</string>
+    <string name="title_storagePermission">Storage permission</string>
+    <string name="text_storagePermissionHelp">This permission allows &appname; to read your device\'s storage for sharing media files</string>
 
-    <string name="text_requestPermissionLocationServiceSummary">SyncShare uses location service to see Wi-Wi network name</string>
+    <!--string name="title_readPhoneStatePermission">Permission to read phone state</string-->
+    <!--string name="text_readPhoneStatePermissionHelp">&appname; needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you</string-->
 
-    <!-- battery optimization request -->
-    <string name="text_batteryOptimization">Battery optimization</string>
-    <string name="btn_requestDisableBO">Disable</string>
+    <!--string name="text_locationPermissionHelp">&appname; uses location service to use camera</string-->
 
-    <!-- enter device id dialog -->
+    <string name="title_batteryOptimization">Battery optimization</string>
+    <string name="btn_disable">Disable</string>
+
     <string name="title_enterDeviceId">Enter Device ID</string>
     <string name="btn_add">Add</string>
     <string name="msg_wrongDeviceId">Wrong Device ID\n(should be 9 groups)</string>
-    
-    <!-- process qr code -->
-    <string name="title_unrecognizedCode">Unrecognized code</string>
-    <string name="title_cannotVerify">Cannot verify code</string>
-    <string name="text_notConnected">You are probably not connected to the Wi-Fi network</string>
-    <string name="title_differentNetwork">Different network</string>
-    <string name="text_connectToSameNetwork">Devices are not on the same network. Please connect the devices to the same network and try again</string>
 
-    <!-- drawer main -->
+    <string name="title_unrecognizedCode">Unrecognized code</string>
+
     <string name="menu_devices">Manage devices</string>
-    <string name="menu_prefernces">Preferences</string>
-    <string name="menu_about">About</string>
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
-    <!-- notification channels -->
     <string name="text_ncHighPriority">High priority</string>
-    <string name="text_ncHighPriorityDescription">SyncShare high priority notifications</string>
+    <string name="text_ncHighPriorityDescription">&appname; high priority notifications</string>
     <string name="text_ncLowPriority">Low priority</string>
-    <string name="text_ncLowPriorityDescription">SyncShare low priority notifications</string>
+    <string name="text_ncLowPriorityDescription">&appname; low priority notifications</string>
 
-    <!-- communication service notification -->
-    <string name="text_communicationServiceIdle">SyncShare is sharing your media</string>
+    <string name="text_communicationServiceIdle">&appname; is sharing your media</string>
     <string name="text_communicationServiceIdleAction">Tap to stop sharing</string>
 
-    <!-- device manage activity action bar -->
-    <string name="text_deviceManageTitle">Manage devices</string>
+    <string name="title_deviceManage">Manage devices</string>
 
-    <!-- my devices list -->
     <string name="text_noDevices">No devices added yet</string>
-    <string name="text_myDevices">My devices</string>
-    <string name="btn_addDevices">Add device</string>
+    <string name="header_myDevices">My devices</string>
+    <string name="btn_addDevice">Add device</string>
 
-    <!-- pair device activity -->
     <string name="title_addDevice">Add device</string>
     <string name="title_deviceInfo">Device information</string>
 
@@ -73,32 +64,17 @@
     <string name="btn_showDeviceInfo">Device information</string>
     <string name="btn_scanQrCode">Scan QR Code</string>
     <string name="btn_enterIdManually">Enter Device ID manually</string>
-    <string name="text_useDiscoveredDevices">Use discovered devices</string>
+    <string name="header_useDiscoveredDevices">Use discovered devices</string>
     <string name="text_discoveringDevices">No nearby devices found</string>
 
-    <!-- device info fragment -->
     <string name="text_deviceInfoHelp">Scan this qr code on another device. You can also manually enter the ID of this device on another</string>
 
-    <string name="text_myDeviceInfo">My device</string>
-    <string name="text_noDeviceIdError">For some reason, SyncShare did not find information about this device. To solve this, restart SyncShare. If this is not the first time you have seen this message, then please contact the developer</string>
+    <string name="text_noDeviceIdError">For some reason, &appname; did not find information about this device. To solve this, restart &appname;. If this is not the first time you have seen this message, then please contact the developer</string>
 
-    <string name="text_locationServiceDisabled">Turn on location service to continue</string>
-    <string name="btn_enableLocationService">Enable</string>
-
-    <string name="text_locationPermissionDenied">Grant location permission to continue</string>
-
-    <!-- scan qr code activity -->
-    <string name="text_cameraPermissionDenied">Camera permission required</string>
-
-    <!-- category adapter -->
-    <string name="text_defaultCategoryName">Category without name</string>
-
-    <!-- main activity toolbar menu -->
     <string name="menu_stopSharing">Stop sharing</string>
     <string name="menu_startSharing">Start sharing</string>
 
     <!-- stuff (secret keys) generation dialog -->
-    <!-- Идет создание секретных ключей. Это может занять несколько минут. Пожалуйста, подождите. -->
     <string name="text_generatingInProgress">Secret keys are being created. This may take several minutes. Please wait.</string>
     <string name="title_generationFailed">Creation failed</string>
     <string name="text_generationFailed">Failed to create secret keys. Please try again. If this is not the first time you have received this message, then please contact the developer</string>
@@ -121,60 +97,53 @@
     <string name="text_trustQuestionHelp">Does the following device identifier match what is on the second device in the Device Information section?\n\n%s</string>
     <string name="btn_yes">Yes</string>
     <string name="btn_no">No</string>
-    <string name="title_verification">Device verification</string>
-    <string name="text_verificationHelp">Does the following code match what you see on the second device?\n\n%s</string>
-
 
     <string name="text_unknownAddress">No known address for the device</string>
-    <string name="text_unknownDevice">Unknown device</string>
-    <string name="text_unknownState">Device state is unknown</string>
 
-    <!-- my device details -->
     <string name="text_deviceName">Device name</string>
     <string name="text_appVersion">Version</string>
     <string name="switch_allowAccess">Allow access</string>
     <string name="text_deviceId">Device ID</string>
     <string name="text_deviceNamePlaceholder">%s %s</string>
-    <string name="text_notVerifiedHelp">To verify the device, click on the notification on it and follow the instructions. If there is no notification, connect the devices to the same Wi-Fi network</string>
+
     <string name="btn_remove">Remove</string>
     <string name="text_confirmRemoval">Are you sure you want to remove the device?</string>
     <string name="btn_cancel">Cancel</string>
 
-    <string name="text_serviceNotStarted">SyncShare service\nis not started</string>
+    <string name="text_serviceNotStarted">&appname; service\nis not started</string>
     <string name="btn_start">Start</string>
 
-    <string name="menu_openDeviceInfo">Add device</string>
+    <string name="menu_addDevice">Add device</string>
 
     <string name="text_localDevice">This device</string>
     <string name="header_onlineDevices">Online devices</string>
 
     <string name="text_noDevicesAdded">No devices added</string>
     <string name="text_noOnlineDevices">All devices are offline</string>
-    <string name="btn_addDevice">Add device</string>
     <string name="btn_manageDevices">Manage devices</string>
 
     <string name="text_localDeviceHelp">Here you can choose which albums will be available to other devices</string>
     <string name="text_myDevicesHelp">Here you can manage your devices. For example, you can deny access to media for specific device</string>
-    <string name="text_remoteAlbumsHelp">Here you can find %s albums that you have granted access to in the This Device tab</string>
+    <string name="text_remoteAlbumsHelp">Here you can find %s albums that you have granted access to</string>
+    <string name="text_deviceDiscoveryHelp">Do not forget to run the &appname; service on the second device. Otherwise, the device will not be displayed here</string>
 
     <string name="text_loadingAlbums">Loading albums</string>
     <string name="text_noAlbumsFound">No albums found</string>
-    <string name="text_cannotLoadAlbums">Cannot load albums\nPlease restart SyncShare</string>
+    <string name="text_cannotLoadAlbums">Cannot load albums\nPlease restart &appname;</string>
 
     <string name="text_loadingMedia">Loading media</string>
     <string name="text_noMediaFound">No media found</string>
-    <string name="text_cannotLoadMedia">Cannot load media\nPlease restart SyncShare</string>
+    <string name="text_cannotLoadMedia">Cannot load media\nPlease restart &appname;</string>
 
     <string name="title_error">Error</string>
-    <string name="text_internalAppError">An internal SyncShare error occurred (code %s). Restart the application and try again. If this is not the first time you have seen this message, please contact the developer</string>
+    <string name="text_internalAppError">An internal &appname; error occurred (code %s). Restart the application and try again. If this is not the first time you have seen this message, please contact the developer</string>
 
     <string name="title_deviceOffline">Offline</string>
     <string name="text_deviceOffline">Device is offline and cannot be reached</string>
 
-    <string name="progress_checkingOnline">Checking online</string>
-    <string name="progress_loadingDevice">Loading device</string>
-    <string name="progress_requestingAlbums">Requesting albums list</string>
-
     <string name="title_securityException">Security exception</string>
     <string name="text_securityException">Unable to connect to device. There are two reasons for this. The first is that you did not add this device to %s. The second is that you have denied access for this device</string>
+
+    <string name="text_galleryVideo">Video</string>
+
 </resources>

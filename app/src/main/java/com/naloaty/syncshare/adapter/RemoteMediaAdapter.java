@@ -1,5 +1,6 @@
 package com.naloaty.syncshare.adapter;
 
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -74,7 +76,11 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
                     Media newMedia = mediaList.get(newItemPosition);
                     Media oldMedia = mList.get(oldItemPosition);
 
-                    return TextUtils.equals(newMedia.getFilename(), oldMedia.getFilename());
+                    return TextUtils.equals(newMedia.getFilename(), oldMedia.getFilename())
+                            && TextUtils.equals(newMedia.getMimeType(), oldMedia.getMimeType())
+                            && newMedia.getDateTaken() == oldMedia.getDateTaken()
+                            && newMedia.getOrientation() == oldMedia.getOrientation()
+                            && newMedia.getSize() == oldMedia.getSize();
 
                 }
             });
@@ -101,8 +107,12 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
                 .centerCrop()
                 .placeholder(R.color.colorBlueLight)
                 .error(R.color.colorOffline)
-                //.animate(R.anim.fade_in)//TODO:DONT WORK WELL
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
+
+        if (media.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+            holder.videoText.setVisibility(View.VISIBLE);
+        else
+            holder.videoText.setVisibility(View.INVISIBLE);
 
         try
         {
@@ -112,6 +122,7 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
 
             Glide.with(holder.thumbnail.getContext())
                     .asBitmap()
+                    .thumbnail(0.5f)
                     .load(URL)
                     .apply(options)
                     .into(holder.thumbnail);
@@ -130,11 +141,13 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView thumbnail;
+        CardView videoText;
         OnRVClickListener clickListener;
 
         public ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
             super(itemView);
 
+            this.videoText = itemView.findViewById(R.id.text_video);
             this.thumbnail = itemView.findViewById(R.id.thumbnail);
             this.clickListener = clickListener;
 

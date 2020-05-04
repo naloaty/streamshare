@@ -6,8 +6,11 @@
     <color name="colorSecondary">#66bb6a</color>
     <color name="colorPassive">#20000000</color>
     <color name="colorSelection">#20000000</color>
+    <color name="colorSelectionDark">#74000000</color>
     <color name="colorSurface">#fefefe</color>
     <color name="colorBlack">#212121</color>
+
+    <color name="colorShadowTint">#BF000000</color>
 
     <color name="colorBlueLight">#7C86CE</color>
     <color name="colorBlueLightDarker">#5A69C6</color>
@@ -24,5 +27,7 @@
     <color name="colorOnline">#12BC00</color>
 
     <color name="dark_colorShadowStart">#000E171A</color>
-    <color name="dark_colorShadowEnd">#500E171A</color>
+    <color name="dark_colorShadowEnd">#7A0E171A</color>
+
+
 </resources>

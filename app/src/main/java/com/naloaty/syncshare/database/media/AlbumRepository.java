@@ -18,8 +18,7 @@ public class AlbumRepository {
     private static final String TAG = "AlbumRepo";
 
     /*
-     * TODO: AsyncTask get() method DOES NOT asynchronous
-     * it is block UI, so it should be replaced by callback (or make it using Rx style)
+     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by rx)
      */
 
     private AlbumDao albumDao;

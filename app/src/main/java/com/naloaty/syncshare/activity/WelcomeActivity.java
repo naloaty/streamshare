@@ -16,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
 import com.naloaty.syncshare.util.AppUtils;
+import com.naloaty.syncshare.util.PermissionHelper;
 import com.naloaty.syncshare.widget.DynamicViewPagerAdapter;
 
 public class WelcomeActivity extends SSActivity {
@@ -72,7 +73,7 @@ public class WelcomeActivity extends SSActivity {
                         @Override
                         public void onClick(View v)
                         {
-                            AppUtils.requestDisableBatteryOptimization(WelcomeActivity.this);
+                            PermissionHelper.requestDisableBatteryOptimization(WelcomeActivity.this);
                         }
                     });
         }
@@ -151,24 +152,24 @@ public class WelcomeActivity extends SSActivity {
 
     private void checkPermissionsState()
     {
-        if (Build.VERSION.SDK_INT < 23)
-            return;
+        /*if (Build.VERSION.SDK_INT < 23)
+            return;*/
 
-        boolean permissionsOk = AppUtils.checkRunningConditions(this);
+        boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(this);
 
         mPermissionsView.findViewById(R.id.layout_welcome_page_2_perm_ok_img)
-                .setVisibility(permissionsOk ? View.VISIBLE : View.GONE);
+                .setVisibility(permissionsGranted ? View.VISIBLE : View.GONE);
 
         mPermissionsView.findViewById(R.id.layout_welcome_page_2_request_btn)
-                .setVisibility(permissionsOk ? View.GONE : View.VISIBLE);
+                .setVisibility(permissionsGranted ? View.GONE : View.VISIBLE);
     }
 
     private void checkBatteryOptimizationState()
     {
-        if (Build.VERSION.SDK_INT < 23)
-            return;
+        /*if (Build.VERSION.SDK_INT < 23)
+            return;*/
 
-        boolean batteryOptimizationDisabled = AppUtils.checkBatteryOptimizationDisabled(this);
+        boolean batteryOptimizationDisabled = PermissionHelper.checkBatteryOptimizationDisabled(this);
 
         mBatteryOptimizationView.findViewById(R.id.welcome_page_3_perm_ok_img)
                 .setVisibility(batteryOptimizationDisabled ? View.VISIBLE : View.GONE);

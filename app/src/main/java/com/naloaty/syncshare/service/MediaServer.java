@@ -3,16 +3,19 @@ package com.naloaty.syncshare.service;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.communication.SimpleServerResponse;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.MediaServerKeyword;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.device.SSDeviceRepository;
 import com.naloaty.syncshare.database.media.Album;
+import com.naloaty.syncshare.media.Media;
 import com.naloaty.syncshare.media.MediaObject;
 import com.naloaty.syncshare.media.MediaProvider;
 import com.naloaty.syncshare.security.CustomServerSocketFactory;
@@ -27,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,11 +47,16 @@ public class MediaServer extends SimpleWebServer {
     private static final String TAG = "MediaServer";
 
     private Context mContext;
+    private boolean isSecureMode = false;
 
-    public MediaServer(Context context) {
-        super(null, AppConfig.MEDIA_SERVER_PORT, new File("/sdcard/"), true);
+    public MediaServer(Context context, int port, boolean secureMode) {
+        super(null, port, new File("/sdcard/"), true);
 
+        isSecureMode = secureMode;
         mContext = context;
+
+        if (!secureMode)
+            return;
 
         SSLContext sslContext = SecurityUtils.getSSLContext(new SecurityManager(context), context.getFilesDir());
 
@@ -93,6 +102,9 @@ public class MediaServer extends SimpleWebServer {
     }
 
     private Response defaultPOSTRespond(Map<String, String> postBody, IHTTPSession session, String uri) {
+
+        if (!isSecureMode)
+            return getForbiddenResponse();
 
         // Remove URL arguments
         uri = uri.trim().replace(File.separatorChar, '/');
@@ -186,6 +198,9 @@ public class MediaServer extends SimpleWebServer {
 
     private Response deviceGETRespond(String request) {
 
+        if (!isSecureMode)
+            return getForbiddenResponse();
+
         switch (request) {
             case MediaServerKeyword.REQUEST_INFORMATION:
                 SSDevice myDevice = AppUtils.getLocalDevice(mContext);
@@ -200,6 +215,9 @@ public class MediaServer extends SimpleWebServer {
     }
 
     private Response mediaGETRespond(String[] request, Map<String, String> headers, IHTTPSession session) {
+
+        if (!isSecureMode && !request[1].equals(MediaServerKeyword.REQUEST_SERVE_FILE))
+            return getForbiddenResponse();
 
         switch (request[1]) {
             case MediaServerKeyword.REQUEST_ALBUMS:
@@ -224,30 +242,83 @@ public class MediaServer extends SimpleWebServer {
             case MediaServerKeyword.REQUEST_MEDIA_LIST:
                 Map<String, List<String>> parameters = session.getParameters();
 
+                Log.d(TAG, "params: " + parameters);
+
                 if (!parameters.containsKey(MediaServerKeyword.GET_ALBUM_ID))
                     return getBadRequestResponse();
 
                 String albumId = parameters.get(MediaServerKeyword.GET_ALBUM_ID).get(0);
-                //TODO: get media list by album id
 
-                return getInternalErrorResponse();
+                try
+                {
+                    List<Media> media = MediaProvider.getMediaFromMediaStore(mContext, albumId);
+
+                    Gson converter = new Gson();
+                    String json = converter.toJson(media);
+
+                    Log.d(TAG, "Media fetched with success. Items count is " + media.size());
+
+                    return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, json);
+                }
+                catch (Exception e) {
+                    Log.w(TAG, "Cannot serve media list: " + e);
+                    return getInternalErrorResponse();
+                }
 
             case MediaServerKeyword.REQUEST_THUMBNAIL:
                 try {
                     MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
 
+                    Bitmap thumb;
                     if (mediaObject.isVideo()) {
-                        Log.d(TAG, "Serving thumbnail");
-                        Bitmap thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
-                        return returnThumbnailResponse(thumb);
+                        thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
+                    }
+                    else
+                    {
+                        thumb = ThumbnailUtils.createImageThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
                     }
 
 
-                    Log.d(TAG, "serving file " + request[2] + " by path " + mediaObject.getPath());
+                    Log.d(TAG, "serving thumbnail " + request[2] + " by path " + mediaObject.getPath());
+                    return returnThumbnailResponse(thumb);
+                    //return serveFile(headers, new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
+                }
+                catch (Exception e) {
+                    Log.d(TAG, "Cannot serve file " + request[2] + " because " + e);
+                    return getInternalErrorResponse();
+                }
+
+            case MediaServerKeyword.REQUEST_FULLSIZE_IMAGE:
+                try {
+                    MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
+
+
+                    if (mediaObject.isVideo()) {
+                        Log.d(TAG, "Serving video fullsize thumbnail " + request[2] + " by path");
+                        Bitmap thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
+                        return returnThumbnailResponse(thumb);
+                    }
+
+                    Log.d(TAG, "Serving fullsize image" + request[2] + " by path " + mediaObject.getPath());
                     return serveFile(headers, new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
                 }
                 catch (Exception e) {
                     Log.d(TAG, "Cannot serve file " + request[2] + " because " + e);
+                    return getInternalErrorResponse();
+                }
+
+            case MediaServerKeyword.REQUEST_SERVE_FILE:
+
+                try {
+                    MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
+
+                    Log.d(TAG, "Serving file" + request[2] + " by path " + mediaObject.getPath());
+                    return serveFile(headers, new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
+
+                }
+                catch (Exception e) {
+                    Log.d(TAG, "Cannot serve file " + request[2] + " because " + e);
+                    e.printStackTrace();
                     return getInternalErrorResponse();
                 }
 
@@ -356,7 +427,7 @@ public class MediaServer extends SimpleWebServer {
     }
 
     private Response returnThumbnailResponse(Bitmap bitmap) throws IOException {
-        bitmap = ThumbnailUtils.extractThumbnail(bitmap, 160, 230);
+        bitmap = ThumbnailUtils.extractThumbnail(bitmap, 360, 360);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
         byte[] bitmapData = bos.toByteArray();

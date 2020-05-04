@@ -22,8 +22,7 @@ public class NetworkDeviceRepository {
     private static final String TAG = "NetworkDeviceRepo";
 
     /*
-     * TODO: AsyncTask get() method DOES NOT asynchronous
-     * it is block UI, so it should be replaced by callback
+     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by rx)
      */
     private NetworkDeviceDao networkDeviceDao;
     private LiveData<List<NetworkDevice>> allDevices;
@@ -133,9 +132,6 @@ public class NetworkDeviceRepository {
         new DeleteAllDevicesAT(networkDeviceDao).execute();
     }
 
-    /*
-     * TODO
-     */
     public NetworkDevice findDeviceDep(String ipAddress, String deviceId, String serviceName) {
         try
         {
@@ -151,10 +147,6 @@ public class NetworkDeviceRepository {
         return networkDeviceDao.findDevice(ipAddress, deviceId, serviceName);
     }
 
-
-    /*
-     * TODO
-     */
     public int getDeviceCount() {
         try
         {
@@ -167,10 +159,6 @@ public class NetworkDeviceRepository {
 
     }
 
-
-    /*
-     * TODO
-     */
     public List<NetworkDevice> getAllDevicesList() {
         try
         {

@@ -124,12 +124,20 @@
 
         </androidx.cardview.widget.CardView>
 
+        <include
+            android:layout_marginTop="16dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            layout="@layout/discovery_help" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="22dp"
             android:layout_marginRight="22dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="14dp"
             android:layout_marginBottom="6dp">
 
             <TextView
@@ -137,7 +145,7 @@
                 android:id="@+id/default_header_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_useDiscoveredDevices"
+                android:text="@string/header_useDiscoveredDevices"
                 android:textStyle="bold"
                 android:textSize="@dimen/font_size_secondary"
                 android:layout_marginTop="4dp"

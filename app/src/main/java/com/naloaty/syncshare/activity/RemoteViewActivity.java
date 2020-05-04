@@ -2,15 +2,12 @@ package com.naloaty.syncshare.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,21 +17,9 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
-import com.naloaty.syncshare.database.device.SSDevice;
-import com.naloaty.syncshare.dialog.EnterDeviceIdDialog;
-import com.naloaty.syncshare.dialog.SingleTextInputDialog;
-import com.naloaty.syncshare.fragment.AddOptionsFragment;
-import com.naloaty.syncshare.fragment.OptionFragment;
 import com.naloaty.syncshare.fragment.RemoteAlbumsFragment;
 import com.naloaty.syncshare.fragment.RemoteMediaFragment;
 import com.naloaty.syncshare.fragment.RemoteViewFragment;
-import com.naloaty.syncshare.security.SecurityManager;
-import com.naloaty.syncshare.security.SecurityUtils;
-import com.naloaty.syncshare.service.CommunicationService;
-import com.naloaty.syncshare.util.AddDeviceHelper;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 
 public class RemoteViewActivity extends SSActivity {
 
@@ -75,7 +60,7 @@ public class RemoteViewActivity extends SSActivity {
                         setFragment(targetFragment, getIntent().getStringExtra(EXTRA_DEVICE_NICKNAME));
                         break;
 
-                    case MediaView:
+                    case MediaGridView:
                         bundle = new Bundle();
                         bundle.putString(EXTRA_ALBUM, intent.getStringExtra(EXTRA_ALBUM));
                         bundle.putString(EXTRA_DEVICE_ID, getIntent().getStringExtra(EXTRA_DEVICE_ID));
@@ -164,7 +149,7 @@ public class RemoteViewActivity extends SSActivity {
                 candidate = mRemoteAlbumsFragment;
                 break;
 
-            case MediaView:
+            case MediaGridView:
                 candidate = mRemoteMediaFragment;
                 break;
         }
@@ -199,7 +184,7 @@ public class RemoteViewActivity extends SSActivity {
                 isExpand = true;
                 break;
 
-            case MediaView:
+            case MediaGridView:
                 isExpand = false;
                 break;
 

@@ -9,6 +9,10 @@ import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.media.Media;
+import com.naloaty.syncshare.util.NetworkStateMonitor;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -21,6 +25,7 @@ public class CommunicationHelper {
 
     private static final String TAG = "RemoteViewHelper";
     private static final String PROTOCOL = "https://";
+    private static final String PROTOCOL_INSECURE = "http://";
 
     public static Call<SSDevice> requestDeviceInformation(final Context context, final NetworkDevice networkDevice) {
 
@@ -101,4 +106,29 @@ public class CommunicationHelper {
                 + MediaServerKeyword.REQUEST_THUMBNAIL
                 + "/";
     }
+
+    public static String getFullsizeImageRequestURL(NetworkDevice networkDevice) {
+        return PROTOCOL
+                + networkDevice.getIpAddress()
+                + ":"
+                + AppConfig.MEDIA_SERVER_PORT
+                + "/"
+                + MediaServerKeyword.REQUEST_TARGET_MEDIA
+                + "/"
+                + MediaServerKeyword.REQUEST_FULLSIZE_IMAGE
+                + "/";
+    }
+
+    public static String getServeRequestURL(NetworkDevice networkDevice) {
+        return PROTOCOL_INSECURE
+                + networkDevice.getIpAddress()
+                + ":"
+                + AppConfig.MEDIA_INSECURE_SERVER_PORT
+                + "/"
+                + MediaServerKeyword.REQUEST_TARGET_MEDIA
+                + "/"
+                + MediaServerKeyword.REQUEST_SERVE_FILE
+                + "/";
+    }
+
 }

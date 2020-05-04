@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.activity.AddDeviceActivity;
 import com.naloaty.syncshare.activity.RemoteViewActivity;
 import com.naloaty.syncshare.adapter.OnRVClickListener;
 import com.naloaty.syncshare.adapter.RemoteAlbumsAdapter;
@@ -34,9 +34,7 @@ import com.naloaty.syncshare.database.device.NetworkDeviceViewModel;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.device.SSDeviceViewModel;
 import com.naloaty.syncshare.database.media.Album;
-import com.naloaty.syncshare.dialog.SSProgressDialog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -135,7 +133,7 @@ public class RemoteAlbumsFragment extends Fragment {
                 Album album = mList.get(itemIndex);
 
                 Intent intent = new Intent(RemoteViewActivity.ACTION_CHANGE_FRAGMENT);
-                intent.putExtra(RemoteViewActivity.EXTRA_TARGET_FRAGMENT, RemoteViewFragment.MediaView.toString());
+                intent.putExtra(RemoteViewActivity.EXTRA_TARGET_FRAGMENT, RemoteViewFragment.MediaGridView.toString());
                 intent.putExtra(RemoteViewActivity.EXTRA_ALBUM_NAME, album.getName());
                 Gson gson = new Gson();
                 intent.putExtra(RemoteViewActivity.EXTRA_ALBUM, gson.toJson(album));
@@ -182,6 +180,7 @@ public class RemoteAlbumsFragment extends Fragment {
                         new AlertDialog.Builder(getContext())
                                 .setTitle(R.string.title_deviceOffline)
                                 .setMessage(R.string.text_deviceOffline)
+                                .setCancelable(false)
                                 .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
                                 {
                                     @Override
@@ -261,6 +260,7 @@ public class RemoteAlbumsFragment extends Fragment {
                 if (t instanceof SSLHandshakeException) {
                     new AlertDialog.Builder(getContext())
                             .setTitle(R.string.title_securityException)
+                            .setCancelable(false)
                             .setMessage(String.format(getString(R.string.text_securityException), mSSDevice.getNickname()))
                             .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
                             {
@@ -284,6 +284,7 @@ public class RemoteAlbumsFragment extends Fragment {
 
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.title_error)
+                .setCancelable(false)
                 .setMessage(String.format(getString(R.string.text_internalAppError), errorCode))
                 .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
                 {

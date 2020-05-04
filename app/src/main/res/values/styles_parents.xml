@@ -20,7 +20,6 @@
         <item name="textAppearanceButton">@style/TextAppearance.Button</item>
         <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
         <item name="rippleSelector">@drawable/ripple_selector</item>
-        <item name="backgroundGradientTop">@drawable/background_gradient_top_dark</item>
 
         <item name="dialogBackground">@drawable/dialog_background</item>
     </style>

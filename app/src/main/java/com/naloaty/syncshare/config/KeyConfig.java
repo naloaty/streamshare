@@ -2,6 +2,7 @@ package com.naloaty.syncshare.config;
 
 public class KeyConfig {
 
+    /* RSA KEY */
     public static final int KEY_SIZE = 2048;
 
     public static final String CRYPTO_PROVIDER = "BC";

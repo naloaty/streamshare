@@ -114,7 +114,6 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
                 .centerCrop()
                 .placeholder(R.color.colorBlueLight)
                 .error(R.color.colorOffline)
-                //.animate(R.anim.fade_in)//TODO:DONT WORK WELL
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
 
 

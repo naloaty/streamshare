@@ -9,12 +9,12 @@
     <ImageView
         android:layout_width="128dp"
         android:layout_height="128dp"
-        app:srcCompat="@drawable/ic_sync_accent_128dp"/>
+        app:srcCompat="@drawable/ic_syncshare"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:gravity="center"
         android:orientation="vertical">
 

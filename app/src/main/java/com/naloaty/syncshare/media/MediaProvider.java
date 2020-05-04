@@ -14,6 +14,8 @@ import com.naloaty.syncshare.database.media.AlbumRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+
 public class MediaProvider {
 
     private static final String TAG = "MediaProvider";
@@ -23,7 +25,7 @@ public class MediaProvider {
         Uri      uri        = MediaStore.Files.getContentUri("external");
         String[] projection = Album.getProjection();
         String   sort       = "max(" + MediaStore.Images.Media.DATE_MODIFIED + ")";
-        boolean  ascending  = true; //По возрастанию
+        boolean  ascending  = false; //По возрастанию
 
         String selection =
                 String.format("%s=? or %s=?) group by (%s",
@@ -122,6 +124,47 @@ public class MediaProvider {
         for (int x = 0; x < b.length - 1; x++) c += b[x] + "/";
         c = c.substring(0, c.length() - 1);
         return c;
+    }
+
+    public static List<Media> getMediaFromMediaStore(Context context, String albumId) {
+
+        Uri      uri        = MediaStore.Files.getContentUri("external");
+        String[] projection = Media.getProjection();
+        String   sort       = MediaStore.MediaColumns.DATE_MODIFIED;
+        boolean  ascending  = false; //По возрастанию
+
+        String selection =
+                String.format("%s=? or %s=?) and (%s=?",
+                        MediaStore.Files.FileColumns.MEDIA_TYPE,
+                        MediaStore.Files.FileColumns.MEDIA_TYPE,
+                        MediaStore.Files.FileColumns.PARENT);
+
+        Object[] args =
+                {
+                        MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE,
+                        MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO,
+                        albumId
+                };
+
+        String[] argsStr = new String[args.length];
+
+        for (int i = 0; i < args.length; i++)
+            argsStr[i] = String.valueOf(args[i]);
+
+
+        ContentResolver contentResolver = context.getContentResolver();
+
+        Cursor cursor = contentResolver.query(uri, projection, selection, argsStr, sort);
+        List<Media> mediaList = new ArrayList<>();
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext())
+                mediaList.add(new Media(cursor));
+        }
+
+        cursor.close();
+
+        return mediaList;
     }
 
     /*

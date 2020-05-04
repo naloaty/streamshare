@@ -58,7 +58,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:drawableLeft="@drawable/ic_add_24dp"
-            android:text="@string/btn_addDevices"/>
+            android:text="@string/btn_addDevice"/>
 
     </LinearLayout>
 

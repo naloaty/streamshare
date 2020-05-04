@@ -49,9 +49,9 @@ public class MainFragment extends Fragment {
     private SSDeviceViewModel mSSDeviceViewModel;
 
     /* Local device */
-    private TextView mAlbums;
+    /*private TextView mAlbums;
     private TextView mPhotos;
-    private TextView mVideos;
+    private TextView mVideos;*/
     private LinearLayout mLocalDeviceLayout;
 
     private final IntentFilter mFilter = new IntentFilter();
@@ -103,9 +103,9 @@ public class MainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         /* Local device */
-        mAlbums = view.findViewById(R.id.local_device_albums);
+        /*mAlbums = view.findViewById(R.id.local_device_albums);
         mPhotos = view.findViewById(R.id.local_device_photos);
-        mVideos = view.findViewById(R.id.local_device_videos);
+        mVideos = view.findViewById(R.id.local_device_videos);*/
         mLocalDeviceLayout = view.findViewById(R.id.local_device_layout);
 
         initMessage(view.findViewById(R.id.message_placeholder));

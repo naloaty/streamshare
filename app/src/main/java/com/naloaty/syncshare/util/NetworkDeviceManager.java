@@ -4,16 +4,10 @@ import android.content.Context;
 import android.util.Log;
 
 
-import com.naloaty.syncshare.config.Keyword;
 import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.database.device.NetworkDeviceRepository;
-import com.naloaty.syncshare.database.device.SSDevice;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -57,19 +51,6 @@ public class NetworkDeviceManager {
 
         //disposable.dispose();
 
-    }
-
-    public static SSDevice loadDeviceFromJson(JSONObject json) throws JSONException {
-        JSONObject deviceInfo = json.getJSONObject(Keyword.DEVICE_INFO);
-
-        SSDevice device = new SSDevice(deviceInfo.getString(Keyword.DEVICE_INFO_SERIAL), deviceInfo.getString(Keyword.APP_INFO_VERSION));
-
-        device.setBrand(deviceInfo.getString(Keyword.DEVICE_INFO_BRAND));
-        device.setModel(deviceInfo.getString(Keyword.DEVICE_INFO_MODEL));
-        device.setNickname(deviceInfo.getString(Keyword.DEVICE_INFO_USER));
-        device.setLastUsageTime(System.currentTimeMillis());
-
-        return device;
     }
 
     public static void manageLostDevice(Context context, String serviceName) {

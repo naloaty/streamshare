@@ -116,7 +116,7 @@ public class OnlineDevicesAdapter extends RecyclerView.Adapter<OnlineDevicesAdap
 
         holder.deviceIcon.setImageResource(imageResource);
         holder.deviceNickname.setText(device.getNickname());
-        holder.extraData.setText("Extra data");
+        //holder.extraData.setText("Extra data");
     }
 
     @Override
@@ -129,7 +129,7 @@ public class OnlineDevicesAdapter extends RecyclerView.Adapter<OnlineDevicesAdap
 
         ImageView deviceIcon;
         TextView deviceNickname;
-        TextView extraData;
+        //TextView extraData;
         LinearLayout layout;
 
         OnRVClickListener clickListener;
@@ -139,7 +139,7 @@ public class OnlineDevicesAdapter extends RecyclerView.Adapter<OnlineDevicesAdap
 
             this.deviceIcon = itemView.findViewById(R.id.online_device_icon);
             this.deviceNickname = itemView.findViewById(R.id.online_device_nickname);
-            this.extraData = itemView.findViewById(R.id.online_device_extra_data);
+            //this.extraData = itemView.findViewById(R.id.online_device_extra_data);
             this.layout = itemView.findViewById(R.id.online_device_layout);
 
             this.clickListener = clickListener;

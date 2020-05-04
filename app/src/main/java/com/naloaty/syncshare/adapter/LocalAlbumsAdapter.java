@@ -113,7 +113,6 @@ public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.
                 .centerCrop()
                 .placeholder(R.color.colorBlueLight)
                 .error(R.color.colorOffline)
-                //.animate(R.anim.fade_in)//TODO:DONT WORK WELL
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
 
         try

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -17,17 +18,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.RemoteViewActivity;
 import com.naloaty.syncshare.adapter.OnRVClickListener;
-import com.naloaty.syncshare.adapter.RemoteAlbumsAdapter;
 import com.naloaty.syncshare.adapter.RemoteMediaAdapter;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
@@ -35,6 +35,7 @@ import com.naloaty.syncshare.database.device.NetworkDeviceViewModel;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.device.SSDeviceViewModel;
 import com.naloaty.syncshare.database.media.Album;
+import com.naloaty.syncshare.media.ListHolder;
 import com.naloaty.syncshare.media.Media;
 
 import java.util.List;
@@ -54,8 +55,9 @@ public class RemoteMediaFragment extends Fragment {
 
     private static final String TAG = "RemoteMediaFragment";
 
+    private List<Media> mList;
     private RecyclerView mRecyclerView;
-    private RemoteMediaAdapter mRVadapter;
+    private RemoteMediaAdapter mRVAdapter;
 
     private SSDeviceViewModel ssDeviceVM;
     private NetworkDeviceViewModel netDeviceVM;
@@ -128,16 +130,26 @@ public class RemoteMediaFragment extends Fragment {
         OnRVClickListener clickListener = new OnRVClickListener() {
             @Override
             public void onClick(int itemIndex) {
+                Bundle bundle = new Bundle();
+                bundle.putInt(SlideshowDialogFragment.EXTRA_POSITION, itemIndex);
 
+                ListHolder listHolder = new ListHolder(mList, mNetworkDevice);
+                bundle.putSerializable(SlideshowDialogFragment.EXTRA_LIST_HOLDER, listHolder);
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                SlideshowDialogFragment newFragment = SlideshowDialogFragment.newInstance();
+
+                newFragment.setArguments(bundle);
+                newFragment.show(ft, "slideshow");
             }
         };
 
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
-        mRVadapter = new RemoteMediaAdapter(clickListener, mNetworkDevice);
+        mRVAdapter = new RemoteMediaAdapter(clickListener, mNetworkDevice);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mRVadapter);
+        mRecyclerView.setAdapter(mRVAdapter);
     }
 
 
@@ -167,6 +179,7 @@ public class RemoteMediaFragment extends Fragment {
                         new AlertDialog.Builder(getContext())
                                 .setTitle(R.string.title_deviceOffline)
                                 .setMessage(R.string.text_deviceOffline)
+                                .setCancelable(false)
                                 .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
                                 {
                                     @Override
@@ -223,7 +236,8 @@ public class RemoteMediaFragment extends Fragment {
 
                 Log.d(TAG, "requestMediaList(): received response");
                 if (response.body() != null && response.body().size() > 0) {
-                    mRVadapter.setMediaList(response.body());
+                    mList = response.body();
+                    mRVAdapter.setMediaList(response.body());
                     setUIState(UIState.MediaShown);
                     Log.d(TAG, "requestMediaList(): body has items. Message -> " + response.message());
                 }
@@ -244,6 +258,7 @@ public class RemoteMediaFragment extends Fragment {
                     new AlertDialog.Builder(getContext())
                             .setTitle(R.string.title_securityException)
                             .setMessage(String.format(getString(R.string.text_securityException), mSSDevice.getNickname()))
+                            .setCancelable(false)
                             .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
                             {
                                 @Override
@@ -267,6 +282,7 @@ public class RemoteMediaFragment extends Fragment {
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.title_error)
                 .setMessage(String.format(getString(R.string.text_internalAppError), errorCode))
+                .setCancelable(false)
                 .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
                 {
                     @Override
