@@ -1,14 +1,20 @@
 <resources>
 
-    <!-- generalization start -->
+    <!-- SyncShare themes -->
     <style name="Theme.SyncShare" parent="Theme.SyncShare.Base" />
 
-    <style name="Theme.SyncShare.NoActionBar" parent="Theme.SyncShare.Base.NoActionBar" />
+    <style name="Theme.SyncShare.NoActionBar" parent="Theme.SyncShare.Base.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
 
-    <style name="Theme.SyncShare.NoActionBar.StaticStatusBar" parent="Theme.SyncShare.NoActionBar" />
-    <!-- generalization end -->
+    <style name="Theme.SyncShare.NoActionBar.FullScreen" parent="Theme.SyncShare.Base.NoActionBar">
+        <item name="android:navigationBarColor">@color/colorBlack</item>
+    </style>
 
-    <!-- text styling start -->
+
+    <!-- Text styling -->
     <style name="TextAppearance">
         <item name="android:textStyle">normal</item>
     </style>
@@ -37,9 +43,9 @@
         <!-- this disable button text CAPS -->
         <item name="android:textAllCaps">false</item>
     </style>
-    <!-- text styling end -->
 
-    <!-- widget styling start -->
+
+    <!-- Widget styling -->
     <style name="Widget.SyncShare.ProgressBar.Horizontal.Oval" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:progressDrawable">?roundProgressBar</item>
         <item name="android:background">?roundProgressBarShape</item>
@@ -83,6 +89,5 @@
         <item name="buttonBarButtonStyle">@style/Widget.SyncShare.ButtonStyle.Dialog</item>
     </style>
 
-    <!-- widget styling end -->
 
 </resources>

@@ -145,5 +145,10 @@
     <string name="text_securityException">Unable to connect to device. There are two reasons for this. The first is that you did not add this device to %s. The second is that you have denied access for this device</string>
 
     <string name="text_galleryVideo">Video</string>
+    <string name="title_noVideoSource">No video source</string>
+    <string name="text_noVideoSource">For some reason, the video source is missing. Try reloading the album. If this is not the first time you have seen this message, then contact the developer</string>
+
+    <string name="title_noImageSource">No source</string>
+    <string name="text_noImageSource">For some reason, the image source is missing. Try reloading the album. If this is not the first time you have seen this message, then contact the developer</string>
 
 </resources>

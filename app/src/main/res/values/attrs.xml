@@ -5,5 +5,4 @@
     <attr name="roundProgressBarShape" format="reference" />
     <attr name="rippleSelector" format="reference" />
     <attr name="dialogBackground" format="reference" />
-    <attr name="backgroundGradientTop" format="reference" />
 </resources>

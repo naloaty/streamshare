@@ -92,6 +92,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
 
+    //ExoPlayer
+    implementation 'com.google.android.exoplayer:exoplayer:2.11.4'
+
     //implementation 'jp.wasabeef:recyclerview-animators:2.2.7'
 
     //implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'

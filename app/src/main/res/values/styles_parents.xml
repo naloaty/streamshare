@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- prototype start -->
 
     <!-- light theme -->
-    <style name="Theme.Prototype.SyncShare.Base" parent="Theme.MaterialComponents.Light">
+    <style name="Theme.SyncShare.Base" parent="Theme.MaterialComponents.Light">
         <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorSurface">@color/colorSurface</item>
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="roundProgressBar">@drawable/round_progress_bar</item>
         <item name="roundProgressBarShape">@drawable/round_progress_bar_shape</item>
@@ -20,18 +18,14 @@
         <item name="textAppearanceButton">@style/TextAppearance.Button</item>
         <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
         <item name="rippleSelector">@drawable/ripple_selector</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
 
         <item name="dialogBackground">@drawable/dialog_background</item>
     </style>
-    <!-- prototype end -->
-
-
-    <!-- generalization start -->
-    <style name="Theme.SyncShare.Base" parent="Theme.Prototype.SyncShare.Base" />
 
     <style name="Theme.SyncShare.Base.NoActionBar" parent="@style/Theme.SyncShare.Base">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    <!-- generalization end -->
+
 </resources>

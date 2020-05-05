@@ -7,11 +7,11 @@
     <!--uses-permission android:name="android.permission.READ_PHONE_STATE" /-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--uses-permission android:name="android.permission.FOREGROUND_SERVICE" /-->
-    <uses-permission  android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
-    <uses-permission  android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission  android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission  android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission  android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
@@ -19,12 +19,14 @@
         android:label="@string/text_appName"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SyncShare.NoActionBar"
+        android:theme="@style/Theme.SyncShare"
         tools:ignore="GoogleAppIndexingWarning"
         android:hardwareAccelerated="true">
 
         <activity
-            android:name=".activity.MainActivity">
+            android:name=".activity.MainActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,25 +34,42 @@
         </activity>
 
         <activity
-            android:name=".activity.WelcomeActivity">
+            android:name=".activity.WelcomeActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar">
         </activity>
 
         <activity
-            android:name=".activity.DeviceManageActivity">
+            android:name=".activity.DeviceManageActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar">
         </activity>
 
         <activity
-            android:name=".activity.AddDeviceActivity">
+            android:name=".activity.AddDeviceActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar">
         </activity>
 
         <activity
-            android:name=".activity.LocalDeviceActivity">
+            android:name=".activity.LocalDeviceActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar">
         </activity>
 
         <activity
             android:name=".activity.RemoteViewActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar"
             android:configChanges="orientation|screenSize">
 
+        </activity>
+
+        <activity
+            android:name=".activity.ImageViewActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar"
+            android:configChanges="orientation|screenSize">
+        </activity>
+
+        <activity
+            android:name=".activity.VideoPlayerActivity"
+            android:theme="@style/Theme.SyncShare.NoActionBar"
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity

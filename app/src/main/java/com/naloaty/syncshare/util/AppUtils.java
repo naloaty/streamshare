@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Build;
 import android.util.Log;
 
@@ -33,6 +34,14 @@ public class AppUtils {
         }
 
         return mSharedPreferences;
+    }
+
+    public static int getStatusBarHeight(Resources r) {
+        int resourceId = r.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0)
+            return r.getDimensionPixelSize(resourceId);
+
+        return 0;
     }
 
     public static SSDevice getLocalDevice(Context context)

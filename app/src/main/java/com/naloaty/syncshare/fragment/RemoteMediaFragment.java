@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.activity.ImageViewActivity;
 import com.naloaty.syncshare.activity.RemoteViewActivity;
 import com.naloaty.syncshare.adapter.OnRVClickListener;
 import com.naloaty.syncshare.adapter.RemoteMediaAdapter;
@@ -130,17 +132,13 @@ public class RemoteMediaFragment extends Fragment {
         OnRVClickListener clickListener = new OnRVClickListener() {
             @Override
             public void onClick(int itemIndex) {
-                Bundle bundle = new Bundle();
-                bundle.putInt(SlideshowDialogFragment.EXTRA_POSITION, itemIndex);
+                Intent intent = new Intent(getActivity(), ImageViewActivity.class);
+                intent.putExtra(ImageViewActivity.EXTRA_POSITION, itemIndex);
 
                 ListHolder listHolder = new ListHolder(mList, mNetworkDevice);
-                bundle.putSerializable(SlideshowDialogFragment.EXTRA_LIST_HOLDER, listHolder);
+                intent.putExtra(ImageViewActivity.EXTRA_LIST_HOLDER, listHolder);
 
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                SlideshowDialogFragment newFragment = SlideshowDialogFragment.newInstance();
-
-                newFragment.setArguments(bundle);
-                newFragment.show(ft, "slideshow");
+                startActivity(intent);
             }
         };
 

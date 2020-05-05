@@ -85,7 +85,7 @@ public class RemoteViewActivity extends SSActivity {
         /* Collapsing toolbar */
         mAppBarLayout = findViewById(R.id.remote_view_app_bar_layout);
         mToolBarLayout = findViewById(R.id.remote_view_toolbar_layout);
-        mToolBar = findViewById(R.id.remote_view_toolbar);
+        mToolBar = findViewById(R.id.toolbar);
         mAppBarLayout.setExpanded(true, true);
 
         //Important to call this BEFORE setNavigationOnClickListener()
