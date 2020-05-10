@@ -3,6 +3,10 @@ package com.naloaty.syncshare.media;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -11,6 +15,8 @@ import android.util.Log;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.database.media.AlbumRepository;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +32,9 @@ public class MediaProvider {
         String[] projection = Album.getProjection();
         String   sort       = "max(" + MediaStore.Images.Media.DATE_MODIFIED + ")";
         boolean  ascending  = false; //По возрастанию
+
+        if (!ascending)
+            sort += " DESC ";
 
         String selection =
                 String.format("%s=? or %s=?) group by (%s",
@@ -133,6 +142,9 @@ public class MediaProvider {
         String   sort       = MediaStore.MediaColumns.DATE_MODIFIED;
         boolean  ascending  = false; //По возрастанию
 
+        if (!ascending)
+            sort += " DESC ";
+
         String selection =
                 String.format("%s=? or %s=?) and (%s=?",
                         MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -184,7 +196,12 @@ public class MediaProvider {
 
         if(uri != null)
         {
-            String[] projection = new String[]{ MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.MIME_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE};
+            String[] projection = new String[]{
+                    MediaStore.Files.FileColumns.DATA,
+                    MediaStore.Files.FileColumns.MIME_TYPE,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.Images.ImageColumns.ORIENTATION};
+
             String selection = MediaStore.Files.FileColumns._ID + "=?";
             String[] args = { filename };
 
@@ -193,20 +210,65 @@ public class MediaProvider {
             String path = null;
             String mime = null;
             int media_type = 0;
+            int orientation = -1;
 
             if(cursor.moveToFirst())
             {
                 path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA));
                 mime = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE));
                 media_type = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE));
+                orientation = cursor.getInt(cursor.getColumnIndexOrThrow( MediaStore.Images.ImageColumns.ORIENTATION));
             }
 
             cursor.close();
 
             if(path != null)
-                return new MediaObject(path, mime, media_type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
+                return new MediaObject(path, mime, media_type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO, orientation);
         }
 
         throw new Exception("Not found");
+    }
+
+
+    public static Bitmap getCorrectlyOrientedThumbnail(Context context, MediaObject mediaObject, boolean nativeSize) {
+        Bitmap srcBitmap;
+
+        int size;
+
+        if (nativeSize)
+            size = MediaStore.Images.Thumbnails.FULL_SCREEN_KIND;
+        else
+            size = MediaStore.Images.Thumbnails.MINI_KIND;
+
+        if (mediaObject.isVideo())
+            srcBitmap = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), size);
+        else
+            srcBitmap = ThumbnailUtils.createImageThumbnail(mediaObject.getPath(), size);
+
+        int orientation = mediaObject.getOrientation();
+
+        /*
+         * if the orientation is not 0 (or -1, which means we don't know), we
+         * have to do a rotation.
+         */
+        if (orientation > 0) {
+            int outWidth = 250;
+            int outHeight = 250;
+
+            if (nativeSize) {
+                outWidth = srcBitmap.getWidth();
+                outHeight = srcBitmap.getHeight();
+            }
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(orientation);
+
+            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                    srcBitmap.getHeight(), matrix, true);
+
+            srcBitmap = ThumbnailUtils.extractThumbnail(srcBitmap, outWidth, outHeight);
+        }
+
+        return srcBitmap;
     }
 }

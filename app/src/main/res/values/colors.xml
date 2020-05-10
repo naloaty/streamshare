@@ -10,6 +10,7 @@
     <color name="colorSurface">#fefefe</color>
     <color name="colorBlack">#000000</color>
     <color name="colorWhiteTransparent">#BFFFFFFF</color>
+    <color name="colorBlackTransparent">#BF000000</color>
 
     <color name="colorShadowTint">#BF000000</color>
 
@@ -21,6 +22,8 @@
     <color name="colorBlueDark">#3951B5</color>
     <color name="colorWhiteBlueTheme">#F4F8FF</color>
     <color name="colorBackgroundBlueTheme">#EFECF7</color>
+
+    <color name="colorEmptyThumbnail">#F2F3F5</color>
 
     <color name="colorDecorator">#DCDCDC</color>
     <color name="colorTextSecondary">#737373</color>

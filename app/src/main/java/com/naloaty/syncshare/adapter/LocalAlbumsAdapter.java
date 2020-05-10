@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.media.MediaObject;
@@ -24,6 +26,8 @@ import com.naloaty.syncshare.media.MediaProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
 public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.ViewHolder>{
 
@@ -111,19 +115,23 @@ public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.
         RequestOptions options = new RequestOptions()
                 .format(DecodeFormat.PREFER_ARGB_8888)
                 .centerCrop()
-                .placeholder(R.color.colorBlueLight)
-                .error(R.color.colorOffline)
+                .placeholder(R.color.colorEmptyThumbnail)
+                .error(R.drawable.ic_warning_24dp)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
 
         try
         {
             Log.d(TAG, "Album lastItemFilename: " + album.getLastItemFilename());
 
+            DrawableCrossFadeFactory factory =
+                    new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+
             MediaObject cover = MediaProvider.getMediaObjectById(holder.albumPreview.getContext(), album.getLastItemFilename());
             Glide.with(holder.albumPreview.getContext())
                     .asBitmap()
                     .load(cover.getPath())
                     .apply(options)
+                    .transition(withCrossFade(factory))
                     .into(holder.albumPreview);
         }
         catch (Exception e) {

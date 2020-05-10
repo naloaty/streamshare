@@ -269,17 +269,18 @@ public class MediaServer extends SimpleWebServer {
                 try {
                     MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
 
-                    Bitmap thumb;
+                    /*Bitmap thumb;
                     if (mediaObject.isVideo()) {
                         thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
                     }
                     else
                     {
                         thumb = ThumbnailUtils.createImageThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
-                    }
+                    }*/
 
+                    Bitmap thumb = MediaProvider.getCorrectlyOrientedThumbnail(mContext, mediaObject, false);
 
-                    Log.d(TAG, "serving thumbnail " + request[2] + " by path " + mediaObject.getPath());
+                    Log.d(TAG, "Serving thumbnail " + request[2] + " by path " + mediaObject.getPath());
                     return returnThumbnailResponse(thumb);
                     //return serveFile(headers, new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
                 }
@@ -295,7 +296,8 @@ public class MediaServer extends SimpleWebServer {
 
                     if (mediaObject.isVideo()) {
                         Log.d(TAG, "Serving video fullsize thumbnail " + request[2] + " by path");
-                        Bitmap thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
+                        //Bitmap thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
+                        Bitmap thumb = MediaProvider.getCorrectlyOrientedThumbnail(mContext, mediaObject, true);
                         return returnThumbnailResponse(thumb);
                     }
 
@@ -427,7 +429,15 @@ public class MediaServer extends SimpleWebServer {
     }
 
     private Response returnThumbnailResponse(Bitmap bitmap) throws IOException {
-        bitmap = ThumbnailUtils.extractThumbnail(bitmap, 360, 360);
+        /*int width = 360;
+        int height = 360;
+
+        if (nativeSize) {
+            width = bitmap.getWidth();
+            height = bitmap.getHeight();
+        }
+
+        bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height);*/
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
         byte[] bitmapData = bos.toByteArray();

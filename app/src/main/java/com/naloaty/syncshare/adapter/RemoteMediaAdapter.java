@@ -1,5 +1,6 @@
 package com.naloaty.syncshare.adapter;
 
+import android.content.Context;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,13 +11,16 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
@@ -24,6 +28,8 @@ import com.naloaty.syncshare.media.Media;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
 public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.ViewHolder> {
 
@@ -36,6 +42,7 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
     public RemoteMediaAdapter(OnRVClickListener clickListener, NetworkDevice networkDevice) {
         mClickListener = clickListener;
         mNetworkDevice = networkDevice;
+
     }
 
     public void setMediaList(List<Media> mediaList) {
@@ -105,8 +112,8 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
         RequestOptions options = new RequestOptions()
                 .format(DecodeFormat.PREFER_ARGB_8888)
                 .centerCrop()
-                .placeholder(R.color.colorBlueLight)
-                .error(R.color.colorOffline)
+                .placeholder(R.color.colorEmptyThumbnail)
+                .error(R.drawable.ic_warning_24dp)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
 
         if (media.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
@@ -120,11 +127,14 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
 
             Log.d(TAG, "Media url: " + URL);
 
+            DrawableCrossFadeFactory factory =
+                    new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+
             Glide.with(holder.thumbnail.getContext())
                     .asBitmap()
-                    .thumbnail(0.5f)
                     .load(URL)
                     .apply(options)
+                    .transition(withCrossFade(factory))
                     .into(holder.thumbnail);
 
         }

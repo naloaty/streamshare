@@ -1,6 +1,7 @@
 package com.naloaty.syncshare.adapter;
 
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,20 +12,26 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.activity.ImageViewActivity;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.database.media.Album;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
 public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapter.ViewHolder>{
 
@@ -109,11 +116,12 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
         holder.albumName.setText(album.getName());
         holder.itemsCount.setText(String.valueOf(album.getItemsCount()));
 
+
         RequestOptions options = new RequestOptions()
                 .format(DecodeFormat.PREFER_ARGB_8888)
                 .centerCrop()
-                .placeholder(R.color.colorBlueLight)
-                .error(R.color.colorOffline)
+                .placeholder(R.color.colorEmptyThumbnail)
+                .error(R.drawable.ic_warning_24dp)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
 
 
@@ -126,10 +134,14 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
 
             Log.d(TAG, "Album icon url: " + URL);
 
+            DrawableCrossFadeFactory factory =
+                    new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+
             Glide.with(holder.albumPreview.getContext())
                     .asBitmap()
                     .load(URL)
                     .apply(options)
+                    .transition(withCrossFade(factory))
                     .into(holder.albumPreview);
 
         }

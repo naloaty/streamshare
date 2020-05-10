@@ -95,6 +95,11 @@ dependencies {
     //ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.11.4'
 
+    //ImageView with pinch to zoom support
+    implementation 'com.github.MikeOrtiz:TouchImageView:3.0.2'
+
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
+
     //implementation 'jp.wasabeef:recyclerview-animators:2.2.7'
 
     //implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'

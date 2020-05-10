@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -24,14 +25,19 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.MediaActivity;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.media.ListHolder;
 import com.naloaty.syncshare.media.Media;
+import com.ortiz.touchview.TouchImageView;
 
 import java.util.List;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class ImageViewActivity extends MediaActivity {
 
@@ -134,28 +140,15 @@ public class ViewPagerAdapter extends PagerAdapter {
         LayoutInflater layoutInflater = LayoutInflater.from(ImageViewActivity.this);
         View view = layoutInflater.inflate(R.layout.image_fullscreen, container, false);
 
-        ImageView image = view.findViewById(R.id.image);
+        TouchImageView image = view.findViewById(R.id.image);
         image.setOnClickListener(v -> toggleSystemUI());
 
         LinearLayout playBtn = view.findViewById(R.id.play_btn);
 
-
         Media media = mList.get(position);
 
-        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(ImageViewActivity.this);
-        circularProgressDrawable.setTint(ContextCompat.getColor(ImageViewActivity.this, R.color.colorAccent));
-        circularProgressDrawable.setStrokeWidth(10f);
-        circularProgressDrawable.setCenterRadius(90f);
-        circularProgressDrawable.start();
-
-
-        RequestOptions options = new RequestOptions()
-                .format(DecodeFormat.PREFER_ARGB_8888)
-                .placeholder(circularProgressDrawable)
-                .error(R.drawable.ic_warning_24dp)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
-
         if (media.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO){
+            image.setZoomEnabled(false);
             playBtn.setVisibility(View.VISIBLE);
             playBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -175,7 +168,29 @@ public class ViewPagerAdapter extends PagerAdapter {
             });
         }
         else
+        {
+            image.setZoomEnabled(true);
             playBtn.setVisibility(View.INVISIBLE);
+        }
+
+
+        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(ImageViewActivity.this);
+        circularProgressDrawable.setColorSchemeColors(ContextCompat.getColor(ImageViewActivity.this, R.color.colorAccent));
+        circularProgressDrawable.setStrokeWidth(12f);
+        circularProgressDrawable.setCenterRadius(90f);
+        circularProgressDrawable.start();
+
+        //TODO: detail lose while zooming
+        /*
+         * Try to use https://github.com/davemorrissey/subsampling-scale-image-view
+         * But in that case file should be saved on disk.
+         */
+
+        RequestOptions options = new RequestOptions()
+                .format(DecodeFormat.PREFER_ARGB_8888)
+                .placeholder(circularProgressDrawable)
+                .error(R.drawable.ic_warning_24dp)
+                .diskCacheStrategy(DiskCacheStrategy.NONE);
 
         try
         {
@@ -183,9 +198,13 @@ public class ViewPagerAdapter extends PagerAdapter {
 
             Log.d(TAG, "Media url: " + URL);
 
+            DrawableCrossFadeFactory factory =
+                    new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+
             Glide.with(ImageViewActivity.this)
                     .load(URL)
                     .apply(options)
+                    .transition(withCrossFade(factory))
                     .into(image);
 
         }

@@ -17,6 +17,12 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
+import com.naloaty.syncshare.security.SecurityManager;
+import com.naloaty.syncshare.security.SecurityUtils;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 public class VideoPlayerActivity extends SSActivity {
 
@@ -30,6 +36,13 @@ public class VideoPlayerActivity extends SSActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
 
         String videoURL;
 
