@@ -2,7 +2,7 @@
 <resources>
 
     <!-- light theme -->
-    <style name="Theme.SyncShare.Base" parent="Theme.MaterialComponents.Light">
+    <style name="Theme.SyncShare.Base.Light" parent="Theme.MaterialComponents.Light">
         <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -23,7 +23,37 @@
         <item name="dialogBackground">@drawable/dialog_background</item>
     </style>
 
-    <style name="Theme.SyncShare.Base.NoActionBar" parent="@style/Theme.SyncShare.Base">
+    <style name="Theme.SyncShare.Base.Light.NoActionBar" parent="@style/Theme.SyncShare.Base.Light">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Dark theme -->
+    <style name="Theme.SyncShare.Base.Dark" parent="Theme.MaterialComponents">
+        <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
+        <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="roundSelector">@drawable/round_selector</item>
+        <item name="roundProgressBar">@drawable/round_progress_bar</item>
+        <item name="roundProgressBarShape">@drawable/round_progress_bar_shape</item>
+        <item name="floatingActionButtonStyle">@style/Widget.SyncShare.FloatingActionButtonStyle</item>
+        <item name="materialButtonStyle">@style/Widget.SyncShare.ButtonStyle</item>
+        <item name="buttonStyle">@style/Widget.SyncShare.ButtonStyle</item>
+        <item name="textAppearanceButton">@style/TextAppearance.Button</item>
+        <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
+        <item name="rippleSelector">@drawable/ripple_selector</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
+
+        <item name="colorControlNormal">@android:color/white</item>
+        <!--item name="toolbarStyle">@style/Widget.SyncShare.ToolbarStyle.Dark</item-->
+
+        <item name="dialogBackground">@drawable/dialog_background</item>
+    </style>
+
+    <style name="Theme.SyncShare.Base.Dark.NoActionBar" parent="@style/Theme.SyncShare.Base.Dark">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

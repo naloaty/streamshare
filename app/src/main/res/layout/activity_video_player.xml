@@ -5,9 +5,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="false"
     app:resize_mode="fill"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorBlack">
 
-    <com.google.android.exoplayer2.ui.PlayerView
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appbar_layout"
+        android:background="@color/colorBlackTransparent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.naloaty.syncshare.activity.CustomPlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

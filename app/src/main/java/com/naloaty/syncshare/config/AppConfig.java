@@ -2,7 +2,7 @@ package com.naloaty.syncshare.config;
 
 public class AppConfig {
     public static final String
-        APP_VERSION = "0.1 indev::mobile",
+        APP_VERSION = "0.2 indev::mobile",
         DNSSD_SERVICE_NAME = "SyncShare",
         DNSSD_SERVICE_TYPE = "_syncsharecomm._tcp.",
         PLATFORM_MOBILE = "mobile",
@@ -10,6 +10,5 @@ public class AppConfig {
 
     public static final int
         DNSSD_SERVER_PORT = 12321,
-        MEDIA_SERVER_PORT = 12322,
-        MEDIA_INSECURE_SERVER_PORT = 12323;
+        MEDIA_SERVER_PORT = 12322;
 }

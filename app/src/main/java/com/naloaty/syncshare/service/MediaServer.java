@@ -47,16 +47,11 @@ public class MediaServer extends SimpleWebServer {
     private static final String TAG = "MediaServer";
 
     private Context mContext;
-    private boolean isSecureMode = false;
 
     public MediaServer(Context context, int port, boolean secureMode) {
         super(null, port, new File("/sdcard/"), true);
 
-        isSecureMode = secureMode;
         mContext = context;
-
-        if (!secureMode)
-            return;
 
         SSLContext sslContext = SecurityUtils.getSSLContext(new SecurityManager(context), context.getFilesDir());
 
@@ -102,9 +97,6 @@ public class MediaServer extends SimpleWebServer {
     }
 
     private Response defaultPOSTRespond(Map<String, String> postBody, IHTTPSession session, String uri) {
-
-        if (!isSecureMode)
-            return getForbiddenResponse();
 
         // Remove URL arguments
         uri = uri.trim().replace(File.separatorChar, '/');
@@ -198,9 +190,6 @@ public class MediaServer extends SimpleWebServer {
 
     private Response deviceGETRespond(String request) {
 
-        if (!isSecureMode)
-            return getForbiddenResponse();
-
         switch (request) {
             case MediaServerKeyword.REQUEST_INFORMATION:
                 SSDevice myDevice = AppUtils.getLocalDevice(mContext);
@@ -215,9 +204,6 @@ public class MediaServer extends SimpleWebServer {
     }
 
     private Response mediaGETRespond(String[] request, Map<String, String> headers, IHTTPSession session) {
-
-        if (!isSecureMode && !request[1].equals(MediaServerKeyword.REQUEST_SERVE_FILE))
-            return getForbiddenResponse();
 
         switch (request[1]) {
             case MediaServerKeyword.REQUEST_ALBUMS:

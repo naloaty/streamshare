@@ -25,7 +25,6 @@ public class CommunicationHelper {
 
     private static final String TAG = "RemoteViewHelper";
     private static final String PROTOCOL = "https://";
-    private static final String PROTOCOL_INSECURE = "http://";
 
     public static Call<SSDevice> requestDeviceInformation(final Context context, final NetworkDevice networkDevice) {
 
@@ -120,10 +119,10 @@ public class CommunicationHelper {
     }
 
     public static String getServeRequestURL(NetworkDevice networkDevice) {
-        return PROTOCOL_INSECURE
+        return PROTOCOL
                 + networkDevice.getIpAddress()
                 + ":"
-                + AppConfig.MEDIA_INSECURE_SERVER_PORT
+                + AppConfig.MEDIA_SERVER_PORT
                 + "/"
                 + MediaServerKeyword.REQUEST_TARGET_MEDIA
                 + "/"

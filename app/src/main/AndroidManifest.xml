@@ -19,13 +19,13 @@
         android:label="@string/text_appName"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SyncShare"
+        android:theme="@style/Theme.SyncShare.Light"
         tools:ignore="GoogleAppIndexingWarning"
         android:hardwareAccelerated="true">
 
         <activity
             android:name=".activity.MainActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar"
+            android:theme="@style/Theme.SyncShare.Light.NoActionBar"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,40 +35,40 @@
 
         <activity
             android:name=".activity.WelcomeActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar">
+            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name=".activity.DeviceManageActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar">
+            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name=".activity.AddDeviceActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar">
+            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name=".activity.LocalDeviceActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar">
+            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name=".activity.RemoteViewActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar"
+            android:theme="@style/Theme.SyncShare.Light.NoActionBar"
             android:configChanges="orientation|screenSize">
 
         </activity>
 
         <activity
             android:name=".activity.ImageViewActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar"
+            android:theme="@style/Theme.SyncShare.Dark.NoActionBar"
             android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name=".activity.VideoPlayerActivity"
-            android:theme="@style/Theme.SyncShare.NoActionBar"
+            android:theme="@style/Theme.SyncShare.Dark.NoActionBar"
             android:configChanges="orientation|screenSize">
         </activity>
 

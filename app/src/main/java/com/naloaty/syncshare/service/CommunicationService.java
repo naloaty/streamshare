@@ -27,7 +27,6 @@ public class CommunicationService extends SSService {
     private CommunicationNotification mNotification;
     private DNSSDHelper mDNSSDHelper;
     private MediaServer mMediaServer;
-    private MediaServer mMediaInsecureServer;
 
     @Nullable
     @Override
@@ -58,17 +57,10 @@ public class CommunicationService extends SSService {
 
         Log.d(TAG, "Starting MediaServer");
         mMediaServer = new MediaServer(this, AppConfig.MEDIA_SERVER_PORT, true);
-        mMediaInsecureServer = new MediaServer(this, AppConfig.MEDIA_INSECURE_SERVER_PORT, false);
 
         try { mMediaServer.start(); }
         catch (Exception e) {
             Log.d(TAG, "Cannot start MediaServer: ");
-            e.printStackTrace();
-        }
-
-        try { mMediaInsecureServer.start(); }
-        catch (Exception e) {
-            Log.d(TAG, "Cannot start Insecure MediaServer: ");
             e.printStackTrace();
         }
 
@@ -113,15 +105,6 @@ public class CommunicationService extends SSService {
         }
         catch (Exception e) {
             Log.d(TAG, "Cannot stop MediaServer: ");
-            e.printStackTrace();
-        }
-
-        try
-        {
-            mMediaInsecureServer.stop();
-        }
-        catch (Exception e) {
-            Log.d(TAG, "Cannot stop Insecure MediaServer: ");
             e.printStackTrace();
         }
 

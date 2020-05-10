@@ -1,16 +1,21 @@
 <resources>
 
     <!-- SyncShare themes -->
-    <style name="Theme.SyncShare" parent="Theme.SyncShare.Base" />
+    <style name="Theme.SyncShare.Light" parent="Theme.SyncShare.Base.Light" />
+    <style name="Theme.SyncShare.Dark" parent="Theme.SyncShare.Base.Dark" />
 
-    <style name="Theme.SyncShare.NoActionBar" parent="Theme.SyncShare.Base.NoActionBar">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
+    <style name="Theme.SyncShare.Light.NoActionBar" parent="Theme.SyncShare.Base.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
+
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <style name="Theme.SyncShare.NoActionBar.FullScreen" parent="Theme.SyncShare.Base.NoActionBar">
-        <item name="android:navigationBarColor">@color/colorBlack</item>
+    <style name="Theme.SyncShare.Dark.NoActionBar" parent="Theme.SyncShare.Base.Dark.NoActionBar">
+        <item name="android:statusBarColor">@color/colorBlackTransparent</item>
+        <item name="android:navigationBarColor">@color/colorBlackTransparent</item>
+
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
 
@@ -92,6 +97,11 @@
         <item name="android:windowBackground">?dialogBackground</item>
         <item name="buttonBarButtonStyle">@style/Widget.SyncShare.ButtonStyle.Dialog</item>
     </style>
+
+    <!-- Dark theme -->
+    <!--style name="Widget.SyncShare.ToolbarStyle.Dark" parent="Widget.MaterialComponents.Toolbar" >
+        <item name="android:background">@color/colorBlackTransparent</item>
+    </style-->
 
 
 </resources>

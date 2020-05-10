@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
@@ -39,6 +40,8 @@ public class MediaActivity extends SSActivity {
         mToolbar = findViewById(R.id.toolbar);
         mRootLayout = findViewById(R.id.root_layout);
         mAppbarLayout = findViewById(R.id.appbar_layout);
+
+        mAppbarLayout.setOutlineProvider(null);
 
         setupSystemUI();
 
@@ -95,7 +98,7 @@ public class MediaActivity extends SSActivity {
                                 | View.SYSTEM_UI_FLAG_IMMERSIVE);
 
                 fullScreenMode = true;
-                changeBackGroundColor();
+                //changeBackGroundColor();
             }
         });
     }
@@ -109,32 +112,36 @@ public class MediaActivity extends SSActivity {
         runOnUiThread(new Runnable() {
             public void run() {
                 mAppbarLayout.animate()
-                        .translationY(0)
+                        .translationY(AppUtils.getStatusBarHeight(getResources()))
                         .setInterpolator(new DecelerateInterpolator())
                         .setDuration(240)
                         .start();
 
+                //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
                 getWindow().getDecorView().setSystemUiVisibility(
                                   View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_FULLSCREEN);
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
                 fullScreenMode = false;
-                changeBackGroundColor();
+                //changeBackGroundColor();
             }
         });
     }
 
     private void setupSystemUI() {
         mAppbarLayout.animate()
-                .translationY(0)
+                .translationY(AppUtils.getStatusBarHeight(getResources()))
                 .setInterpolator(new DecelerateInterpolator())
                 .setDuration(240).start();
+
+       // getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         getWindow().getDecorView().setSystemUiVisibility(
                           View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         /*getWindow().getDecorView().setOnSystemUiVisibilityChangeListener
                 (visibility -> {
