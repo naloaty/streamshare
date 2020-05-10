@@ -24,8 +24,8 @@
     <string name="title_storagePermission">Storage permission</string>
     <string name="text_storagePermissionHelp">This permission allows &appname; to read your device\'s storage for sharing media files</string>
 
-    <!--string name="title_readPhoneStatePermission">Permission to read phone state</string-->
-    <!--string name="text_readPhoneStatePermissionHelp">&appname; needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you</string-->
+    <string name="title_readPhoneStatePermission">Permission to read phone state</string>
+    <string name="text_readPhoneStatePermissionHelp">&appname; needs to access your device\'s serial number to create a long-term identity number, helping other devices recognize you</string>
 
     <!--string name="text_locationPermissionHelp">&appname; uses location service to use camera</string-->
 

@@ -36,8 +36,8 @@ public class PermissionHelper {
     }
 
     public static boolean checkBatteryOptimizationDisabled(Context context) {
-        /*if (Build.VERSION.SDK_INT < 23)
-            return true;*/
+        if (Build.VERSION.SDK_INT < 23)
+            return true;
 
         String packageName = context.getPackageName();
         PowerManager pm = (PowerManager) context.getSystemService(POWER_SERVICE);
@@ -46,8 +46,8 @@ public class PermissionHelper {
     }
 
     public static void requestDisableBatteryOptimization(Activity activity) {
-        /*if (Build.VERSION.SDK_INT < 23)
-            return;*/
+        if (Build.VERSION.SDK_INT < 23)
+            return;
 
         String packageName = activity.getPackageName();
 
