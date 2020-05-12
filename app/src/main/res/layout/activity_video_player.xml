@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="false"
-    app:resize_mode="fill"
-    android:orientation="vertical"
+    android:keepScreenOn="true"
+    android:focusable="true"
     android:background="@color/colorBlack">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -27,4 +26,4 @@
         android:layout_height="match_parent"
         android:focusable="true"/>
 
-</LinearLayout>
+</RelativeLayout>

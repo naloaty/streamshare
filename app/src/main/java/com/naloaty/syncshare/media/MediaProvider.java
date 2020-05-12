@@ -12,8 +12,10 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.database.media.AlbumRepository;
+import com.naloaty.syncshare.util.PermissionHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +28,10 @@ public class MediaProvider {
 
     private static final String TAG = "MediaProvider";
 
-    public static List<Album> getAlbums(Context context) throws Exception{
+    public static List<Album> getAlbums(Context context) throws Exception {
+
+        if (!PermissionHelper.checkRequiredPermissions(context))
+            return new ArrayList<>();
 
         Uri      uri        = MediaStore.Files.getContentUri("external");
         String[] projection = Album.getProjection();
@@ -69,7 +74,10 @@ public class MediaProvider {
 
     }
 
-    public static List<Album> getSharedAlbums(Context context) throws Exception{
+    public static List<Album> getSharedAlbums(Context context) throws Exception {
+
+        if (!PermissionHelper.checkRequiredPermissions(context))
+            return new ArrayList<>();
 
         AlbumRepository shared = new AlbumRepository(context);
 
@@ -108,6 +116,9 @@ public class MediaProvider {
     }
 
     public static void clearGhostAlbums(Context context) throws Exception {
+        if (!PermissionHelper.checkRequiredPermissions(context))
+            return;
+
         AlbumRepository shared = new AlbumRepository(context);
 
         List<Album> dbAlbums = shared.getAllAlbumsList();
@@ -136,6 +147,9 @@ public class MediaProvider {
     }
 
     public static List<Media> getMediaFromMediaStore(Context context, String albumId) {
+
+        if (!PermissionHelper.checkRequiredPermissions(context))
+            return new ArrayList<>();
 
         Uri      uri        = MediaStore.Files.getContentUri("external");
         String[] projection = Media.getProjection();
@@ -187,6 +201,9 @@ public class MediaProvider {
      */
     public static MediaObject getMediaObjectById(Context context, String filename) throws Exception{
 
+        if (!PermissionHelper.checkRequiredPermissions(context))
+            throw new Exception("Not found");
+
         // Remove extension
         int dot = filename.lastIndexOf('.');
         if (dot >= 0)
@@ -231,6 +248,11 @@ public class MediaProvider {
 
 
     public static Bitmap getCorrectlyOrientedThumbnail(Context context, MediaObject mediaObject, boolean nativeSize) {
+
+        if (!PermissionHelper.checkRequiredPermissions(context))
+            return BitmapFactory.decodeResource(context.getResources(),
+                    R.drawable.ic_warning_24dp);
+
         Bitmap srcBitmap;
 
         int size;

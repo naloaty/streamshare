@@ -1,5 +1,6 @@
 package com.naloaty.syncshare.activity;
 
+import android.content.res.Configuration;
 import android.icu.util.Measure;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
@@ -27,6 +29,7 @@ import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
 import com.naloaty.syncshare.communication.SSOkHttpClient;
 import com.naloaty.syncshare.util.AppUtils;
+import com.naloaty.syncshare.util.DeviceUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;

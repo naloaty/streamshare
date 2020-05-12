@@ -18,11 +18,15 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
+import com.naloaty.syncshare.fragment.AddOptionsFragment;
+import com.naloaty.syncshare.fragment.OptionFragment;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 
@@ -67,6 +71,15 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        Fragment localDevice = getSupportFragmentManager().findFragmentById(R.id.fragment_localDevice);
+
+        if (localDevice != null)
+            localDevice.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -84,6 +97,8 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         setUpNavigationDrawer();
 
         mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
+
+
 
     }
 

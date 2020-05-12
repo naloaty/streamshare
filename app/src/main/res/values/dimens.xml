@@ -14,4 +14,5 @@
     <dimen name="devices_online_padding">8dp</dimen>
 
     <dimen name="collapsing_app_bar_height">180dp</dimen>
+    <dimen name="media_column_size">150dp</dimen>
 </resources>

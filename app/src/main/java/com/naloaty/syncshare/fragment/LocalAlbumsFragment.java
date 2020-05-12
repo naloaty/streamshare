@@ -3,6 +3,7 @@ package com.naloaty.syncshare.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +28,8 @@ import com.naloaty.syncshare.adapter.OnRVClickListener;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.database.media.AlbumViewModel;
 import com.naloaty.syncshare.media.MediaProvider;
+import com.naloaty.syncshare.util.DeviceUtils;
+import com.naloaty.syncshare.util.PermissionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +69,18 @@ public class LocalAlbumsFragment extends Fragment {
 
         mRecyclerView = view.findViewById(R.id.local_device_recycler_view);
 
-        setupRecyclerView();
+        if (PermissionHelper.checkRequiredPermissions(getContext()))
+            setupRecyclerView();
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (PermissionHelper.checkRequiredPermissions(getContext()))
+            setupRecyclerView();
+    }
 
     private void setupRecyclerView() {
 
@@ -79,7 +92,15 @@ public class LocalAlbumsFragment extends Fragment {
             }
         };
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        Fragment mainFragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+
+        RecyclerView.LayoutManager layoutManager;
+
+        if (DeviceUtils.isPortrait(getResources()) || mainFragment != null)
+            layoutManager = new LinearLayoutManager(getContext());
+        else
+            layoutManager = new GridLayoutManager(getContext(), 2);
+
         mRVadapter = new LocalAlbumsAdapter(clickListener);
 
         mRecyclerView.setLayoutManager(layoutManager);

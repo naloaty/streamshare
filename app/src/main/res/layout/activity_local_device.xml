@@ -33,7 +33,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <fragment
-            android:id="@+id/local_device_fragment"
+            android:id="@+id/fragment_localDevice"
             android:name="com.naloaty.syncshare.fragment.LocalAlbumsFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

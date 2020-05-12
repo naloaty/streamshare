@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,11 +38,14 @@ import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.device.SSDeviceViewModel;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
+import com.naloaty.syncshare.util.DeviceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainFragment extends Fragment {
+
+    private static final String TAG = "MainFragment";
 
     private ArrayList<SSDevice> mList = new ArrayList<>();
     private RecyclerView mRecyclerView;
@@ -116,7 +121,22 @@ public class MainFragment extends Fragment {
         setupRecyclerView();
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+        Fragment localDevice = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_localDevice);
+
+        if (localDevice != null && DeviceUtils.isLandscape(getResources())){
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            mLocalDeviceLayout.setVisibility(View.GONE);
+        }
+        else
+        {
+            mLocalDeviceLayout.setVisibility(View.VISIBLE);
+        }
+
+    }
 
     private void setupRecyclerView() {
 
@@ -131,8 +151,15 @@ public class MainFragment extends Fragment {
         };
 
         /* RecyclerView */
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager;
+
+        if (DeviceUtils.isPortrait(getResources()))
+            layoutManager = new LinearLayoutManager(getContext());
+        else
+            layoutManager = new GridLayoutManager(getContext(), 2);
+
         mRVAdapter = new OnlineDevicesAdapter(clickListener);
+
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mRVAdapter);

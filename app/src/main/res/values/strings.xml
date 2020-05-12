@@ -98,7 +98,7 @@
     <string name="btn_yes">Yes</string>
     <string name="btn_no">No</string>
 
-    <string name="text_unknownAddress">No known address for the device</string>
+    <string name="text_unknownAddress">Address is unknown</string>
 
     <string name="text_deviceName">Device name</string>
     <string name="text_appVersion">Version</string>

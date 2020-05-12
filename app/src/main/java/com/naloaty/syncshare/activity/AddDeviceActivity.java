@@ -44,6 +44,7 @@ public class AddDeviceActivity extends SSActivity {
     public static final int REQUEST_LOCATION_BY_CODE_SCANNER = 3;
     public static final String ACTION_CHANGE_FRAGMENT = "com.naloaty.intent.action.PAIR_DEVICE_CHANGE_FRAGMENT";
     public static final String EXTRA_TARGET_FRAGMENT = "targetFragment";
+    public static final String EXTRA_SAVED_FRAGMENT = "saved_fragment";
 
     private AppBarLayout mAppBarLayout;
     private CollapsingToolbarLayout mToolBarLayout;
@@ -51,6 +52,8 @@ public class AddDeviceActivity extends SSActivity {
 
     private AddOptionsFragment mAddOptionsFragment;
     private DeviceInfoFragment mConnectionInfoFragment ;
+
+    private OptionFragment mCurrentFragment;
 
     private final AddDeviceHelper.AddDeviceCallback callback = new AddDeviceHelper.AddDeviceCallback() {
         @Override
@@ -198,11 +201,23 @@ public class AddDeviceActivity extends SSActivity {
         mAddOptionsFragment = new AddOptionsFragment();
         mConnectionInfoFragment = new DeviceInfoFragment();
 
-        setFragment(OptionFragment.Options);
-
         //======= Init broadcast =========
         mFilter.addAction(ACTION_CHANGE_FRAGMENT);
         mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
+
+        if (savedInstanceState != null) {
+            mCurrentFragment = OptionFragment.valueOf(savedInstanceState.getString(EXTRA_SAVED_FRAGMENT));
+            setFragment(mCurrentFragment);
+        }
+        else
+            setFragment(OptionFragment.Options);
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(EXTRA_SAVED_FRAGMENT, mCurrentFragment.toString());
     }
 
     @Override
@@ -330,6 +345,8 @@ public class AddDeviceActivity extends SSActivity {
 
             transaction.add(R.id.add_device_fragment_placeholder, candidate);
             transaction.commit();
+
+            mCurrentFragment = targetFragment;
 
             setToolbar(targetFragment);
         }

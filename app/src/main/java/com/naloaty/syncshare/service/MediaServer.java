@@ -279,7 +279,6 @@ public class MediaServer extends SimpleWebServer {
                 try {
                     MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
 
-
                     if (mediaObject.isVideo()) {
                         Log.d(TAG, "Serving video fullsize thumbnail " + request[2] + " by path");
                         //Bitmap thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
@@ -315,7 +314,10 @@ public class MediaServer extends SimpleWebServer {
         }
     }
 
-    Response serveFile(Map<String, String> header, File file, String mime) {
+    /*
+     * This method is copied from SimpleWebServer
+     */
+    private Response serveFile(Map<String, String> header, File file, String mime) {
         Response res;
         try {
             // Calculate etag

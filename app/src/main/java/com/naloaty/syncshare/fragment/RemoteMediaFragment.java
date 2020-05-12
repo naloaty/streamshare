@@ -6,6 +6,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +40,7 @@ import com.naloaty.syncshare.database.device.SSDeviceViewModel;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.media.ListHolder;
 import com.naloaty.syncshare.media.Media;
+import com.naloaty.syncshare.util.DeviceUtils;
 
 import java.util.List;
 
@@ -142,12 +144,38 @@ public class RemoteMediaFragment extends Fragment {
             }
         };
 
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), getColumnsCount());
         mRVAdapter = new RemoteMediaAdapter(clickListener, mNetworkDevice);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mRVAdapter);
+
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setUpColumns();
+    }
+
+    private void setUpColumns() {
+        int columnsCount = getColumnsCount();
+
+        if (columnsCount != ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount()) {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), columnsCount));
+        }
+    }
+
+    private int getColumnsCount() {
+        /*
+         * TODO: add ability to change in settings
+         */
+
+        return DeviceUtils.getOptimalColumsCount(getResources());
+        /*return DeviceUtils.isPortrait(getResources())
+                ? 3
+                : 4;*/
     }
 
 

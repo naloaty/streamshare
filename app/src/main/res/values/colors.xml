@@ -24,6 +24,8 @@
     <color name="colorBackgroundBlueTheme">#EFECF7</color>
 
     <color name="colorEmptyThumbnail">#F2F3F5</color>
+    <color name="colorTabletBackground">#F1F3F4</color>
+    <color name="colorCardBackground">#FEFEFE</color>
 
     <color name="colorDecorator">#DCDCDC</color>
     <color name="colorTextSecondary">#737373</color>
