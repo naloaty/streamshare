@@ -7,9 +7,6 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 
 import com.naloaty.syncshare.database.SSDatabase;
-import com.naloaty.syncshare.database.device.SSDevice;
-import com.naloaty.syncshare.database.device.SSDeviceDao;
-import com.naloaty.syncshare.database.device.SSDeviceRepository;
 
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class AlbumRepository {
 
         //Room auto generates these abstract methods
         albumDao = database.albumDao();
-        allAlbums = albumDao.getAllAlbums();
+        allAlbums = albumDao.getAllAlbumsDep();
     }
 
     public void insert(Album album) {
@@ -96,7 +93,6 @@ public class AlbumRepository {
     /*
      * Used only outside of UI Thread
      */
-
     public List<Album> getAllAlbumsList() {
         return albumDao.getAllAlbumsList();
     }

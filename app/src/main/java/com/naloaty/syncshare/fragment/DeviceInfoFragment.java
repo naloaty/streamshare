@@ -13,12 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.app.GlideApp;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.security.SecurityUtils;
 import com.naloaty.syncshare.util.AppUtils;
@@ -116,7 +116,7 @@ public class DeviceInfoFragment extends Fragment{
             Bitmap bitmap = encoder.createBitmap(bitMatrix);
 
 
-            GlideApp.with(getContext())
+            Glide.with(getContext())
                     .load(bitmap)
                     .into(mQRCode);
         }

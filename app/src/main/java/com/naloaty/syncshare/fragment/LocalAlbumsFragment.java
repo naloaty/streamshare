@@ -117,21 +117,10 @@ public class LocalAlbumsFragment extends Fragment {
             public void onFinish(List<Album> albums) {
                 isLoadingAlbums = false;
 
-                mList = new ArrayList<>();
-                List<Album> databaseAlbums = mAlbumViewModel.getAllAlbumsList();
+                mList.clear();
 
-                for (Album album: albums) {
-
-                    for(Album dbAlbum: databaseAlbums){
-                        if (dbAlbum.getName().equals(album.getName())
-                                && dbAlbum.getPath().equals(album.getPath())){
-                            album.setAccessAllowed(dbAlbum.isAccessAllowed());
-                            break;
-                        }
-                    }
-
-                    mList.add(album);
-                }
+                if (albums != null)
+                    mList.addAll(albums);
 
                 mRVadapter.setAlbumsList(mList);
                 updateUIState();
@@ -145,7 +134,7 @@ public class LocalAlbumsFragment extends Fragment {
             }
         };
 
-        new LoadAlbumsAT(getContext(), callback).execute();
+        new LoadAlbumsAT(getContext(), callback).execute(mAlbumViewModel);
     }
 
     public interface AlbumsLoaderCallback {
@@ -154,7 +143,7 @@ public class LocalAlbumsFragment extends Fragment {
         void onFail();
     }
 
-    private static class LoadAlbumsAT extends AsyncTask<Void, Void, List<Album>> {
+    private static class LoadAlbumsAT extends AsyncTask<AlbumViewModel, Void, List<Album>> {
 
         private final Context context;
         private final AlbumsLoaderCallback callback;
@@ -171,10 +160,13 @@ public class LocalAlbumsFragment extends Fragment {
         }
 
         @Override
-        protected List<Album> doInBackground(Void... voids) {
+        protected List<Album> doInBackground(AlbumViewModel... viewModels) {
 
             try 
             {
+                if (viewModels[0] == null)
+                    cancel(true);
+
                 List<Album> albums = MediaProvider.getAlbums(context);
 
                 Log.w(TAG, "Count: " + albums.size());
@@ -182,7 +174,23 @@ public class LocalAlbumsFragment extends Fragment {
                 if (albums == null)
                     cancel(true);
 
-                return albums;
+                ArrayList<Album> resultAlbums = new ArrayList<>();
+                List<Album> databaseAlbums = viewModels[0].getAllAlbumsList();
+
+                for (Album album: albums) {
+
+                    for(Album dbAlbum: databaseAlbums){
+                        if (dbAlbum.getName().equals(album.getName())
+                                && dbAlbum.getPath().equals(album.getPath())){
+                            album.setAccessAllowed(dbAlbum.isAccessAllowed());
+                            break;
+                        }
+                    }
+
+                    resultAlbums.add(album);
+                }
+
+                return resultAlbums;
             }
             catch (Exception e) {
                 Log.d(TAG, "Cannot load albums: " + e.getMessage());

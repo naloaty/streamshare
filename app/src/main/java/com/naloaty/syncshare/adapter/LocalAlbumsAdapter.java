@@ -127,6 +127,7 @@ public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.
                     new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
             MediaObject cover = MediaProvider.getMediaObjectById(holder.albumPreview.getContext(), album.getLastItemFilename());
+
             Glide.with(holder.albumPreview.getContext())
                     .asBitmap()
                     .load(cover.getPath())

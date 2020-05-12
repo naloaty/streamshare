@@ -1,5 +1,7 @@
 package com.naloaty.syncshare.database.media;
 
+import android.database.Observable;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -27,8 +29,9 @@ public interface AlbumDao {
     @Query("SELECT COUNT(*) FROM albums_table")
     Integer getAlbumCount();
 
+    @Deprecated
     @Query("SELECT * FROM albums_table")
-    LiveData<List<Album>> getAllAlbums();
+    LiveData<List<Album>> getAllAlbumsDep();
 
     @Query("SELECT * FROM albums_table")
     List<Album> getAllAlbumsList();

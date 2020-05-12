@@ -50,7 +50,7 @@ public class AlbumViewModel extends AndroidViewModel {
     }
 
     public List<Album> getAllAlbumsList () {
-        return repository.getAllAlbumListDep();
+        return repository.getAllAlbumsList();
     }
 
     public void publish(Album album) {
