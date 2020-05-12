@@ -2,8 +2,10 @@ package com.naloaty.syncshare.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,9 +28,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.adapter.LocalAlbumsAdapter;
 import com.naloaty.syncshare.adapter.OnRVClickListener;
+import com.naloaty.syncshare.app.SSActivity;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.database.media.AlbumViewModel;
 import com.naloaty.syncshare.media.MediaProvider;
+import com.naloaty.syncshare.security.SecurityUtils;
+import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.DeviceUtils;
 import com.naloaty.syncshare.util.PermissionHelper;
 
@@ -43,22 +49,41 @@ public class LocalAlbumsFragment extends Fragment {
     private LocalAlbumsAdapter mRVadapter;
     private AlbumViewModel mAlbumViewModel;
 
-
     private boolean isLoadingAlbums = false;
     private boolean isLoadingFailed = false;
+
+    private final IntentFilter mFilter = new IntentFilter();
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d(TAG, "rec brod " + intent);
+
+            if (getContext() == null)
+                return;
+
+            boolean securityStuffOk = SecurityUtils.checkSecurityStuff(getContext().getFilesDir(), false);
+            boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
+
+            if (securityStuffOk && permissionsGranted)
+                setupRecyclerView();
+        }
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
+
+        mFilter.addAction(SSActivity.PERMISSION_REQUEST_RESULT);
+        mFilter.addAction(SSActivity.SECURITY_STUFF_GENERATION_RESULT);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_local_albums_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_local_albums_fragment, container, false);
     }
 
     @Override
@@ -69,17 +94,30 @@ public class LocalAlbumsFragment extends Fragment {
 
         mRecyclerView = view.findViewById(R.id.local_device_recycler_view);
 
-        if (PermissionHelper.checkRequiredPermissions(getContext()))
+        boolean securityStuffOk = SecurityUtils.checkSecurityStuff(getContext().getFilesDir(), false);
+        boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
+
+        if (securityStuffOk && permissionsGranted)
             setupRecyclerView();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mReceiver, mFilter);
+    }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void onPause() {
+        super.onPause();
 
-        if (PermissionHelper.checkRequiredPermissions(getContext()))
-            setupRecyclerView();
+        boolean securityStuffOk = SecurityUtils.checkSecurityStuff(getContext().getFilesDir(), false);
+        boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
+
+        if (!permissionsGranted || !securityStuffOk)
+            return;
+
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mReceiver);
     }
 
     private void setupRecyclerView() {
@@ -122,7 +160,13 @@ public class LocalAlbumsFragment extends Fragment {
                 if (albums != null)
                     mList.addAll(albums);
 
-                mRVadapter.setAlbumsList(mList);
+                /*
+                 * At some reason it wroks faster
+                 */
+                for (Album album: albums)
+                    mRVadapter.addAlbum(album);
+
+                //mRVadapter.setAlbumsList(mList);
                 updateUIState();
 
             }

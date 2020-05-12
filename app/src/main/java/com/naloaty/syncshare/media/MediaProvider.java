@@ -249,9 +249,13 @@ public class MediaProvider {
 
     public static Bitmap getCorrectlyOrientedThumbnail(Context context, MediaObject mediaObject, boolean nativeSize) {
 
-        if (!PermissionHelper.checkRequiredPermissions(context))
+        if (!PermissionHelper.checkRequiredPermissions(context)){
+            Log.d(TAG, "Permissions not granted");
+
             return BitmapFactory.decodeResource(context.getResources(),
                     R.drawable.ic_warning_24dp);
+        }
+
 
         Bitmap srcBitmap;
 

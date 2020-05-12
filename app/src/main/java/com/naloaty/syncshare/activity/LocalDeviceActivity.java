@@ -51,14 +51,4 @@ public class LocalDeviceActivity extends SSActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        Fragment localDevice = getSupportFragmentManager().findFragmentById(R.id.fragment_localDevice);
-
-        if (localDevice != null)
-            localDevice.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 }

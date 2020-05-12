@@ -22,6 +22,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.app.GlideApp;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.media.Media;
@@ -130,7 +131,7 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
             DrawableCrossFadeFactory factory =
                     new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
-            Glide.with(holder.thumbnail.getContext())
+            GlideApp.with(holder.thumbnail.getContext())
                     .asBitmap()
                     .load(URL)
                     .apply(options)

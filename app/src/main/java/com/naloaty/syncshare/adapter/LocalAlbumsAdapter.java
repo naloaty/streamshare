@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
@@ -29,6 +28,7 @@ import java.util.List;
 
 import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
+
 public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.ViewHolder>{
 
     private static final String TAG = "LocalAlbumsAdapter";
@@ -38,6 +38,11 @@ public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.
 
     public LocalAlbumsAdapter(OnRVClickListener clickListener){
         mClickListener = clickListener;
+    }
+
+    public void addAlbum(Album album) {
+        mList.add(album);
+        notifyItemInserted(mList.size() - 1);
     }
 
     public void setAlbumsList(List<Album> albumsList) {

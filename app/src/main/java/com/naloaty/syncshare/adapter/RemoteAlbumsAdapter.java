@@ -24,6 +24,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.ImageViewActivity;
+import com.naloaty.syncshare.app.GlideApp;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.database.media.Album;
@@ -137,7 +138,7 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
             DrawableCrossFadeFactory factory =
                     new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
-            Glide.with(holder.albumPreview.getContext())
+            GlideApp.with(holder.albumPreview.getContext())
                     .asBitmap()
                     .load(URL)
                     .apply(options)

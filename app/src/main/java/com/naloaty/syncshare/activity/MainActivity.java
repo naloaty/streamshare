@@ -41,6 +41,9 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
     private NavigationView mNavigationView;
     private MenuItem mSelectedDrawerItem;
     private MenuItem mServiceToggle;
+    private boolean mServiceRunning = false;
+
+    private final String SERVICE_STATE = "service_state";
 
     private final IntentFilter mFilter = new IntentFilter();
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -54,12 +57,14 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         }
     };
 
-    private void setServiceState(boolean serviceStarted) {
+    private void setServiceState(boolean serviceRunning) {
+
+        mServiceRunning = serviceRunning;
 
         if (mServiceToggle == null)
             return;
 
-        if (serviceStarted) {
+        if (serviceRunning) {
             mServiceToggle.setTitle(R.string.menu_stopSharing);
             mServiceToggle.setIcon(R.drawable.ic_service_off_24dp);
         }
@@ -71,15 +76,6 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        Fragment localDevice = getSupportFragmentManager().findFragmentById(R.id.fragment_localDevice);
-
-        if (localDevice != null)
-            localDevice.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -98,8 +94,14 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
 
         mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
 
+        if (savedInstanceState != null)
+            setServiceState(savedInstanceState.getBoolean(SERVICE_STATE, false));
+    }
 
-
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SERVICE_STATE, mServiceRunning);
     }
 
     /*
@@ -231,6 +233,17 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         getMenuInflater().inflate(R.menu.toolbar_menu_main, menu);
 
         mServiceToggle = menu.findItem(R.id.action_toggle_sharing);
+
+        if (mServiceRunning) {
+            mServiceToggle.setTitle(R.string.menu_stopSharing);
+            mServiceToggle.setIcon(R.drawable.ic_service_off_24dp);
+        }
+        else
+        {
+            mServiceToggle.setTitle(R.string.menu_startSharing);
+            mServiceToggle.setIcon(R.drawable.ic_service_on_24dp);
+        }
+
         return true;
     }
 

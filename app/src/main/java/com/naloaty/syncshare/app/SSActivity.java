@@ -9,7 +9,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.WelcomeActivity;
 import com.naloaty.syncshare.dialog.PermissionRequest;
@@ -25,7 +28,10 @@ public class SSActivity extends AppCompatActivity {
 
     private static final String TAG = "SSActivity";
     public static final int PERMISSION_REQUEST = 1;
+
     public static final String WELCOME_SHOWN = "welcome_shown";
+    public static final String PERMISSION_REQUEST_RESULT = "permission_request_result";
+    public static final String SECURITY_STUFF_GENERATION_RESULT = "sec_stuff_gen_result";
 
     private AlertDialog mOngoingRequest;
     private boolean mSkipPermissionRequest = false;
@@ -72,6 +78,9 @@ public class SSActivity extends AppCompatActivity {
                     ssDialog.dismiss();
                     Toast.makeText(SSActivity.this, getText(R.string.toast_keysCreationSuccess), Toast.LENGTH_LONG).show();
                 }
+
+                Intent intent = new Intent(SECURITY_STUFF_GENERATION_RESULT);
+                LocalBroadcastManager.getInstance(SSActivity.this).sendBroadcast(intent);
 
             }
 
@@ -143,6 +152,10 @@ public class SSActivity extends AppCompatActivity {
 
         if (!PermissionHelper.checkRequiredPermissions(this))
             requestRequiredPermissions(!mSkipPermissionRequest);
+
+        Log.d(TAG, "Sending broadcast");
+        Intent intent = new Intent(PERMISSION_REQUEST_RESULT);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
     }
 

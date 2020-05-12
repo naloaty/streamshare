@@ -28,6 +28,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
+import com.naloaty.syncshare.app.GlideApp;
 import com.naloaty.syncshare.app.MediaActivity;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
@@ -201,7 +202,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             DrawableCrossFadeFactory factory =
                     new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
-            Glide.with(ImageViewActivity.this)
+            GlideApp.with(ImageViewActivity.this)
                     .load(URL)
                     .apply(options)
                     .transition(withCrossFade(factory))
