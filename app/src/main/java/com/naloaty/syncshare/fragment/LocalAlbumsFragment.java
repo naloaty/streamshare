@@ -160,13 +160,7 @@ public class LocalAlbumsFragment extends Fragment {
                 if (albums != null)
                     mList.addAll(albums);
 
-                /*
-                 * At some reason it wroks faster
-                 */
-                for (Album album: albums)
-                    mRVadapter.addAlbum(album);
-
-                //mRVadapter.setAlbumsList(mList);
+                mRVadapter.setAlbumsList(mList);
                 updateUIState();
 
             }

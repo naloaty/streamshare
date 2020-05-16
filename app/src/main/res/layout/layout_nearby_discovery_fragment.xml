@@ -10,13 +10,14 @@
         android:layout_height="match_parent"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingBottom="16dp"/>
+        android:paddingBottom="16dp"
+        android:visibility="visible"/>
 
     <include
-        android:layout_marginTop="35dp"
         android:id="@+id/message_placeholder"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:visibility="gone"
+        android:layout_gravity="center"
         layout="@layout/view_message" />
 </LinearLayout>

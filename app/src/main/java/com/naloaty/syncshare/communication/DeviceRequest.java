@@ -21,4 +21,5 @@ public interface DeviceRequest {
      */
     @POST(MediaServerKeyword.REQUEST_TARGET_DEVICE + "/" + MediaServerKeyword.REQUEST_INFORMATION)
     Call<SimpleServerResponse> sendDeviceInformation(@Body SSDevice ssDevice);
+
 }

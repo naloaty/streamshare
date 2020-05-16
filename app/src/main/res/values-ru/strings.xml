@@ -19,7 +19,7 @@
     <string name="btn_close">Закрыть</string>
 
     <string name="text_permissionsHelp">&appname; требуются некоторые разрешения для корректной работы</string>
-    <string name="text_batteryOptimizationHelp">Андроид может остановить медиа-сервер &appname; спустя некоторое время. Чтобы этого не случилось, отключите оптимизацию энергосбережения для &appname; </string>
+    <string name="text_batteryOptimizationHelp">Андроид может остановить медиа-сервер &appname; спустя некоторое время. Чтобы этого не случилось, отключите оптимизацию энергопотребления для &appname; </string>
 
     <string name="title_storagePermission">Доступ к хранилищу</string>
     <string name="text_storagePermissionHelp">Данное разрешение позволяет &appname; получить доступ к медиа-файлам</string>
@@ -29,16 +29,16 @@
 
     <!--string name="text_locationPermissionHelp">&appname; uses location service to use camera</string-->
 
-    <string name="title_batteryOptimization">Оптимизация энергопотребления</string>
+    <string name="title_batteryOptimization">Оптимизация\nэнергопотребления</string>
     <string name="btn_disable">Отключить</string>
 
-    <string name="title_enterDeviceId">Введите ID устрйства</string>
+    <string name="title_enterDeviceId">Введите ID устройства</string>
     <string name="btn_add">Добавить</string>
     <string name="msg_wrongDeviceId">Неправильный ID\n(должно быть 9 групп)</string>
 
-    <string name="title_unrecognizedCode">Нераспозанный код</string>
+    <string name="title_unrecognizedCode">Нераспознанный код</string>
 
-    <string name="menu_devices">Управление устрйствами</string>
+    <string name="menu_devices">Управление устройствами</string>
 
     <string name="drawer_open">Открыть панель навигации</string>
     <string name="drawer_close">Закрыть панель навигации</string>
@@ -48,28 +48,28 @@
     <string name="text_ncLowPriority">Низкий приоритет</string>
     <string name="text_ncLowPriorityDescription">Уведомления от &appname;, которые имеют низкий приоритет</string>
 
-    <string name="text_communicationServiceIdle">&appname; предоставляет доступ к медиа-файлам</string>
+    <string name="text_communicationServiceIdle">&appname; сервис активен</string>
     <string name="text_communicationServiceIdleAction">Нажмите, чтобы остановить</string>
 
-    <string name="title_deviceManage">Упраление устройствами</string>
+    <string name="title_deviceManage">Управление устройствами</string>
 
-    <string name="text_noDevices">Вы ещё не добавили устройств</string>
+    <string name="text_noDevices">Вы ещё не добавили\nустройств</string>
     <string name="header_myDevices">Мои устройства</string>
     <string name="btn_addDevice">Добавить устройство</string>
 
     <string name="title_addDevice">Добавить устройство</string>
-    <string name="title_deviceInfo">Информация об устрйстве</string>
+    <string name="title_deviceInfo">Информация об устройстве</string>
 
     <string name="text_addDeviceHelp">Выберите способ добавления ID другого устройства</string>
-    <string name="btn_showDeviceInfo">Информация об устрйстве</string>
+    <string name="btn_showDeviceInfo">Информация об устройстве</string>
     <string name="btn_scanQrCode">Сканировать QR код</string>
     <string name="btn_enterIdManually">Ввести ID устройства</string>
     <string name="header_useDiscoveredDevices">Устройства поблизости</string>
-    <string name="text_discoveringDevices">Устройств поблизости не обнаружено</string>
+    <string name="text_discoveringDevices">Устройств поблизости\nне обнаружено</string>
 
-    <string name="text_deviceInfoHelp">Отсканируйте данный QR код на втором устрйстве. Вы также можете ввести вышеуказанный ID вручную</string>
+    <string name="text_deviceInfoHelp">Отсканируйте данный QR код на втором устройстве. Вы также можете ввести вышеуказанный ID вручную</string>
 
-    <string name="text_noDeviceIdError">По какой-то причине &appname; не смог получить информацию об устройстве. Чтобы это решить, перезпустите &appname; Если вы видите это сообщение уже не в первый раз, то сообщите об этом разработчику</string>
+    <string name="text_noDeviceIdError">По какой-то причине &appname; не смог получить информацию об устройстве. Чтобы это решить, перезапустите &appname; Если вы видите это сообщение уже не в первый раз, то сообщите об этом разработчику</string>
 
     <string name="menu_stopSharing">Остановить сервис</string>
     <string name="menu_startSharing">Запустить сервис</string>
@@ -80,22 +80,22 @@
     <string name="text_generationFailed">Не удалось создать ключи шифрования. Попробуйте ещё раз. Если вы видите это сообщение уже не в первый раз, то сообщите об этом разработчику</string>
     <string name="btn_tryAgain">Повторить</string>
     <string name="btn_exitApp">Выйти</string>
-    <string name="toast_keysCreationSuccess">Ключи шифроваия успешно созданы</string>
+    <string name="toast_keysCreationSuccess">Ключи шифрования успешно созданы</string>
 
     <string name="text_onRequestDeviceInfo">Запрос информации об устройстве</string>
     <string name="text_onSendingDeviceInfo">Отправка информации об устройстве</string>
     <string name="toast_alreadyAdded">Устройство уже добавлено</string>
 
 
-    <string name="text_offlineDevice">Устройство, которое вы пытаетесь добавить, находится не в сети. Чтобы завершить добавление, подключите оба устройства к одной сети Wi-Fi. Далее либо выполните процедуру добавления на втором устройстве, либо удалите его из списка добавленный и повторите попытку</string>
-    <string name="text_handShakeException">Выполните процедуру добавления на втором устройстве, чтобы завершить настройку обоих устройств</string>
+    <string name="text_offlineDevice">Устройство, которое вы пытаетесь добавить, находится не в сети. Чтобы завершить добавление, подключите оба устройства к одной сети Wi-Fi. Далее либо выполните процедуру добавления на втором устройстве, либо удалите его из списка добавленных и повторите попытку</string>
+    <string name="text_handShakeException">Выполните процедуру добавления на втором устройстве, чтобы завершить настройку</string>
     <string name="text_onSuccessfullyAdded">Оба устройства успешно настроены</string>
     <string name="text_oExchangeFailed">Не удалось связаться со вторым устройством. Чтобы завершить добавление, подключите оба устройства к одной сети Wi-Fi. Далее либо выполните процедуру добавления на втором устройстве, либо удалите его из списка добавленный и повторите попытку</string>
 
     <string name="title_success">Успех</string>
     <string name="title_step2">Шаг 2</string>
-    <string name="title_trustQuestion">Вы доверяте этому устройству?</string>
-    <string name="text_trustQuestionHelp">Совпадает ли данный ID с тем, что вы видите на экране второго устройства в разделе информации об устройстве?\n\n%s</string>
+    <string name="title_trustQuestion">Вы доверяете этому устройству?</string>
+    <string name="text_trustQuestionHelp">Совпадает ли данный ID с тем, что вы видите на экране второго устройства в разделе "информация об устройстве"?\n\n%s</string>
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
 
@@ -119,22 +119,22 @@
     <string name="text_localDevice">Это устройство</string>
     <string name="header_onlineDevices">Устройства в сети</string>
 
-    <string name="text_noDevicesAdded">Вы ещё не добавили устройств</string>
-    <string name="text_noOnlineDevices">Все ваши устройства не в сети</string>
+    <string name="text_noDevicesAdded">Вы ещё не добавили\nустройств</string>
+    <string name="text_noOnlineDevices">Все ваши устройства\nне в сети</string>
     <string name="btn_manageDevices">Управление устройствами</string>
 
     <string name="text_localDeviceHelp">Здесь вы можете выбрать альбомы, к которым будет предоставлен доступ на других устройствах</string>
-    <string name="text_myDevicesHelp">Здесь вы можете управлять своими устройствами. Например, ограничивать доступ для определённых устройств</string>
-    <string name="text_remoteAlbumsHelp">Здесь отображется список альбомов на %s, к которым вы предоставили доступ</string>
+    <string name="text_myDevicesHelp">Здесь вы можете управлять своими устройствами. Например, ограничивать доступ</string>
+    <string name="text_remoteAlbumsHelp">Здесь отображается список альбомов на %s, к которым вы предоставили доступ</string>
     <string name="text_deviceDiscoveryHelp">Не забудьте запустить сервис &appname; на втором устройстве, иначе оно не будет отображаться в списке ниже</string>
 
     <string name="text_loadingAlbums">Загрузка альбомов</string>
-    <string name="text_noAlbumsFound">Альбомы не найдны</string>
-    <string name="text_cannotLoadAlbums">Не удалось загрузить альбомв\nПожалуйства, презапустите &appname;</string>
+    <string name="text_noAlbumsFound">Альбомы не найдены</string>
+    <string name="text_cannotLoadAlbums">Не удалось загрузить альбомы\nПожалуйста, презапустите &appname;</string>
 
     <string name="text_loadingMedia">Загрузка медиа-файлов</string>
     <string name="text_noMediaFound">Медиа-файлы не найдены</string>
-    <string name="text_cannotLoadMedia">Не удалось загрузить медиа-файлы\nПожалуйства, презапустите &appname;</string>
+    <string name="text_cannotLoadMedia">Не удалось загрузить медиа-файлы\nПожалуйста, презапустите &appname;</string>
 
     <string name="title_error">Ошибка</string>
     <string name="text_internalAppError">Произошла внутренняя ошибка &appname; (код %s). Перезапустите приложение и попробуйте ещё раз. Если вы видите это сообщение уже не в первый раз, то сообщите об этом разработчику</string>
@@ -144,13 +144,13 @@
 
     <string name="title_securityException">Уведомление безопасности</string>
 
-    <string name="text_securityException">Не удалось подключиться к устрйоству. Это могло произойти по двум причинам. Первая заключается в том, что вы возможно не добавили данное устройства на %s. Вторая - вы запретили доступ к медиа-файлам этому устройству</string>
+    <string name="text_securityException">Не удалось подключиться к устройству. Это могло произойти по двум причинам. Первая заключается в том, что вы не добавили данное устройство на %s. Вторая - вы запретили доступ к медиа-файлам этому устройству</string>
 
     <string name="text_galleryVideo">Видео</string>
     <string name="title_noVideoSource">Нет источника видео</string>
     <string name="text_noVideoSource">По какой-то причине отсутствует источник видео. Попробуйте перезайти в альбом. Если вы видите это сообщение уже не в первый раз, то свяжитесь с разработчиком</string>
 
-    <string name="title_noImageSource">Нет источника</string>
+    <string name="title_noImageSource">Нет источника изображения</string>
     <string name="text_noImageSource">По какой-то причине отсутствует источник изображения. Попробуйте перезайти в альбом. Если вы видите это сообщение уже не в первый раз, то свяжитесь с разработчиком</string>
 
 </resources>

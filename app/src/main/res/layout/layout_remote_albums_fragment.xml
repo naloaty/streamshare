@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <include
-            layout="@layout/remote_albums_help"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/remote_albums_recycler_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <include
-            android:layout_marginTop="35dp"
-            android:id="@+id/message_placeholder"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:visibility="gone"
-            layout="@layout/view_message_loader"/>
+            <include
+                layout="@layout/remote_albums_help"/>
 
-    </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/remote_albums_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"/>
 
-</androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <include
+        android:id="@+id/message_placeholder"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        layout="@layout/view_message_loader"/>
+</FrameLayout>

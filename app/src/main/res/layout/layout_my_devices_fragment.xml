@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent">
 
-        <include
-            layout="@layout/my_devices_help" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/my_devices_recycler_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <include
-            android:layout_marginTop="35dp"
-            android:id="@+id/message_placeholder"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:visibility="gone"
-            layout="@layout/view_message" />
+            <include
+                layout="@layout/my_devices_help" />
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/my_devices_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <include
+        android:id="@+id/message_placeholder"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="invisible"
+        layout="@layout/view_message" />
+</FrameLayout>
