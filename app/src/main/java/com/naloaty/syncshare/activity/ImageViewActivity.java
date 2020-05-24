@@ -154,16 +154,18 @@ public class ViewPagerAdapter extends PagerAdapter {
             playBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String URL = CommunicationHelper.getServeRequestURL(mNetworkDevice) + media.getFilename();
 
-                    Log.d(TAG, "Intent for video by URL -> " + URL);
+                    //TODO: refactor NetrworkDevice system
+
+                    Log.d(TAG, "Intent for video by URL -> " + CommunicationHelper.getServeRequestURL(mNetworkDevice));
 
                         /*Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(URL), media.getMimeType());
                         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(intent);*/
 
                     Intent intent = new Intent(ImageViewActivity.this, VideoPlayerActivity.class);
-                    intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_SOURCE, URL);
+                    intent.putExtra(VideoPlayerActivity.EXTRA_REMOTE_URL, CommunicationHelper.getServeRequestURL(mNetworkDevice));
+                    intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_INFO, media);
                     startActivity(intent);
                 }
             });

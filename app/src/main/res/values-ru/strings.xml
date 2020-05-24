@@ -153,4 +153,10 @@
     <string name="title_noImageSource">Нет источника изображения</string>
     <string name="text_noImageSource">По какой-то причине отсутствует источник изображения. Попробуйте перезайти в альбом. Если вы видите это сообщение уже не в первый раз, то свяжитесь с разработчиком</string>
 
+    <string name="title_unsupportedVideo">Не поддерживается</string>
+    <string name="text_unsupportedVideo">Формат данного видео не поддерживается видео плеером &appname;</string>
+    <string name="text_unsupportedVideoInsecure">Формат данного видео не поддерживается видео плеером &appname;. Желаете открыть его в стороннем плеере?</string>
+
+    <string name="text_videoPlayerError">Произошла неожиданная ошибка. Пожалуйста, попробуйте ещё раз</string>
+
 </resources>

@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "0.3.3 indev"
+        versionName "0.3.4 indev"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
@@ -42,6 +42,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     def room_version = "2.2.5"
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
 
     //Material design
     implementation 'com.google.android.material:material:1.1.0-alpha05'

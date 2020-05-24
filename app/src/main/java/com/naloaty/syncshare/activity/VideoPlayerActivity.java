@@ -1,9 +1,12 @@
 package com.naloaty.syncshare.activity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.icu.util.Measure;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -14,13 +17,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.Allocator;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -28,6 +36,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
 import com.naloaty.syncshare.communication.SSOkHttpClient;
+import com.naloaty.syncshare.media.Media;
 import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.DeviceUtils;
 
@@ -39,9 +48,26 @@ import okhttp3.OkHttpClient;
 
 public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.VisibilityListener {
 
+    //TODO: remove this functionality
+    //This feature is temporary. Only for exclusive build for Mikil.
+    private boolean insecureMode = true;
+
     private static final String TAG = "VideoPlayerActivity";
 
-    public static final String EXTRA_VIDEO_SOURCE = "videoSource";
+    //TODO: add ability to change this in settings
+
+    private static int BUFFER_SEGMENT_SIZE = 10000;
+    private static int MIN_BUFFERSIZE_MS = 10 * 1000;
+    private static int MAX_BUFFERSIZE_MS = 25 * 1000;
+
+    //Length of media that should be buffered after seeking
+    private static int BUFFER_FOR_PLAYBACK_MS = 2 * 1000;
+
+    //Length of media that should be buffered after buffer is depleted
+    private static int BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 5 * 1000;
+
+    public static final String EXTRA_REMOTE_URL = "remoteUrl";
+    public static final String EXTRA_VIDEO_INFO = "videoInfo";
     private CustomPlayerView playerView;
     private SimpleExoPlayer simpleExoPlayer;
 
@@ -75,10 +101,12 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
             }
         });
 
-        String videoURL;
+        String remoteURL;
+        Media videoInfo;
 
-        if (getIntent() != null && getIntent().hasExtra(EXTRA_VIDEO_SOURCE)) {
-            videoURL = getIntent().getStringExtra(EXTRA_VIDEO_SOURCE);
+        if (getIntent() != null) {
+            remoteURL = getIntent().getStringExtra(EXTRA_REMOTE_URL);
+            videoInfo = (Media) getIntent().getSerializableExtra(EXTRA_VIDEO_INFO);
         }
         else
         {
@@ -93,11 +121,67 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
 
         playerView = findViewById(R.id.player_view);
         playerView.setBackground(getDrawable(R.color.colorBlack));
-        setupPlayer(Uri.parse(videoURL));
+        setupPlayer(Uri.parse(remoteURL + videoInfo.getFilename()), videoInfo.getMimeType());
     }
 
-    private void setupPlayer(Uri videoUri) {
-        simpleExoPlayer = new SimpleExoPlayer.Builder(this).build();
+    private void setupPlayer(Uri videoUri, String mime) {
+        DefaultAllocator defaultAllocator = new DefaultAllocator(true, BUFFER_SEGMENT_SIZE);
+        DefaultLoadControl loadControl = new DefaultLoadControl.Builder()
+                .setAllocator(defaultAllocator)
+                .setBufferDurationsMs(MIN_BUFFERSIZE_MS, MAX_BUFFERSIZE_MS, BUFFER_FOR_PLAYBACK_MS, BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS)
+                .createDefaultLoadControl();
+
+        //TODO: replace with smth else
+        ExoPlayer.EventListener listener = new ExoPlayer.EventListener() {
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                switch (error.type) {
+                    case ExoPlaybackException.TYPE_SOURCE:
+                        Log.e(TAG, "TYPE_SOURCE: " + error.getSourceException().getMessage());
+
+                        if (!insecureMode) {
+                            new AlertDialog.Builder(VideoPlayerActivity.this)
+                                    .setTitle(R.string.title_unsupportedVideo)
+                                    .setMessage(R.string.text_unsupportedVideo)
+                                    .setPositiveButton(R.string.btn_close, (dialog, which) -> onBackPressed())
+                                    .show();
+                        }
+                        else
+                        {
+                            new AlertDialog.Builder(VideoPlayerActivity.this)
+                                    .setTitle(R.string.title_unsupportedVideo)
+                                    .setMessage(R.string.text_unsupportedVideoInsecure)
+                                    .setNegativeButton(R.string.btn_no, (dialog, which) -> onBackPressed())
+                                    .setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which)
+                                        {
+                                            onBackPressed();
+                                            Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(videoUri, mime);
+                                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                            startActivity(intent);
+                                        }
+                                    }).show();
+                        }
+                        break;
+
+                    default:
+                        new AlertDialog.Builder(VideoPlayerActivity.this)
+                                .setTitle(R.string.title_error)
+                                .setMessage(R.string.text_videoPlayerError)
+                                .setPositiveButton(R.string.btn_close, (dialog, which) -> onBackPressed())
+                                .show();
+                        break;
+                }
+            }
+        };
+
+        simpleExoPlayer = new SimpleExoPlayer.Builder(this)
+                .setLoadControl(loadControl)
+                .build();
+
+        simpleExoPlayer.addListener(listener);
         playerView.setVisibilityListener(this);
         playerView.setPlayer(simpleExoPlayer);
 

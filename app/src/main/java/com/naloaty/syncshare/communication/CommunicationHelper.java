@@ -24,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class CommunicationHelper {
 
     private static final String TAG = "RemoteViewHelper";
-    private static final String PROTOCOL = "https://";
+    private static final String PROTOCOL = "http://";
 
     public static Call<SSDevice> requestDeviceInformation(final Context context, final NetworkDevice networkDevice) {
 

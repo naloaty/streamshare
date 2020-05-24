@@ -36,6 +36,8 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
 
     private static final String TAG = "RemoteMediaAdapter";
 
+    private int mCounter = 0;
+
     private List<Media> mList = new ArrayList<>();
     private OnRVClickListener mClickListener;
     private NetworkDevice mNetworkDevice;
@@ -130,6 +132,10 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
 
             DrawableCrossFadeFactory factory =
                     new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+
+
+            mCounter++;
+            Log.d(TAG, "Loaded item num " + mCounter);
 
             GlideApp.with(holder.thumbnail.getContext())
                     .asBitmap()

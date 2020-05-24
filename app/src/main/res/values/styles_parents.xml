@@ -50,7 +50,7 @@
         <item name="colorControlNormal">@android:color/white</item>
         <!--item name="toolbarStyle">@style/Widget.SyncShare.ToolbarStyle.Dark</item-->
 
-        <item name="dialogBackground">@drawable/dialog_background</item>
+        <item name="dialogBackground">@drawable/dialog_background_dark</item>
     </style>
 
     <style name="Theme.SyncShare.Base.Dark.NoActionBar" parent="@style/Theme.SyncShare.Base.Dark">

@@ -172,8 +172,8 @@ public class RemoteMediaFragment extends Fragment {
          * TODO: add ability to change in settings
          */
 
-        return DeviceUtils.getOptimalColumsCount(getResources());
-        /*return DeviceUtils.isPortrait(getResources())
+       return DeviceUtils.getOptimalColumsCount(getResources());
+       /*return DeviceUtils.isPortrait(getResources())
                 ? 3
                 : 4;*/
     }

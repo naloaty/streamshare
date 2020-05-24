@@ -1,5 +1,7 @@
 package com.naloaty.syncshare.media;
 
+import java.io.Serializable;
+
 public class MediaObject {
 
     private String path;

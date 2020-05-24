@@ -55,12 +55,12 @@ public class MediaServer extends SimpleWebServer {
 
         SSLContext sslContext = SecurityUtils.getSSLContext(new SecurityManager(context), context.getFilesDir());
 
-        if (sslContext != null) {
+        /*if (sslContext != null) {
             SSLServerSocketFactory factory = sslContext.getServerSocketFactory();
             setServerSocketFactory(new CustomServerSocketFactory(factory, null));
         }
         else
-            Log.w(TAG, "Cannot start media server in secure mode");
+            Log.w(TAG, "Cannot start media server in secure mode");*/
     }
 
     @Override
@@ -315,13 +315,14 @@ public class MediaServer extends SimpleWebServer {
     }
 
     /*
-     * This method is copied from SimpleWebServer
+     * https://stackoverflow.com/questions/34943119/video-streaming-using-nanohttpd-error-java-net-socketexception-sendto-failed/
      */
     private Response serveFile(Map<String, String> header, File file, String mime) {
         Response res;
         try {
             // Calculate etag
-            String etag = Integer.toHexString((file.getAbsolutePath() + file.lastModified() + "" + file.length()).hashCode());
+            String etag = Integer.toHexString((file.getAbsolutePath() +
+                    file.lastModified() + "" + file.length()).hashCode());
 
             // Support (simple) skipping:
             long startFrom = 0;
@@ -341,27 +342,12 @@ public class MediaServer extends SimpleWebServer {
                 }
             }
 
-            // get if-range header. If present, it must match etag or else we
-            // should ignore the range request
-            String ifRange = header.get("if-range");
-            boolean headerIfRangeMissingOrMatching = (ifRange == null || etag.equals(ifRange));
-
-            String ifNoneMatch = header.get("if-none-match");
-            boolean headerIfNoneMatchPresentAndMatching = ifNoneMatch != null && ("*".equals(ifNoneMatch) || ifNoneMatch.equals(etag));
-
-            // Change return code and add Content-Range header when skipping is
-            // requested
+            // Change return code and add Content-Range header when skipping is requested
             long fileLen = file.length();
-
-            if (headerIfRangeMissingOrMatching && range != null && startFrom >= 0 && startFrom < fileLen) {
-                // range request that matches current etag
-                // and the startFrom of the range is satisfiable
-                if (headerIfNoneMatchPresentAndMatching) {
-                    // range request that matches current etag
-                    // and the startFrom of the range is satisfiable
-                    // would return range from file
-                    // respond with not-modified
-                    res = newFixedLengthResponse(Response.Status.NOT_MODIFIED, mime, "");
+            if (range != null && startFrom >= 0) {
+                if (startFrom >= fileLen) {
+                    res = newFixedLengthResponse(Response.Status.RANGE_NOT_SATISFIABLE, MIME_PLAINTEXT, "");
+                    res.addHeader("Content-Range", "bytes 0-0/" + fileLen);
                     res.addHeader("ETag", etag);
                 } else {
                     if (endAt < 0) {
@@ -372,48 +358,35 @@ public class MediaServer extends SimpleWebServer {
                         newLen = 0;
                     }
 
-                    FileInputStream fis = new FileInputStream(file);
+                    final long dataLen = newLen;
+                    FileInputStream fis = new FileInputStream(file) {
+                        @Override
+                        public int available() throws IOException {
+                            return (int) dataLen;
+                        }
+                    };
                     fis.skip(startFrom);
 
-                    res = newFixedLengthResponse(Response.Status.PARTIAL_CONTENT, mime, fis, newLen);
-                    res.addHeader("Accept-Ranges", "bytes");
-                    res.addHeader("Content-Length", "" + newLen);
-                    res.addHeader("Content-Range", "bytes " + startFrom + "-" + endAt + "/" + fileLen);
+                    res = createResponse(Response.Status.PARTIAL_CONTENT, mime, fis);
+                    res.addHeader("Content-Length", "" + dataLen);
+                    res.addHeader("Content-Range", "bytes " + startFrom + "-" +
+                            endAt + "/" + fileLen);
                     res.addHeader("ETag", etag);
                 }
             } else {
-
-                if (headerIfRangeMissingOrMatching && range != null && startFrom >= fileLen) {
-                    // return the size of the file
-                    // 4xx responses are not trumped by if-none-match
-                    res = newFixedLengthResponse(Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "");
-                    res.addHeader("Content-Range", "bytes */" + fileLen);
-                    res.addHeader("ETag", etag);
-                } else if (range == null && headerIfNoneMatchPresentAndMatching) {
-                    // full-file-fetch request
-                    // would return entire file
-                    // respond with not-modified
+                if (etag.equals(header.get("if-none-match")))
                     res = newFixedLengthResponse(Response.Status.NOT_MODIFIED, mime, "");
-                    res.addHeader("ETag", etag);
-                } else if (!headerIfRangeMissingOrMatching && headerIfNoneMatchPresentAndMatching) {
-                    // range request that doesn't match current etag
-                    // would return entire (different) file
-                    // respond with not-modified
-
-                    res = newFixedLengthResponse(Response.Status.NOT_MODIFIED, mime, "");
-                    res.addHeader("ETag", etag);
-                } else {
-                    // supply the file
-                    res = newFixedFileResponse(file, mime);
+                else {
+                    res = createResponse(Response.Status.OK, mime, new FileInputStream(file));
                     res.addHeader("Content-Length", "" + fileLen);
                     res.addHeader("ETag", etag);
                 }
             }
         } catch (IOException ioe) {
-            res = getForbiddenResponse("Reading file failed.");
+            res = newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "Forbidden: Reading file failed");
         }
 
-        return res;
+        return (res == null) ? newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "Error 404: File not found") : res;
     }
 
     private Response returnThumbnailResponse(Bitmap bitmap) throws IOException {
@@ -435,6 +408,7 @@ public class MediaServer extends SimpleWebServer {
         return createResponse(Response.Status.OK, MIME_TYPES.get("png"), bs);
     }
 
+    // Announce that the file server accepts partial content requests
     private Response createResponse(Response.Status status, String mimeType, InputStream message) {
         Response res = newChunkedResponse(status, mimeType, message);
         res.addHeader("Accept-Ranges", "bytes");
