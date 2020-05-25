@@ -55,12 +55,12 @@ public class MediaServer extends SimpleWebServer {
 
         SSLContext sslContext = SecurityUtils.getSSLContext(new SecurityManager(context), context.getFilesDir());
 
-        /*if (sslContext != null) {
+        if (sslContext != null) {
             SSLServerSocketFactory factory = sslContext.getServerSocketFactory();
             setServerSocketFactory(new CustomServerSocketFactory(factory, null));
         }
         else
-            Log.w(TAG, "Cannot start media server in secure mode");*/
+            Log.w(TAG, "Cannot start media server in secure mode");
     }
 
     @Override

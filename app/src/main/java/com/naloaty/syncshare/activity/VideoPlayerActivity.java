@@ -50,7 +50,7 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
 
     //TODO: remove this functionality
     //This feature is temporary. Only for exclusive build for Mikil.
-    private boolean insecureMode = true;
+    private boolean insecureMode = false;
 
     private static final String TAG = "VideoPlayerActivity";
 
