@@ -9,6 +9,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewParent;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -50,6 +54,8 @@ public class AddDeviceActivity extends SSActivity {
     private CollapsingToolbarLayout mToolBarLayout;
     private Toolbar mToolBar;
 
+    //TODO: Memory leak
+    //Replace by getSupportFragmentManager().findFragmentById(R.id.add_device_fragment_placeholder);
     private AddOptionsFragment mAddOptionsFragment;
     private DeviceInfoFragment mConnectionInfoFragment ;
 
@@ -179,8 +185,13 @@ public class AddDeviceActivity extends SSActivity {
         mToolBarLayout = findViewById(R.id.add_device_toolbar_layout);
         mToolBar = findViewById(R.id.add_device_toolbar);
 
-        mToolBarLayout.setTitle(getString(R.string.title_addDevice));
-        mAppBarLayout.setExpanded(true, true);
+        if (mToolBarLayout != null)
+            mToolBarLayout.setTitle(getString(R.string.title_addDevice));
+        else
+            mToolBar.setTitle(R.string.title_addDevice);
+
+        if (mAppBarLayout != null)
+            mAppBarLayout.setExpanded(true, true);
 
         //Important to call this BEFORE setNavigationOnClickListener()
         setSupportActionBar(mToolBar);
@@ -376,7 +387,12 @@ public class AddDeviceActivity extends SSActivity {
         else
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
 
-        mToolBarLayout.setTitle(getString(titleResource));
-        mAppBarLayout.setExpanded(isOptions, true);
+        if (mToolBarLayout != null)
+            mToolBarLayout.setTitle(getString(titleResource));
+        else
+            mToolBar.setTitle(titleResource);
+
+        if (mAppBarLayout != null)
+            mAppBarLayout.setExpanded(isOptions, true);
     }
 }

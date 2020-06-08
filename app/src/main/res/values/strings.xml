@@ -58,10 +58,10 @@
     <string name="btn_addDevice">Add device</string>
 
     <string name="title_addDevice">Add device</string>
-    <string name="title_deviceInfo">Device information</string>
+    <string name="title_deviceInfo">QR code &amp; ID</string>
 
     <string name="text_addDeviceHelp">Choose the option to determinate the ID of another device</string>
-    <string name="btn_showDeviceInfo">Device information</string>
+    <string name="btn_showDeviceInfo">Show QR code &amp; ID</string>
     <string name="btn_scanQrCode">Scan QR Code</string>
     <string name="btn_enterIdManually">Enter Device ID manually</string>
     <string name="header_useDiscoveredDevices">Use discovered devices</string>

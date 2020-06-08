@@ -15,4 +15,6 @@
 
     <dimen name="collapsing_app_bar_height">180dp</dimen>
     <dimen name="media_column_size">150dp</dimen>
+
+    <dimen name="nearby_discovery_min_height">250dp</dimen>
 </resources>

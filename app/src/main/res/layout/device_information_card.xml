@@ -1,0 +1,126 @@
+<androidx.cardview.widget.CardView android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/corner_radius"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="10dp">
+
+            <!-- Options description -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:gravity="center">
+
+                <TextView
+                    style="@style/TextAppearance.Primary"
+                    android:id="@+id/device_info_help_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/text_deviceInfoHelp"
+                    android:textSize="@dimen/font_size_secondary"/>
+            </LinearLayout>
+
+            <!-- Device name -->
+            <RelativeLayout
+                android:id="@+id/device_info_device_name_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/device_name_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_alignParentStart="true"
+                    android:tint="@color/colorAccent"
+                    android:src="@drawable/ic_account_box_24dp"/>
+
+                <TextView
+                    android:id="@+id/device_info_name"
+                    style="@style/TextAppearance.Secondary"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/text_defaultValue"
+                    android:textSize="@dimen/font_size_primary" />
+
+            </RelativeLayout>
+
+            <!-- App version -->
+            <RelativeLayout
+                android:id="@+id/device_app_version_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/app_version_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_alignParentStart="true"
+                    android:tint="@color/colorAccent"
+                    android:src="@drawable/ic_syncshare_wb_full"/>
+
+                <TextView
+                    android:id="@+id/device_info_app_version"
+                    style="@style/TextAppearance.Secondary"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/text_defaultValue"
+                    android:textSize="@dimen/font_size_primary" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorDecorator"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+
+            <!-- Device id -->
+            <RelativeLayout
+                android:id="@+id/device_id_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    android:id="@+id/device_info_device_id"
+                    style="@style/TextAppearance.Secondary"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/text_defaultValue"
+                    android:textSize="@dimen/font_size_secondary" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.cardview.widget.CardView>

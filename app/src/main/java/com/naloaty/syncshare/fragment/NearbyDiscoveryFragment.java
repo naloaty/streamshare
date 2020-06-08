@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -52,6 +54,8 @@ public class NearbyDiscoveryFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private DiscoveredDevicesAdapter mRVAdapter;
     private NetworkDeviceViewModel networkDeviceViewModel;
+
+    LinearLayout mRootLayout;
 
     private DNSSDHelper mDNSSDHelper;
 
@@ -108,7 +112,36 @@ public class NearbyDiscoveryFragment extends Fragment {
         initMessage(view.findViewById(R.id.message_placeholder));
 
         mRecyclerView = view.findViewById(R.id.nearby_discovery_recycler_view);
+        mRootLayout = view.findViewById(R.id.root_linear_layout);
         setupRecyclerView();
+        setupView();
+    }
+
+    /*
+     * This fixes minHeight of view inside of ScrollView
+     */
+    private void setupView() {
+        ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!isAdded())
+                    return;
+
+                Log.d(TAG, "Layout adjusted");
+                mRootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                int height = mRootLayout.getMeasuredHeight();
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mRootLayout.getLayoutParams();
+
+                if(height < (int)getResources().getDimension(R.dimen.nearby_discovery_min_height)) {
+                    params.height = (int) getResources().getDimension(R.dimen.nearby_discovery_min_height);
+                    mRootLayout.setLayoutParams(params);
+                }
+
+            }
+        };
+
+        ViewTreeObserver viewTreeObserver = mRootLayout.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener);
     }
 
     private void setupRecyclerView() {

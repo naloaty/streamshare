@@ -58,16 +58,16 @@
     <string name="btn_addDevice">Добавить устройство</string>
 
     <string name="title_addDevice">Добавить устройство</string>
-    <string name="title_deviceInfo">Информация об устройстве</string>
+    <string name="title_deviceInfo">QR код и ID</string>
 
     <string name="text_addDeviceHelp">Выберите способ добавления ID другого устройства</string>
-    <string name="btn_showDeviceInfo">Информация об устройстве</string>
+    <string name="btn_showDeviceInfo">Показать QR код и ID</string>
     <string name="btn_scanQrCode">Сканировать QR код</string>
     <string name="btn_enterIdManually">Ввести ID устройства</string>
     <string name="header_useDiscoveredDevices">Устройства поблизости</string>
     <string name="text_discoveringDevices">Устройств поблизости\nне обнаружено</string>
 
-    <string name="text_deviceInfoHelp">Отсканируйте данный QR код на втором устройстве. Вы также можете ввести вышеуказанный ID вручную</string>
+    <string name="text_deviceInfoHelp">Отсканируйте данный QR код на втором устройстве. Вы также можете ввести нижеуказанный ID вручную</string>
 
     <string name="text_noDeviceIdError">По какой-то причине &appname; не смог получить информацию об устройстве. Чтобы это решить, перезапустите &appname; Если вы видите это сообщение уже не в первый раз, то сообщите об этом разработчику</string>
 

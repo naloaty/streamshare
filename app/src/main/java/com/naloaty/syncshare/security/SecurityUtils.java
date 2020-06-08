@@ -50,7 +50,7 @@ public class SecurityUtils {
     public static void initBCProvider() {
         if (!isProviderInitialized){
             Security.removeProvider("BC");
-            Security.insertProviderAt(new BouncyCastleProvider(), 0);
+            Security.insertProviderAt(new BouncyCastleProvider(), 1);
             isProviderInitialized = true;
         }
     }
