@@ -30,8 +30,8 @@ import com.naloaty.syncshare.util.AppUtils;
  * NOTE: LocalAlbumsActivity is not used on tablets. In this case, LocalAlbumsFragment is located on MainActivity.
  *
  * Related fragments:
- * @see com.naloaty.syncshare.fragment.MainFragment
- * @see com.naloaty.syncshare.fragment.LocalAlbumsFragment
+ * {@link com.naloaty.syncshare.fragment.MainFragment}
+ * {@link com.naloaty.syncshare.fragment.LocalAlbumsFragment}
  */
 public class MainActivity extends SSActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -49,7 +49,7 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
 
     /**
      * Receives a broadcast about CommunicationService state changes
-     * @see MainActivity#setServiceState(boolean)
+     * @see #setServiceState(boolean)
      */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -143,7 +143,7 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
     /**
      * Postpones NavigationDrawer action.
      * Action is doing after NavigationDrawer is completely closed (for better user experience).
-     * @see MainActivity#doDrawerAction()
+     * @see #doDrawerAction()
      */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

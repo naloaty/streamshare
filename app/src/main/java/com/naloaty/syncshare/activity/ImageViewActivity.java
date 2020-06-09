@@ -39,7 +39,7 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
  * This activity loads and displays the selected media file in full-resolution.
  *
  * Related fragments:
- * @see com.naloaty.syncshare.fragment.RemoteMediaFragment
+ * {@link com.naloaty.syncshare.fragment.RemoteMediaFragment}
  */
 public class ImageViewActivity extends MediaActivity {
 
@@ -109,7 +109,7 @@ public class ImageViewActivity extends MediaActivity {
 
     /**
      * Sets the index of the image to be displayed.
-     * @see ImageViewActivity#displayMediaInfo(int)
+     * @see #displayMediaInfo(int)
      */
     private void setCurrentItem(int position) {
         mViewPager.setCurrentItem(position, false);

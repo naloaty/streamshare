@@ -14,7 +14,7 @@ import com.naloaty.syncshare.app.SSActivity;
  * This activity represents the device manage screen, that allows users to manage their devices (deny access, remove).
  *
  * Related fragment:
- * @see com.naloaty.syncshare.fragment.MyDevicesFragment
+ * {@link com.naloaty.syncshare.fragment.MyDevicesFragment}
  */
 public class DeviceManageActivity extends SSActivity {
 

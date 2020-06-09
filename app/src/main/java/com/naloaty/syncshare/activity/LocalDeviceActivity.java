@@ -21,8 +21,8 @@ import com.naloaty.syncshare.R;
  * This activity represents the management screen of albums on the local device.
  * NOTE: This activity is not used on tablets. In this case, LocalAlbumsFragment is located on MainActivity.
  *
- * Related fragments:
- * @see com.naloaty.syncshare.fragment.LocalAlbumsFragment
+ * Related fragment:
+ * {@link com.naloaty.syncshare.fragment.LocalAlbumsFragment}
  */
 public class LocalDeviceActivity extends SSActivity {
 

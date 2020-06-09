@@ -68,8 +68,7 @@ public class AddDeviceActivity extends SSActivity {
     private OptionFragment mCurrentFragment;
 
     /**
-     * This callback is called by AddDeviceHelper
-     * @see AddDeviceHelper
+     * This callback is called by {@link AddDeviceHelper}
      */
     private final AddDeviceHelper.AddDeviceCallback addDeviceCallback = new AddDeviceHelper.AddDeviceCallback() {
         @Override
@@ -130,8 +129,8 @@ public class AddDeviceActivity extends SSActivity {
 
     /**
      * Receives a broadcast about CommunicationService state changes and fragment change requests
-     * @see AddDeviceActivity#setFragment(OptionFragment)
-     * @see AddDeviceActivity#openCodeScanner()
+     * @see #setFragment(OptionFragment)
+     * @see #openCodeScanner()
      * @see AddOptionsFragment#setServiceState(boolean)
      * @see AddDeviceHelper
      */
@@ -290,8 +289,8 @@ public class AddDeviceActivity extends SSActivity {
 
     /**
      * Handles contents of scanned QR code
-     * @see AddDeviceHelper
      * @param qrCodeContents Contents of qr code as JSON string
+     * @see AddDeviceHelper
      */
     private void processQRCode(String qrCodeContents) {
         if (qrCodeContents == null)
@@ -331,7 +330,7 @@ public class AddDeviceActivity extends SSActivity {
     }
 
     /**
-     * Sets required fragment
+     * Replaces current fragment with required one
      * @param targetFragment Required fragment
      */
     private void setFragment(@NonNull OptionFragment targetFragment) {

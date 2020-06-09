@@ -121,7 +121,7 @@ public class NearbyDiscoveryFragment extends Fragment {
 
     /**
      * Receives a broadcast about CommunicationService state changes
-     * @see NearbyDiscoveryFragment#setServiceState(boolean)
+     * @see #setServiceState(boolean)
      */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override

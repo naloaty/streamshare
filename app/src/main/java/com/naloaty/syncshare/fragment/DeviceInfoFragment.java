@@ -89,8 +89,8 @@ public class DeviceInfoFragment extends Fragment{
     /**
      * Sets the state of the UI
      * @param state Required UI state
-     * @see DeviceInfoFragment#setDeviceInfo()
-     * @see DeviceInfoFragment#setQRCode()
+     * @see #setDeviceInfo()
+     * @see #setQRCode()
      */
     private void setUIState(UIState state) {
         int helpTextResource;
@@ -144,7 +144,7 @@ public class DeviceInfoFragment extends Fragment{
 
     /**
      * Encodes general information about the current device into a QR code.
-     * @see DeviceInfoFragment#setQRCode(JSONObject)
+     * @see #setQRCode(JSONObject)
      */
     private void setQRCode() {
         try

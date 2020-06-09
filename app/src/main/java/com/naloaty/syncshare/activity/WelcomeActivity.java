@@ -29,17 +29,17 @@ public class WelcomeActivity extends SSActivity {
     private ViewGroup mPermissionsView;
     private ViewGroup mBatteryOptimizationView;
 
+    /**
+     * Do not initialize MainActivity until the Welcome Activity has been completed.
+     * @see SSActivity#setSkipPermissionRequest(boolean)
+     * @see SSActivity#setWelcomePageDisallowed(boolean)
+     * @see SSActivity#setSkipStuffGeneration(boolean)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        /**
-         * Do not initialize MainActivity until the Welcome Activity has been completed.
-         * @see SSActivity#setSkipPermissionRequest(boolean)
-         * @see SSActivity#setWelcomePageDisallowed(boolean)
-         * @see SSActivity#setSkipStuffGeneration(boolean)
-         */
         setSkipPermissionRequest(true);
         setWelcomePageDisallowed(true);
         setSkipStuffGeneration(true);

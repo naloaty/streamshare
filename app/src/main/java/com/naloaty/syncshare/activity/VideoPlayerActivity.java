@@ -38,7 +38,7 @@ import okhttp3.OkHttpClient;
  * This activity loads and displays the selected video file.
  *
  * Related activity:
- * @see ImageViewActivity
+ * {@link ImageViewActivity}
  */
 public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.VisibilityListener {
 
