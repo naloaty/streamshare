@@ -25,15 +25,18 @@ import com.naloaty.syncshare.util.AppUtils;
 
 import org.json.JSONObject;
 
+/*
+ * This fragment displays general information about the current device, including device ID and name.
+ * All this information is encoded into a QR code.
+ */
 public class DeviceInfoFragment extends Fragment{
-
-    private static final String TAG = "DeviceInfoFragment";
 
     public static final String
                     QR_CODE_DEVICE_NICKNAME = "deviceName",
-                    QR_CODE_DEVICE_ID = "deviceId",
-                    QR_CODE_APP_VERSION = "appVersion";
+                    QR_CODE_DEVICE_ID       = "deviceId",
+                    QR_CODE_APP_VERSION     = "appVersion";
 
+    /* UI elements */
     private ImageView mQRCode;
     private TextView mHelpText;
     private TextView mDeviceName;
@@ -52,8 +55,7 @@ public class DeviceInfoFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_device_info_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_device_info_fragment, container, false);
     }
 
     @Override
@@ -71,63 +73,23 @@ public class DeviceInfoFragment extends Fragment{
         setUIState(getRequiredState());
     }
 
+    /**
+     * Returns the optimal state of the UI.
+     * @return Optimal UI state
+     */
     private UIState getRequiredState() {
-        if (SecurityUtils.checkSecurityStuff(getContext().getFilesDir(), false))
+        //Checks if SSL certificate is presented
+        if (SecurityUtils.checkSecurityStuff(requireContext().getFilesDir(), false))
             return UIState.QRShown;
         else
             return UIState.NoDeviceId;
     }
 
-    private void setQRCode() {
-        JSONObject json = new JSONObject();
-
-        try
-        {
-            json.put(QR_CODE_DEVICE_NICKNAME, AppUtils.getLocalDeviceName());
-            json.put(QR_CODE_APP_VERSION, AppConfig.APP_VERSION);
-            json.put(QR_CODE_DEVICE_ID, AppUtils.getDeviceId(getContext()));
-
-            setQRCode(json);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setDeviceInfo() {
-        mDeviceName.setText(AppUtils.getLocalDeviceName());
-        mAppVersion.setText(AppConfig.APP_VERSION);
-        mDeviceId.setText(AppUtils.getDeviceId(getContext()));
-    }
-
-    private void setQRCode(JSONObject deviceInfo) {
-
-        if (deviceInfo == null) {
-            mQRCode.setImageResource(R.drawable.ic_scan_qr_code_24dp);
-            return;
-        }
-
-        try {
-            MultiFormatWriter formatWriter = new MultiFormatWriter();
-
-            BitMatrix bitMatrix = formatWriter.encode(deviceInfo.toString(), BarcodeFormat.QR_CODE, 400, 400);
-            BarcodeEncoder encoder = new BarcodeEncoder();
-
-            Bitmap bitmap = encoder.createBitmap(bitMatrix);
-
-
-            Glide.with(getContext())
-                    .load(bitmap)
-                    .into(mQRCode);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
+    /**
+     * Sets the state of the UI
+     * @param state Required UI state
+     */
     private void setUIState(UIState state) {
-
         int helpTextResource;
         int deviceInfoVisibility;
 
@@ -166,6 +128,60 @@ public class DeviceInfoFragment extends Fragment{
         mAppVersionLayout.setVisibility(deviceInfoVisibility);
 
         currentUIState = state;
+    }
+
+    /**
+     * Displays general information about the current device.
+     */
+    private void setDeviceInfo() {
+        mDeviceName.setText(AppUtils.getLocalDeviceName());
+        mAppVersion.setText(AppConfig.APP_VERSION);
+        mDeviceId.setText(AppUtils.getDeviceId(requireContext()));
+    }
+
+    /**
+     * Encodes general information about the current device into a QR code.
+     * @see DeviceInfoFragment#setQRCode(JSONObject)
+     */
+    private void setQRCode() {
+        try
+        {
+            JSONObject json = new JSONObject();
+            json.put(QR_CODE_DEVICE_NICKNAME, AppUtils.getLocalDeviceName());
+            json.put(QR_CODE_APP_VERSION, AppConfig.APP_VERSION);
+            json.put(QR_CODE_DEVICE_ID, AppUtils.getDeviceId(requireContext()));
+
+            setQRCode(json);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Encodes JSONObject into a QR code and displays it.
+     * @param contents Contents
+     */
+    private void setQRCode(JSONObject contents) {
+        if (contents == null) {
+            mQRCode.setImageResource(R.drawable.ic_scan_qr_code_24dp);
+            return;
+        }
+
+        try {
+            MultiFormatWriter formatWriter = new MultiFormatWriter();
+
+            BitMatrix bitMatrix = formatWriter.encode(contents.toString(), BarcodeFormat.QR_CODE, 400, 400);
+            BarcodeEncoder encoder = new BarcodeEncoder();
+            Bitmap bitmap = encoder.createBitmap(bitMatrix);
+
+            Glide.with(requireContext())
+                    .load(bitmap)
+                    .into(mQRCode);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

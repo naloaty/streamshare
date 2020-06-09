@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -21,47 +22,58 @@ import com.naloaty.syncshare.fragment.RemoteAlbumsFragment;
 import com.naloaty.syncshare.fragment.RemoteMediaFragment;
 import com.naloaty.syncshare.fragment.RemoteViewFragment;
 
+/**
+ * This activity represents a screen for viewing a list of albums and media files on a remote device.
+ *
+ * Related fragments:
+ * @see RemoteAlbumsFragment
+ * @see RemoteMediaFragment
+ */
 public class RemoteViewActivity extends SSActivity {
 
     private static final String TAG = "RemoteViewActivity";
 
     public static final String ACTION_CHANGE_FRAGMENT = "com.naloaty.intent.action.PAIR_DEVICE_CHANGE_FRAGMENT";
-    public static final String EXTRA_TARGET_FRAGMENT = "targetFragment";
+    public static final String EXTRA_TARGET_FRAGMENT  = "targetFragment";
 
-    public static final String EXTRA_DEVICE_ID = "deviceId";
-    public static final String EXTRA_DEVICE_NICKNAME = "deviceNickname";
-    public static final String EXTRA_ALBUM_NAME = "albumName";
-    public static final String EXTRA_ALBUM = "album";
+    public static final String EXTRA_DEVICE_ID        = "deviceId";
+    public static final String EXTRA_DEVICE_NICKNAME  = "deviceNickname";
+    public static final String EXTRA_ALBUM_NAME       = "albumName";
+    public static final String EXTRA_ALBUM            = "album";
 
+    private IntentFilter mFilter = new IntentFilter();
     private RemoteAlbumsFragment mRemoteAlbumsFragment;
     private RemoteMediaFragment mRemoteMediaFragment;
 
-    /* Collapsing toolbar */
+    /* UI elements */
     private AppBarLayout mAppBarLayout;
     private CollapsingToolbarLayout mToolBarLayout;
     private Toolbar mToolBar;
 
-    private final IntentFilter mFilter = new IntentFilter();
+    /**
+     * Receives a broadcast about CommunicationService state changes
+     * @see RemoteViewActivity#setFragment(RemoteViewFragment, String) 
+     */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
 
-            if (ACTION_CHANGE_FRAGMENT.equals(intent.getAction())) {
+            if (ACTION_CHANGE_FRAGMENT.equals(action)) {
 
+                Bundle bundle = new Bundle();
                 RemoteViewFragment targetFragment = RemoteViewFragment.valueOf(intent.getStringExtra(EXTRA_TARGET_FRAGMENT));
 
-                Bundle bundle;
                 switch (targetFragment) {
                     case AlbumsView:
-                        bundle = new Bundle();
                         bundle.putString(EXTRA_DEVICE_ID, getIntent().getStringExtra(EXTRA_DEVICE_ID));
 
                         mRemoteAlbumsFragment.setArguments(bundle);
+
                         setFragment(targetFragment, getIntent().getStringExtra(EXTRA_DEVICE_NICKNAME));
                         break;
 
                     case MediaGridView:
-                        bundle = new Bundle();
                         bundle.putString(EXTRA_ALBUM, intent.getStringExtra(EXTRA_ALBUM));
                         bundle.putString(EXTRA_DEVICE_ID, getIntent().getStringExtra(EXTRA_DEVICE_ID));
 
@@ -82,7 +94,6 @@ public class RemoteViewActivity extends SSActivity {
 
         mFilter.addAction(ACTION_CHANGE_FRAGMENT);
 
-        /* Collapsing toolbar */
         mAppBarLayout = findViewById(R.id.remote_view_app_bar_layout);
         mToolBarLayout = findViewById(R.id.remote_view_toolbar_layout);
         mToolBar = findViewById(R.id.toolbar);
@@ -99,8 +110,12 @@ public class RemoteViewActivity extends SSActivity {
             }
         });
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        else
+            Log.w(TAG, "Toolbar is not properly initialized");
 
         String deviceNickname = getIntent().getStringExtra(EXTRA_DEVICE_NICKNAME);
         String deviceId = getIntent().getStringExtra(EXTRA_DEVICE_ID);
@@ -111,7 +126,6 @@ public class RemoteViewActivity extends SSActivity {
 
         mRemoteAlbumsFragment = new RemoteAlbumsFragment();
         mRemoteAlbumsFragment.setArguments(bundle);
-
         mRemoteMediaFragment = new RemoteMediaFragment();
 
         setFragment(RemoteViewFragment.AlbumsView, deviceNickname);
@@ -119,19 +133,20 @@ public class RemoteViewActivity extends SSActivity {
 
     @Override
     protected void onResume() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mFilter);
         super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mFilter);
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
         super.onPause();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
     }
 
     @Override
     public void onBackPressed() {
-
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.remote_view_fragment_placeholder);
 
         if (currentFragment instanceof RemoteAlbumsFragment)
@@ -140,8 +155,11 @@ public class RemoteViewActivity extends SSActivity {
             setFragment(RemoteViewFragment.AlbumsView, getIntent().getStringExtra(EXTRA_DEVICE_NICKNAME));
     }
 
+    /**
+     * Sets required fragment
+     * @param targetFragment Required fragment
+     */
     private void setFragment(RemoteViewFragment targetFragment, String title) {
-
         Fragment candidate = null;
 
         switch (targetFragment) {
@@ -174,9 +192,11 @@ public class RemoteViewActivity extends SSActivity {
         }
     }
 
-
+    /**
+     * Sets the title and state of toolbar depending on the required fragment
+     * @param fragment Required fragment
+     */
     private void setToolbar(RemoteViewFragment fragment, String title) {
-
         boolean isExpand = false;
 
         switch (fragment) {
@@ -199,5 +219,4 @@ public class RemoteViewActivity extends SSActivity {
 
         mAppBarLayout.setExpanded(isExpand, true);
     }
-
 }

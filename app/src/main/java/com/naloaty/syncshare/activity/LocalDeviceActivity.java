@@ -2,6 +2,7 @@ package com.naloaty.syncshare.activity;
 
 import com.naloaty.syncshare.app.SSActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
@@ -16,9 +17,18 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.naloaty.syncshare.R;
 
+/**
+ * This activity represents the management screen of albums on the local device.
+ * NOTE: This activity is not used on tablets. In this case, LocalAlbumsFragment is located on MainActivity.
+ *
+ * Related fragments:
+ * @see com.naloaty.syncshare.fragment.LocalAlbumsFragment
+ */
 public class LocalDeviceActivity extends SSActivity {
 
-    /* Collapsing toolbar */
+    private static final String TAG = "LocalDeviceActivity";
+
+    /* UI elements */
     private AppBarLayout mAppBarLayout;
     private CollapsingToolbarLayout mToolBarLayout;
     private Toolbar mToolBar;
@@ -27,8 +37,7 @@ public class LocalDeviceActivity extends SSActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_device);
-
-        /* Collapsing toolbar */
+        
         mAppBarLayout = findViewById(R.id.local_device_app_bar_layout);
         mToolBarLayout = findViewById(R.id.local_device_toolbar_layout);
         mToolBar = findViewById(R.id.local_device_toolbar);
@@ -39,16 +48,14 @@ public class LocalDeviceActivity extends SSActivity {
         //Important to call this BEFORE setNavigationOnClickListener()
         setSupportActionBar(mToolBar);
 
-        //To make "close" animation (this instead of using "parent activity")
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        //To make "close" animation (instead of using "parent activity")
+        mToolBar.setNavigationOnClickListener(v -> onBackPressed());
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        else
+            Log.w(TAG, "Toolbar is not properly initialized");
     }
 }

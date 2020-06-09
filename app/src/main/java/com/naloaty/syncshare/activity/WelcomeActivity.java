@@ -19,8 +19,12 @@ import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.PermissionHelper;
 import com.naloaty.syncshare.widget.DynamicViewPagerAdapter;
 
+/**
+ * This activity welcomes the user the first time the application is launched.
+ */
 public class WelcomeActivity extends SSActivity {
 
+    /* UI elements */
     private ViewGroup mSplashView;
     private ViewGroup mPermissionsView;
     private ViewGroup mBatteryOptimizationView;
@@ -29,6 +33,8 @@ public class WelcomeActivity extends SSActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        //Do not initialize MainActivity until the Welcome Activity has been completed.
         setSkipPermissionRequest(true);
         setWelcomePageDisallowed(true);
         setSkipStuffGeneration(true);
@@ -44,39 +50,21 @@ public class WelcomeActivity extends SSActivity {
         pagerAdapter.addView(mSplashView);
 
         /*--------- layout_welcome_page_2 ------------ */
-        if (Build.VERSION.SDK_INT >= 23) {
-            mPermissionsView = (ViewGroup) getLayoutInflater().inflate(R.layout.layout_welcome_page_2, null, false);
-            pagerAdapter.addView(mPermissionsView);
-            checkPermissionsState();
+        mPermissionsView = (ViewGroup) getLayoutInflater().inflate(R.layout.layout_welcome_page_2, null, false);
+        pagerAdapter.addView(mPermissionsView);
+        checkPermissionsState();
 
-            mPermissionsView.findViewById(R.id.layout_welcome_page_2_request_btn)
-                    .setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            requestRequiredPermissions(false);
-                        }
-                    });
-        }
+        mPermissionsView.findViewById(R.id.layout_welcome_page_2_request_btn)
+                .setOnClickListener(v -> requestRequiredPermissions(false));
 
         /*--------- layout_welcome_page_3 ------------ */
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            mBatteryOptimizationView = (ViewGroup) getLayoutInflater().inflate(R.layout.layout_welcome_page_3, null, false);
-            pagerAdapter.addView(mBatteryOptimizationView);
-            checkBatteryOptimizationState();
+        mBatteryOptimizationView = (ViewGroup) getLayoutInflater().inflate(R.layout.layout_welcome_page_3, null, false);
+        pagerAdapter.addView(mBatteryOptimizationView);
+        checkBatteryOptimizationState();
 
-            mBatteryOptimizationView.findViewById(R.id.welcome_page_3_request_btn)
-                    .setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            PermissionHelper.requestDisableBatteryOptimization(WelcomeActivity.this);
-                        }
-                    });
-        }
+        mBatteryOptimizationView.findViewById(R.id.welcome_page_3_request_btn)
+                .setOnClickListener(v -> PermissionHelper.requestDisableBatteryOptimization(WelcomeActivity.this));
 
         /*--------- layout_welcome_page_4 ------------ */
         View view = getLayoutInflater().inflate(R.layout.layout_welcome_page_4, null, false);
@@ -85,36 +73,28 @@ public class WelcomeActivity extends SSActivity {
         /*--------- Widgets setup ------------ */
         progressBar.setMax((pagerAdapter.getCount() - 1) * 100);
 
-        previousButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+        previousButton.setOnClickListener(v -> {
+            if (viewPager.getCurrentItem() - 1 >= 0)
+                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
+        });
+
+        nextButton.setOnClickListener(v -> {
+            if (viewPager.getCurrentItem() + 1 < pagerAdapter.getCount())
+                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+            else
             {
-                if (viewPager.getCurrentItem() - 1 >= 0)
-                    viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
+
+                //Do not show welcome screen anymore
+                getDefaultSharedPreferences().edit()
+                        .putBoolean(SSActivity.WELCOME_SHOWN, true)
+                        .apply();
+
+                startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+                finish();
             }
         });
 
-        nextButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (viewPager.getCurrentItem() + 1 < pagerAdapter.getCount())
-                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
-                else {
-                    //Do not show welcome screen anymore
-
-                    getDefaultSharedPreferences().edit()
-                            .putBoolean(SSActivity.WELCOME_SHOWN, true)
-                            .apply();
-
-                    startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
-                    finish();
-                }
-            }
-        });
-
+        /* UI effects */
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
             @Override
@@ -122,10 +102,13 @@ public class WelcomeActivity extends SSActivity {
             {
                 progressBar.setProgress((position * 100) + (int) (positionOffset * 100));
 
-                if (position == 0) {
+                if (position == 0)
+                {
                     progressBar.setAlpha(positionOffset);
                     previousButton.setAlpha(positionOffset);
-                } else {
+                }
+                else
+                {
                     progressBar.setAlpha(1.0f);
                     previousButton.setAlpha(1.0f);
                 }
@@ -145,15 +128,17 @@ public class WelcomeActivity extends SSActivity {
             }
         });
 
-
         /*--------- All set ------------ */
         viewPager.setAdapter(pagerAdapter);
     }
 
+    /**
+     * Checks and displays the current status of required permissions
+     */
     private void checkPermissionsState()
     {
-        /*if (Build.VERSION.SDK_INT < 23)
-            return;*/
+        if (Build.VERSION.SDK_INT < 23)
+            return;
 
         boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(this);
 
@@ -164,6 +149,9 @@ public class WelcomeActivity extends SSActivity {
                 .setVisibility(permissionsGranted ? View.GONE : View.VISIBLE);
     }
 
+    /**
+     * Checks and displays the current status of battery optimization
+     */
     private void checkBatteryOptimizationState()
     {
         /*if (Build.VERSION.SDK_INT < 23)

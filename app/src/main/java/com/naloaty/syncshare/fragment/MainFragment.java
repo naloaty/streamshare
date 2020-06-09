@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -41,31 +39,34 @@ import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.DeviceUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
+/*
+ * This fragment displays a list of current devices on the network (trusted devices only).
+ */
 public class MainFragment extends Fragment {
 
     private static final String TAG = "MainFragment";
 
+    private final IntentFilter mFilter = new IntentFilter();
     private ArrayList<SSDevice> mList = new ArrayList<>();
-    private RecyclerView mRecyclerView;
     private OnlineDevicesAdapter mRVAdapter;
     private NetworkDeviceViewModel mNetworkDeviceViewModel;
-    private SSDeviceViewModel mSSDeviceViewModel;
+    private SSDeviceViewModel mDeviceViewModel;
 
-    /* Local device */
-    /*private TextView mAlbums;
-    private TextView mPhotos;
-    private TextView mVideos;*/
+    /* UI elements */
+    private RecyclerView mRecyclerView;
     private LinearLayout mLocalDeviceLayout;
 
-    private final IntentFilter mFilter = new IntentFilter();
+    /**
+     * Receives a broadcast about CommunicationService state changes
+     * @see MainFragment#setServiceState(boolean)
+     */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if (action.equals(CommunicationService.SERVICE_STATE_CHANGED)) {
+            if (CommunicationService.SERVICE_STATE_CHANGED.equals(action)) {
                 setServiceState(intent.getBooleanExtra(CommunicationService.EXTRA_SERVICE_SATE, false));
             }
         }
@@ -76,56 +77,52 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mNetworkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
-        mSSDeviceViewModel = new ViewModelProvider(this).get(SSDeviceViewModel.class);
+        mDeviceViewModel = new ViewModelProvider(this).get(SSDeviceViewModel.class);
 
         mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
     }
 
-
-
     @Override
     public void onResume() {
-        setServiceState(AppUtils.isServiceRunning(getContext(), CommunicationService.class));
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mReceiver, mFilter);
         super.onResume();
+
+        setServiceState(AppUtils.isServiceRunning(requireContext(), CommunicationService.class));
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(mReceiver, mFilter);
     }
 
     @Override
     public void onPause() {
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mReceiver);
         super.onPause();
+
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(mReceiver);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_main_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_main_fragment, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /* Local device */
-        /*mAlbums = view.findViewById(R.id.local_device_albums);
-        mPhotos = view.findViewById(R.id.local_device_photos);
-        mVideos = view.findViewById(R.id.local_device_videos);*/
         mLocalDeviceLayout = view.findViewById(R.id.local_device_layout);
+        mLocalDeviceLayout.setOnClickListener((v -> startActivity(new Intent(getContext(), LocalDeviceActivity.class))));
+        mRecyclerView = view.findViewById(R.id.main_fragment_devices_online);
 
         initMessage(view.findViewById(R.id.message_placeholder));
-
-        mLocalDeviceLayout.setOnClickListener((v -> startActivity(new Intent(getContext(), LocalDeviceActivity.class))));
-
-        mRecyclerView = view.findViewById(R.id.main_fragment_devices_online);
         setupRecyclerView();
     }
 
+    /**
+     * Sets the layout state depending on device type (phone or tablet)
+     */
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Fragment localDevice = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_localDevice);
+        Fragment localDevice = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_localDevice);
 
         if (localDevice != null && DeviceUtils.isLandscape(getResources())){
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -138,19 +135,17 @@ public class MainFragment extends Fragment {
 
     }
 
+    /**
+     * Initializes a list of online devices
+     */
     private void setupRecyclerView() {
-
-        OnRVClickListener clickListener = new OnRVClickListener() {
-            @Override
-            public void onClick(int itemIndex) {
-                Intent intent = new Intent(getContext(), RemoteViewActivity.class);
-                intent.putExtra(RemoteViewActivity.EXTRA_DEVICE_ID, mList.get(itemIndex).getDeviceId());
-                intent.putExtra(RemoteViewActivity.EXTRA_DEVICE_NICKNAME, mList.get(itemIndex).getNickname());
-                startActivity(intent);
-            }
+        OnRVClickListener clickListener = itemIndex -> {
+            Intent intent = new Intent(getContext(), RemoteViewActivity.class);
+            intent.putExtra(RemoteViewActivity.EXTRA_DEVICE_ID, mList.get(itemIndex).getDeviceId());
+            intent.putExtra(RemoteViewActivity.EXTRA_DEVICE_NICKNAME, mList.get(itemIndex).getNickname());
+            startActivity(intent);
         };
 
-        /* RecyclerView */
         RecyclerView.LayoutManager layoutManager;
 
         if (DeviceUtils.isPortrait(getResources()))
@@ -160,37 +155,34 @@ public class MainFragment extends Fragment {
 
         mRVAdapter = new OnlineDevicesAdapter(clickListener);
 
-
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mRVAdapter);
 
-        mNetworkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
-            @Override
-            public void onChanged(List<NetworkDevice> networkDevices) {
+        mNetworkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), networkDevices -> {
+            mList = new ArrayList<>();
 
-                mList = new ArrayList<>();
+            for (NetworkDevice networkDevice : networkDevices) {
+                String deviceId = networkDevice.getDeviceId();
+                SSDevice foundedDevice = mDeviceViewModel.findDeviceDep(deviceId);
 
-                for (NetworkDevice networkDevice : networkDevices) {
-                    String deviceId = networkDevice.getDeviceId();
-                    SSDevice foundedDevice = mSSDeviceViewModel.findDeviceDep(deviceId);
+                if (foundedDevice == null)
+                    continue;
 
-                    if (foundedDevice == null)
-                        continue;
-
-                    mList.add(foundedDevice);
-                }
-
-                mRVAdapter.setDevicesList(mList);
-                updateUIState();
+                mList.add(foundedDevice);
             }
+
+            mRVAdapter.setDevicesList(mList);
+            updateUIState();
         });
     }
 
     /*
-     * UI State Machine
+     * Following section represents the UI state machine
+     * TODO: Wrap ViewMessage into widget
+     * TODO: use CircleImageDrawable instead of progressbar
      */
 
-    /* Message view */
+    /* View Message */
     private ImageView mMessageIcon;
     private TextView mMessageText;
     private AppCompatButton mMessageActionBtn;
@@ -215,14 +207,20 @@ public class MainFragment extends Fragment {
         ServiceNotStarted
     }
 
+    /**
+     * Sets the optimal state of the UI
+     */
     private void updateUIState() {
         setUIState(getRequiredState());
     }
 
+    /**
+     * Returns the optimal state of the UI.
+     * @return Optimal UI state
+     */
     private UIState getRequiredState() {
-
         if (isServiceRunning) {
-            boolean hasDevices = mSSDeviceViewModel.getDeviceCount() > 0;
+            boolean hasDevices = mDeviceViewModel.getDeviceCount() > 0;
 
             if (hasDevices) {
                 boolean hasOnlineDevices = mList.size() > 0;
@@ -240,11 +238,19 @@ public class MainFragment extends Fragment {
 
     }
 
-    private void setServiceState(boolean serviceStarted) {
-        isServiceRunning = serviceStarted;
+    /**
+     * Sets the state of the UI depending on the state of CommunicationService
+     * @param serviceRunning CommunicationService state (running or not)
+     */
+    private void setServiceState(boolean serviceRunning) {
+        isServiceRunning = serviceRunning;
         updateUIState();
     }
 
+    /**
+     * Sets the state of the UI
+     * @param state Required UI state
+     */
     private void setUIState(UIState state)
     {
         if (currentUIState == state)
@@ -263,7 +269,7 @@ public class MainFragment extends Fragment {
             case ServiceNotStarted:
                 View.OnClickListener startService = (v -> {
                     Intent intent = new Intent(getContext(), CommunicationService.class);
-                    getActivity().startService(intent);
+                    requireActivity().startService(intent);
                 });
 
                 replaceMessage(R.drawable.ic_service_off_24dp, R.string.text_serviceNotStarted, R.string.btn_start, startService);
@@ -272,9 +278,7 @@ public class MainFragment extends Fragment {
                 break;
 
             case NoDevicesAdded:
-                View.OnClickListener manageDevices = (v -> {
-                    startActivity(new Intent(getContext(), DeviceManageActivity.class));
-                });
+                View.OnClickListener manageDevices = (v -> startActivity(new Intent(getContext(), DeviceManageActivity.class)));
 
                 replaceMessage(R.drawable.ic_devices_24dp, R.string.text_noDevicesAdded, R.string.btn_manageDevices, manageDevices);
                 toggleMessage(true);
@@ -284,12 +288,22 @@ public class MainFragment extends Fragment {
         currentUIState = state;
     }
 
+    /**
+     * Replaces one message with another (progressbar instead of icon)
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int iconResource, int textResource) {
         replaceMessage(iconResource, textResource, 0, null);
     }
 
+    /**
+     * Replaces one message with another
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     * @param btnResource Action button text resource
+     * @param listener Action button click listener
+     */
     private void replaceMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
-
         int currState = mMessageHolder.getVisibility();
 
         if (currState == View.VISIBLE) {
@@ -311,6 +325,13 @@ public class MainFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets the message
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     * @param btnResource Action button text resource
+     * @param listener Action button click listener
+     */
     private void setMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
         mMessageIcon.setImageResource(iconResource);
         mMessageText.setText(textResource);
@@ -336,8 +357,11 @@ public class MainFragment extends Fragment {
         }
     }
 
+    /**
+     * Toggles message visibility
+     * @param isVisible Required message visibility
+     */
     private void toggleMessage(boolean isVisible) {
-
         int currentState = mMessageHolder.getVisibility();
 
         if (isVisible) {

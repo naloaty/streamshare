@@ -18,28 +18,34 @@ import com.naloaty.syncshare.activity.AddDeviceActivity;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 
+/*
+ * This fragment displays a list of device adding options.
+ */
 public class AddOptionsFragment extends Fragment {
 
     private static final String TAG = "AddOptionsFragment";
-
     private ProgressBar mProgressBar;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_add_options_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_add_options_fragment, container, false);
     }
 
-    public void setServiceState(boolean serviceStarted) {
+    /**
+     * Sets the state of UI depending on the state of CommunicationService
+     * @param serviceRunning CommunicationService state (running or not)
+     */
+    public void setServiceState(boolean serviceRunning) {
         if (mProgressBar != null)
-            mProgressBar.setVisibility(serviceStarted ? View.VISIBLE : View.GONE);
+            mProgressBar.setVisibility(serviceRunning ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void onResume() {
-        setServiceState(AppUtils.isServiceRunning(getContext(), CommunicationService.class));
         super.onResume();
+
+        setServiceState(AppUtils.isServiceRunning(requireContext(), CommunicationService.class));
     }
 
     @Override
@@ -48,21 +54,17 @@ public class AddOptionsFragment extends Fragment {
 
         mProgressBar = view.findViewById(R.id.progressBar);
 
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                switch (v.getId()) {
-                    case R.id.add_option_connection_info:
-                        changeFragment(OptionFragment.DeviceInfo);
-                        break;
-                    case R.id.add_option_scan_qr:
-                        changeFragment(OptionFragment.ScanQR);
-                        break;
-                    case R.id.add_option_enter_ip:
-                        changeFragment(OptionFragment.EnterDeviceId);
-                        break;
-                }
+        View.OnClickListener listener = v -> {
+            switch (v.getId()) {
+                case R.id.add_option_connection_info:
+                    changeFragment(OptionFragment.DeviceInfo);
+                    break;
+                case R.id.add_option_scan_qr:
+                    changeFragment(OptionFragment.ScanQR);
+                    break;
+                case R.id.add_option_enter_ip:
+                    changeFragment(OptionFragment.EnterDeviceId);
+                    break;
             }
         };
 
@@ -71,11 +73,16 @@ public class AddOptionsFragment extends Fragment {
         view.findViewById(R.id.add_option_enter_ip).setOnClickListener(listener);
     }
 
-    private void changeFragment(OptionFragment targetFragment) {
+    /**
+     * Sends a request to change a fragment
+     * @param targetFragment Required fragment
+     */
+    private void changeFragment(@NonNull OptionFragment targetFragment) {
+        Log.d(TAG, String.format("Requesting %s fragment", targetFragment));
 
-        Log.d(TAG, "Sending broadcast");
-        LocalBroadcastManager.getInstance(getContext())
+
+        LocalBroadcastManager.getInstance(requireContext())
                 .sendBroadcast(new Intent(AddDeviceActivity.ACTION_CHANGE_FRAGMENT)
-                .putExtra(AddDeviceActivity.EXTRA_TARGET_FRAGMENT, targetFragment.toString()));
+                .putExtra(AddDeviceActivity.EXTRA_TARGET_FRAGMENT, targetFragment));
     }
 }

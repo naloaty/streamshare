@@ -151,10 +151,13 @@
     <string name="title_noImageSource">No source</string>
     <string name="text_noImageSource">For some reason, the image source is missing. Try reloading the album. If this is not the first time you have seen this message, then contact the developer</string>
 
+    <string name="text_imagePosition">%d of %d</string>
+
     <string name="title_unsupportedVideo">Unsupported</string>
     <string name="text_unsupportedVideo">Format of this video is not supported by &appname; video player</string>
     <string name="text_unsupportedVideoInsecure">Format of this video is not supported by &appname; video player. Do you want to open it in external player?</string>
 
-    <string name="text_videoPlayerError">Unexpected video player error occured. Please, try again</string>
+    <string name="text_videoPlayerError">Unexpected video player error occurred. Please, try again</string>
+
 
 </resources>

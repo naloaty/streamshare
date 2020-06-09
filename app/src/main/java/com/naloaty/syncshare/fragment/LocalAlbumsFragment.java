@@ -33,37 +33,49 @@ import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.database.media.AlbumViewModel;
 import com.naloaty.syncshare.media.MediaProvider;
 import com.naloaty.syncshare.security.SecurityUtils;
-import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.DeviceUtils;
 import com.naloaty.syncshare.util.PermissionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * This fragment displays a list of albums on the local device and allows user to manage them.
+ */
 public class LocalAlbumsFragment extends Fragment {
 
     private static final String TAG = "LocalAlbumsFragment";
 
+    private final IntentFilter mFilter = new IntentFilter();
     private ArrayList<Album> mList = new ArrayList<>();
-    private RecyclerView mRecyclerView;
     private LocalAlbumsAdapter mRVadapter;
     private AlbumViewModel mAlbumViewModel;
 
     private boolean isLoadingAlbums = false;
     private boolean isLoadingFailed = false;
 
-    private final IntentFilter mFilter = new IntentFilter();
+    /* UI elements */
+    private RecyclerView mRecyclerView;
 
+    /**
+     * This callback is called by LoadAlbumsAsyncTask
+     * @see LoadAlbumsAT
+     */
+    public interface AlbumsLoaderCallback {
+        void onStart();
+        void onFinish(List<Album> albums);
+        void onFail();
+    }
+
+    /**
+     * Receives a broadcast about following events:
+     * PERMISSION_REQUEST_RESULT (user has granted or denied required permissions)
+     * SECURITY_STUFF_GENERATION_RESULT (SSL certificate created with success or failure)
+     */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            Log.d(TAG, "rec brod " + intent);
-
-            if (getContext() == null)
-                return;
-
-            boolean securityStuffOk = SecurityUtils.checkSecurityStuff(getContext().getFilesDir(), false);
+            boolean securityStuffOk = SecurityUtils.checkSecurityStuff(requireContext().getFilesDir(), false);
             boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
 
             if (securityStuffOk && permissionsGranted)
@@ -74,8 +86,8 @@ public class LocalAlbumsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
 
+        mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
         mFilter.addAction(SSActivity.PERMISSION_REQUEST_RESULT);
         mFilter.addAction(SSActivity.SECURITY_STUFF_GENERATION_RESULT);
     }
@@ -90,12 +102,12 @@ public class LocalAlbumsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initMessage(view.findViewById(R.id.message_placeholder));
-
         mRecyclerView = view.findViewById(R.id.local_device_recycler_view);
 
-        boolean securityStuffOk = SecurityUtils.checkSecurityStuff(getContext().getFilesDir(), false);
+        boolean securityStuffOk = SecurityUtils.checkSecurityStuff(requireContext().getFilesDir(), false);
         boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
+
+        initMessage(view.findViewById(R.id.message_placeholder));
 
         if (securityStuffOk && permissionsGranted)
             setupRecyclerView();
@@ -104,44 +116,40 @@ public class LocalAlbumsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mReceiver, mFilter);
+
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(mReceiver, mFilter);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        boolean securityStuffOk = SecurityUtils.checkSecurityStuff(getContext().getFilesDir(), false);
+        boolean securityStuffOk = SecurityUtils.checkSecurityStuff(requireContext().getFilesDir(), false);
         boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
 
         if (!permissionsGranted || !securityStuffOk)
             return;
 
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(mReceiver);
     }
 
+    /**
+     * Initializes a list of albums on local device
+     */
     private void setupRecyclerView() {
-
-        OnRVClickListener clickListener = new OnRVClickListener() {
-            @Override
-            public void onClick(int itemIndex) {
-                Album album = mList.get(itemIndex);
-                mAlbumViewModel.publish(album);
-            }
+        OnRVClickListener clickListener = itemIndex -> {
+            Album album = mList.get(itemIndex);
+            mAlbumViewModel.publish(album);
         };
 
-        Fragment mainFragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
-
-        RecyclerView.LayoutManager layoutManager;
+        Fragment mainFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
 
         if (DeviceUtils.isPortrait(getResources()) || mainFragment != null)
-            layoutManager = new LinearLayoutManager(getContext());
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         else
-            layoutManager = new GridLayoutManager(getContext(), 2);
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         mRVadapter = new LocalAlbumsAdapter(clickListener);
-
-        mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mRVadapter);
 
         AlbumsLoaderCallback callback = new AlbumsLoaderCallback() {
@@ -175,12 +183,10 @@ public class LocalAlbumsFragment extends Fragment {
         new LoadAlbumsAT(getContext(), callback).execute(mAlbumViewModel);
     }
 
-    public interface AlbumsLoaderCallback {
-        void onStart();
-        void onFinish(List<Album> albums);
-        void onFail();
-    }
-
+    /**
+     * NOTE: Deprecated. Should be replaced by Single (reactive component)
+     * Asynchronous loader of albums on local device.
+     */
     private static class LoadAlbumsAT extends AsyncTask<AlbumViewModel, Void, List<Album>> {
 
         private final Context context;
@@ -199,7 +205,6 @@ public class LocalAlbumsFragment extends Fragment {
 
         @Override
         protected List<Album> doInBackground(AlbumViewModel... viewModels) {
-
             try 
             {
                 if (viewModels[0] == null)
@@ -252,7 +257,9 @@ public class LocalAlbumsFragment extends Fragment {
     }
 
     /*
-     * UI State Machine
+     * Following section represents the UI state machine
+     * TODO: Wrap ViewMessage into widget
+     * TODO: use CircleImageDrawable instead of progressbar
      */
 
     /* Message view */
@@ -277,10 +284,17 @@ public class LocalAlbumsFragment extends Fragment {
         CannotLoadAlbums,
     }
 
+    /**
+     * Sets the optimal state of the UI
+     */
     private void updateUIState() {
         setUIState(getRequiredState());
     }
 
+    /**
+     * Returns the optimal state of the UI.
+     * @return Optimal UI state
+     */
     private UIState getRequiredState() {
 
         if (isLoadingAlbums)
@@ -298,6 +312,10 @@ public class LocalAlbumsFragment extends Fragment {
 
     }
 
+    /**
+     * Sets the state of the UI
+     * @param state Required UI state
+     */
     private void setUIState(UIState state)
     {
         if (currentUIState == state)
@@ -327,10 +345,19 @@ public class LocalAlbumsFragment extends Fragment {
         currentUIState = state;
     }
 
+    /**
+     * Replaces one message with another (progressbar instead of icon)
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int textResource) {
         replaceMessage(0, textResource);
     }
 
+    /**
+     * Replaces one message with another
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int iconResource, int textResource) {
 
         int currState = mMessageHolder.getVisibility();
@@ -354,6 +381,11 @@ public class LocalAlbumsFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets the message
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void setMessage(int iconResource, int textResource) {
         mMessageIcon.setImageResource(iconResource);
         mMessageText.setText(textResource);
@@ -374,6 +406,10 @@ public class LocalAlbumsFragment extends Fragment {
         }
     }
 
+    /**
+     * Toggles message visibility
+     * @param isVisible Required message visibility
+     */
     private void toggleMessage(boolean isVisible) {
 
         int currentState = mMessageHolder.getVisibility();

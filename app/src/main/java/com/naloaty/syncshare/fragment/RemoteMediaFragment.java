@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -54,32 +52,30 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 
 public class RemoteMediaFragment extends Fragment {
 
     private static final String TAG = "RemoteMediaFragment";
 
     private List<Media> mList;
-    private RecyclerView mRecyclerView;
     private RemoteMediaAdapter mRVAdapter;
-
     private SSDeviceViewModel ssDeviceVM;
     private NetworkDeviceViewModel netDeviceVM;
-
     private CompositeDisposable disposables;
-
     private NetworkDevice mNetworkDevice;
     private SSDevice mSSDevice;
-
     private String deviceId;
     private Album mAlbum;
+
+    /* UI elements */
+    private RecyclerView mRecyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         disposables = new CompositeDisposable();
-
         ssDeviceVM = new ViewModelProvider(this).get(SSDeviceViewModel.class);
         netDeviceVM = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
     }
@@ -87,8 +83,7 @@ public class RemoteMediaFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_remote_media_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_remote_media_fragment, container, false);
     }
 
     @Override
@@ -96,14 +91,11 @@ public class RemoteMediaFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerView = view.findViewById(R.id.remote_media_recycler_view);
-        initMessage(view.findViewById(R.id.message_placeholder));
-
         Bundle bundle = getArguments();
 
         if (bundle != null){
-            deviceId = bundle.getString(RemoteViewActivity.EXTRA_DEVICE_ID);
-
             Gson gson = new Gson();
+            deviceId = bundle.getString(RemoteViewActivity.EXTRA_DEVICE_ID);
             mAlbum = gson.fromJson(bundle.getString(RemoteViewActivity.EXTRA_ALBUM), Album.class);
         }
         else
@@ -112,36 +104,43 @@ public class RemoteMediaFragment extends Fragment {
             return;
         }
 
+        initMessage(view.findViewById(R.id.message_placeholder));
         initDevice();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+
         disposables.clear();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         disposables.dispose();
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        setUpColumns();
+    }
+
+    /**
+     * Initializes a grid list of media-files on remote devices.
+     */
     private void setupRecyclerView() {
+        OnRVClickListener clickListener = itemIndex -> {
+            ListHolder listHolder = new ListHolder(mList, mNetworkDevice);
 
-        Log.d(TAG, "setupRecyclerView()");
+            Intent intent = new Intent(getActivity(), ImageViewActivity.class);
+            intent.putExtra(ImageViewActivity.EXTRA_POSITION, itemIndex);
+            intent.putExtra(ImageViewActivity.EXTRA_LIST_HOLDER, listHolder);
 
-        OnRVClickListener clickListener = new OnRVClickListener() {
-            @Override
-            public void onClick(int itemIndex) {
-                Intent intent = new Intent(getActivity(), ImageViewActivity.class);
-                intent.putExtra(ImageViewActivity.EXTRA_POSITION, itemIndex);
-
-                ListHolder listHolder = new ListHolder(mList, mNetworkDevice);
-                intent.putExtra(ImageViewActivity.EXTRA_LIST_HOLDER, listHolder);
-
-                startActivity(intent);
-            }
+            startActivity(intent);
         };
 
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), getColumnsCount());
@@ -153,13 +152,18 @@ public class RemoteMediaFragment extends Fragment {
 
     }
 
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        setUpColumns();
-    }
-
+    /**
+     * Sets the optimal number of columns for the grid layout depending on the screen size.
+     */
     private void setUpColumns() {
+        if (mRecyclerView == null)
+            return;
+
+        if (mRecyclerView.getLayoutManager() == null) {
+            Log.e(TAG, "RecyclerView is not properly initialized: LayoutManager is missing");
+            return;
+        }
+
         int columnsCount = getColumnsCount();
 
         if (columnsCount != ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount()) {
@@ -167,23 +171,20 @@ public class RemoteMediaFragment extends Fragment {
         }
     }
 
+    /**
+     * TODO: add ability to change in settings
+     * Returns the optimal number of columns for the grid layout depending on the screen size.
+     */
     private int getColumnsCount() {
-        /*
-         * TODO: add ability to change in settings
-         */
-
        return DeviceUtils.getOptimalColumsCount(getResources());
-       /*return DeviceUtils.isPortrait(getResources())
-                ? 3
-                : 4;*/
     }
 
-
+    /**
+     * Loads general information about a remote device from a database
+     * TODO: replace by class-helper
+     */
     private void initDevice() {
-        Log.d(TAG, "initDevice()");
-
         setUIState(UIState.LoadingMedia);
-
         Single<NetworkDevice> netDeviceObs = netDeviceVM.findDevice(null, deviceId, null);
 
         disposables.add(netDeviceObs
@@ -192,7 +193,6 @@ public class RemoteMediaFragment extends Fragment {
                 .subscribeWith(new DisposableSingleObserver<NetworkDevice>() {
                     @Override
                     public void onSuccess(NetworkDevice networkDevice) {
-                        Log.d(TAG, "initDevice(): success");
                         mNetworkDevice = networkDevice;
                         setupRecyclerView();
                         initSSDevice();
@@ -200,35 +200,24 @@ public class RemoteMediaFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, "initDevice(): error -> " + e);
                         setUIState(UIState.CannotLoadMedia);
-                        new AlertDialog.Builder(getContext())
+                        new AlertDialog.Builder(requireContext())
                                 .setTitle(R.string.title_deviceOffline)
                                 .setMessage(R.string.text_deviceOffline)
                                 .setCancelable(false)
-                                .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        getActivity().onBackPressed();
-                                    }
-                                }).show();
+                                .setPositiveButton(R.string.btn_close, (dialog, which) -> requireActivity().onBackPressed())
+                                .show();
                     }
                 }));
 
 
     }
 
+    /**
+     * Loads network information about a remote device from a database
+     * TODO: replace by class-helper
+     */
     private void initSSDevice() {
-
-        Log.d(TAG, "initSSDevice()");
-        /*mProgressDialog.setMessage(R.string.progress_loadingDevice);
-
-        if (!mProgressDialog.isShowing()){
-            mProgressDialog.show();
-        }*/
-
         Single<SSDevice> ssDeviceObs = ssDeviceVM.findDevice(deviceId);
 
         disposables.add(ssDeviceObs
@@ -237,62 +226,55 @@ public class RemoteMediaFragment extends Fragment {
                 .subscribeWith(new DisposableSingleObserver<SSDevice>() {
                     @Override
                     public void onSuccess(SSDevice ssDevice) {
-                        Log.d(TAG, "initSSDevice(): success");
                         mSSDevice = ssDevice;
                         requestMediaList();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, "initSSDevice(): error -> " + e);
                         setUIState(UIState.CannotLoadMedia);
                         onInternalError("DEVICE_NOT_FOUND");
                     }
                 }));
     }
 
-    public void requestMediaList() {
-        Log.d(TAG, "requestMediaList()");
-
+    /**
+     * Loads a media list from a specific album on a remote device.
+     * @see CommunicationHelper#requestMediaList(Context, NetworkDevice, Album)
+     */
+    private void requestMediaList() {
         Call<List<Media>> request = CommunicationHelper.requestMediaList(getContext(), mNetworkDevice, mAlbum);
+
+        if (request == null) {
+            onInternalError("NULL_REQUEST");
+            return;
+        }
+
         request.enqueue(new Callback<List<Media>>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<List<Media>> call, Response<List<Media>> response) {
-                //setUIState(UIState.MediaShown);
 
-                Log.d(TAG, "requestMediaList(): received response");
                 if (response.body() != null && response.body().size() > 0) {
                     mList = response.body();
                     mRVAdapter.setMediaList(response.body());
                     setUIState(UIState.MediaShown);
-                    Log.d(TAG, "requestMediaList(): body has items. Message -> " + response.message());
                 }
-                else
-                {
-                    Log.d(TAG, "requestMediaList(): body null or do not have items. Message -> " + response.message());
                     setUIState(UIState.NoMediaFound);
-                }
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<List<Media>> call, Throwable t) {
-
-                Log.d(TAG, "requestMediaList(): failure ->  " + t);
                 setUIState(UIState.CannotLoadMedia);
 
                 if (t instanceof SSLHandshakeException) {
-                    new AlertDialog.Builder(getContext())
+                    new AlertDialog.Builder(requireContext())
                             .setTitle(R.string.title_securityException)
                             .setMessage(String.format(getString(R.string.text_securityException), mSSDevice.getNickname()))
                             .setCancelable(false)
-                            .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    getActivity().onBackPressed();
-                                }
-                            }).show();
+                            .setPositiveButton(R.string.btn_close, (dialog, which) -> requireActivity().onBackPressed())
+                            .show();
                 }
                 else
                     onInternalError("MEDIA_REQUEST_FAILURE");
@@ -300,27 +282,24 @@ public class RemoteMediaFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays an error code alert dialog.
+     * @param errorCode Error code
+     */
     private void onInternalError(String errorCode) {
-
-        Log.d(TAG, "onInternalError(): " + errorCode);
         setUIState(UIState.CannotLoadMedia);
 
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.title_error)
                 .setMessage(String.format(getString(R.string.text_internalAppError), errorCode))
                 .setCancelable(false)
-                .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        getActivity().onBackPressed();
-                    }
-                }).show();
+                .setPositiveButton(R.string.btn_close, (dialog, which) -> requireActivity().onBackPressed())
+                .show();
     }
 
     /*
-     * UI State Machine
+     * Following section represents the UI state machine
+     * TODO: Wrap ViewMessage into widget
      */
 
     /* Message view */
@@ -345,6 +324,10 @@ public class RemoteMediaFragment extends Fragment {
         CannotLoadMedia,
     }
 
+    /**
+     * Sets the state of the UI
+     * @param state Required UI state
+     */
     private void setUIState(UIState state)
     {
         if (currentUIState == state)
@@ -374,10 +357,19 @@ public class RemoteMediaFragment extends Fragment {
         currentUIState = state;
     }
 
+    /**
+     * Replaces one message with another (progressbar instead of icon)
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int textResource) {
         replaceMessage(0, textResource);
     }
 
+    /**
+     * Replaces one message with another
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int iconResource, int textResource) {
 
         int currState = mMessageHolder.getVisibility();
@@ -401,6 +393,11 @@ public class RemoteMediaFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets the message
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void setMessage(int iconResource, int textResource) {
         mMessageIcon.setImageResource(iconResource);
         mMessageText.setText(textResource);
@@ -421,6 +418,10 @@ public class RemoteMediaFragment extends Fragment {
         }
     }
 
+    /**
+     * Toggles message visibility
+     * @param isVisible Required message visibility
+     */
     private void toggleMessage(boolean isVisible) {
 
         int currentState = mMessageHolder.getVisibility();

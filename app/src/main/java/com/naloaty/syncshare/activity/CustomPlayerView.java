@@ -7,9 +7,15 @@ import android.view.View;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
 
+/**
+ * Custom player view for ExoPlayer. Allows to handle changes in the visibility of controls.
+ */
 public final class CustomPlayerView
         extends PlayerView implements PlayerControlView.VisibilityListener {
 
+    /**
+     * Listener of controls visibility.
+     */
     public interface VisibilityListener {
         void onVisibilityChange(int visibility);
     }

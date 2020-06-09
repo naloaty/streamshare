@@ -8,11 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewParent;
-import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,39 +32,49 @@ import com.naloaty.syncshare.fragment.OptionFragment;
 import com.naloaty.syncshare.fragment.AddOptionsFragment;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AddDeviceHelper;
-import com.naloaty.syncshare.util.PermissionHelper;
 
 import org.json.JSONObject;
 
+/**
+ * This activity represents the device adding screen.
+ *
+ * Related fragments:
+ * @see AddOptionsFragment
+ * @see DeviceInfoFragment
+ * @see com.naloaty.syncshare.fragment.NearbyDiscoveryFragment
+ */
 public class AddDeviceActivity extends SSActivity {
 
     private static final String TAG = "AddDeviceActivity";
-
     public static final int REQUEST_LOCATION_BY_CODE_SCANNER = 3;
     public static final String ACTION_CHANGE_FRAGMENT = "com.naloaty.intent.action.PAIR_DEVICE_CHANGE_FRAGMENT";
     public static final String EXTRA_TARGET_FRAGMENT = "targetFragment";
     public static final String EXTRA_SAVED_FRAGMENT = "saved_fragment";
 
+    private final IntentFilter mFilter = new IntentFilter();
+
+    /* UI elements */
     private AppBarLayout mAppBarLayout;
     private CollapsingToolbarLayout mToolBarLayout;
     private Toolbar mToolBar;
 
-    //TODO: Memory leak
-    //Replace by getSupportFragmentManager().findFragmentById(R.id.add_device_fragment_placeholder);
+    /*
+     * TODO: Memory leak
+     * Replace by getSupportFragmentManager().findFragmentById(R.id.add_device_fragment_placeholder);
+     */
     private AddOptionsFragment mAddOptionsFragment;
     private DeviceInfoFragment mConnectionInfoFragment ;
 
     private OptionFragment mCurrentFragment;
 
-    private final AddDeviceHelper.AddDeviceCallback callback = new AddDeviceHelper.AddDeviceCallback() {
+    /**
+     * This callback is called by AddDeviceHelper
+     * @see AddDeviceHelper
+     */
+    private final AddDeviceHelper.AddDeviceCallback addDeviceCallback = new AddDeviceHelper.AddDeviceCallback() {
         @Override
         public void onSuccessfullyAdded() {
-            DialogInterface.OnClickListener btnClose = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    onBackPressed();
-                }
-            };
+            DialogInterface.OnClickListener btnClose = (dialog, which) -> onBackPressed();
 
             new AlertDialog.Builder(AddDeviceActivity.this)
                     .setMessage(R.string.text_onSuccessfullyAdded)
@@ -80,15 +85,9 @@ public class AddDeviceActivity extends SSActivity {
 
         @Override
         public void onException(int errorCode) {
-
             Log.w(TAG, "Device added with exception. Error code is " + errorCode);
 
-            DialogInterface.OnClickListener btnClose = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    onBackPressed();
-                }
-            };
+            DialogInterface.OnClickListener btnClose = (dialog, which) -> onBackPressed();
 
             int helpResource = R.string.text_defaultValue;
             int titleResource = R.string.text_defaultValue;
@@ -129,30 +128,30 @@ public class AddDeviceActivity extends SSActivity {
         }
     };
 
-    private final IntentFilter mFilter = new IntentFilter();
+    /**
+     * Receives a broadcast about CommunicationService state changes and fragment change requests
+     * @see AddDeviceActivity#setFragment(OptionFragment)
+     * @see AddDeviceActivity#openCodeScanner()
+     * @see AddOptionsFragment#setServiceState(boolean)
+     */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
 
-            if (ACTION_CHANGE_FRAGMENT.equals(intent.getAction())
-                    && intent.hasExtra(EXTRA_TARGET_FRAGMENT)) {
-
+            if (ACTION_CHANGE_FRAGMENT.equals(action) && intent.hasExtra(EXTRA_TARGET_FRAGMENT)) {
                 //OptionFragment is enum
                 OptionFragment targetFragment = OptionFragment.valueOf(intent.getStringExtra(EXTRA_TARGET_FRAGMENT));
 
                 switch (targetFragment){
 
                     case EnterDeviceId:
+                        SingleTextInputDialog.OnEnteredListener listener = text -> {
+                            SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
+                            ssDevice.setDeviceId(text);
 
-                        SingleTextInputDialog.OnEnteredListener listener = new SingleTextInputDialog.OnEnteredListener() {
-                            @Override
-                            public void onEntered(String text) {
-                                SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
-                                ssDevice.setDeviceId(text);
-
-                                AddDeviceHelper helper = new AddDeviceHelper(AddDeviceActivity.this, ssDevice, callback);
-                                helper.processDevice();
-                            }
+                            AddDeviceHelper helper = new AddDeviceHelper(AddDeviceActivity.this, ssDevice, addDeviceCallback);
+                            helper.processDevice();
                         };
 
                         new EnterDeviceIdDialog(AddDeviceActivity.this, listener).show();
@@ -165,10 +164,8 @@ public class AddDeviceActivity extends SSActivity {
                     default:
                         setFragment(targetFragment);
                 }
-
-
             }
-            else if (intent.getAction().equals(CommunicationService.SERVICE_STATE_CHANGED)) {
+            else if (CommunicationService.SERVICE_STATE_CHANGED.equals(action)) {
                 if (mAddOptionsFragment != null)
                     mAddOptionsFragment.setServiceState(intent.getBooleanExtra(CommunicationService.EXTRA_SERVICE_SATE, false));
             }
@@ -178,9 +175,9 @@ public class AddDeviceActivity extends SSActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_device_add);
 
-        //======== Init collapsing toolbar ==========
         mAppBarLayout = findViewById(R.id.add_device_app_bar_layout);
         mToolBarLayout = findViewById(R.id.add_device_toolbar_layout);
         mToolBar = findViewById(R.id.add_device_toolbar);
@@ -197,24 +194,18 @@ public class AddDeviceActivity extends SSActivity {
         setSupportActionBar(mToolBar);
 
         //To make "close" animation (this instead of using "parent activity")
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        mToolBar.setNavigationOnClickListener(v -> onBackPressed());
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        else
+            Log.w(TAG, "Toolbar is not properly initialized");
 
-        //======== Init fragments =========
         mAddOptionsFragment = new AddOptionsFragment();
         mConnectionInfoFragment = new DeviceInfoFragment();
-
-        //======= Init broadcast =========
-        mFilter.addAction(ACTION_CHANGE_FRAGMENT);
-        mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
 
         if (savedInstanceState != null) {
             mCurrentFragment = OptionFragment.valueOf(savedInstanceState.getString(EXTRA_SAVED_FRAGMENT));
@@ -223,11 +214,15 @@ public class AddDeviceActivity extends SSActivity {
         else
             setFragment(OptionFragment.Options);
 
+        mFilter.addAction(ACTION_CHANGE_FRAGMENT);
+        mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
+
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+
         outState.putString(EXTRA_SAVED_FRAGMENT, mCurrentFragment.toString());
     }
 
@@ -247,7 +242,6 @@ public class AddDeviceActivity extends SSActivity {
 
     @Override
     public void onBackPressed() {
-
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.add_device_fragment_placeholder);
 
         if (currentFragment instanceof AddOptionsFragment)
@@ -258,11 +252,15 @@ public class AddDeviceActivity extends SSActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if(result != null) {
+
+        if (result != null) {
             processQRCode(result.getContents());
         }
-        else {
+        else
+        {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -273,16 +271,14 @@ public class AddDeviceActivity extends SSActivity {
 
         if (requestCode == REQUEST_LOCATION_BY_CODE_SCANNER)
             openCodeScanner();
-            //if (PermissionHelper.checkLocationPermission(this))
 
     }
 
+    /**
+     * Opens a QR code scanner activity
+     */
     private void openCodeScanner() {
         //TODO: it definitely should be replaced with customized scanner (with toolbar)
-        /*
-         * Since I don’t have enough time to create customized scanner,
-         * so far the standard version of the scanner will be used
-         */
 
         IntentIntegrator integrator = new IntentIntegrator(AddDeviceActivity.this);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
@@ -292,6 +288,11 @@ public class AddDeviceActivity extends SSActivity {
 
     }
 
+    /**
+     * Handles contents of scanned QR code
+     * @see AddDeviceHelper
+     * @param qrCodeContents Contents of qr code as JSON string
+     */
     private void processQRCode(String qrCodeContents) {
         if (qrCodeContents == null)
             return;
@@ -308,13 +309,15 @@ public class AddDeviceActivity extends SSActivity {
             if (!codeDevice.has(DeviceInfoFragment.QR_CODE_DEVICE_ID))
                 throw new Exception("Device ID is missing");
 
-
+            /*
+             * QR code contains device id and main information, so it should be added
+             */
             SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
             ssDevice.setDeviceId(codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_ID));
             ssDevice.setNickname(codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_NICKNAME));
             ssDevice.setAppVersion(codeDevice.getString(DeviceInfoFragment.QR_CODE_APP_VERSION));
 
-            AddDeviceHelper helper = new AddDeviceHelper(this, ssDevice, callback);
+            AddDeviceHelper helper = new AddDeviceHelper(this, ssDevice, addDeviceCallback);
             helper.processDevice();
 
         }
@@ -327,7 +330,11 @@ public class AddDeviceActivity extends SSActivity {
         }
     }
 
-    private void setFragment(OptionFragment targetFragment) {
+    /**
+     * Sets required fragment
+     * @param targetFragment Required fragment
+     */
+    private void setFragment(@NonNull OptionFragment targetFragment) {
 
         Fragment candidate = null;
 
@@ -339,6 +346,11 @@ public class AddDeviceActivity extends SSActivity {
             case DeviceInfo:
                 candidate = mConnectionInfoFragment;
                 break;
+        }
+
+        if (candidate == null) {
+            Log.d(TAG, String.format("Cannot set fragment: %s is not found", targetFragment));
+            return;
         }
 
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.add_device_fragment_placeholder);
@@ -363,7 +375,11 @@ public class AddDeviceActivity extends SSActivity {
         }
     }
 
-    private void setToolbar(OptionFragment fragment) {
+    /**
+     * Sets the title and state of toolbar depending on the required fragment
+     * @param fragment Required fragment
+     */
+    private void setToolbar(@NonNull OptionFragment fragment) {
 
         int titleResource;
         boolean isOptions = false;
@@ -382,10 +398,14 @@ public class AddDeviceActivity extends SSActivity {
                 titleResource = R.string.title_addDevice;
         }
 
-        if (fragment.equals(OptionFragment.Options))
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
+        if (getSupportActionBar() != null) {
+            if (fragment.equals(OptionFragment.Options))
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
+            else
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
+        }
         else
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
+            Log.w(TAG, "Toolbar is not properly initialized");
 
         if (mToolBarLayout != null)
             mToolBarLayout.setTitle(getString(titleResource));

@@ -1,6 +1,5 @@
 package com.naloaty.syncshare.activity;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,51 +13,60 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
-import com.naloaty.syncshare.fragment.AddOptionsFragment;
-import com.naloaty.syncshare.fragment.OptionFragment;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 
-import java.lang.reflect.Method;
 
+/**
+ * This activity represents the main screen, that displays the current devices on the network (trusted devices only).
+ * NOTE: LocalAlbumsActivity is not used on tablets. In this case, LocalAlbumsFragment is located on MainActivity.
+ *
+ * Related fragments:
+ * @see com.naloaty.syncshare.fragment.MainFragment
+ * @see com.naloaty.syncshare.fragment.LocalAlbumsFragment
+ */
 public class MainActivity extends SSActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MainActivity";
 
-    private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerLayout mDrawerLayout;
-    private NavigationView mNavigationView;
-    private MenuItem mSelectedDrawerItem;
-    private MenuItem mServiceToggle;
+    private final IntentFilter mFilter = new IntentFilter();
     private boolean mServiceRunning = false;
 
-    private final String SERVICE_STATE = "service_state";
+    /* UI elements */
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private MenuItem mSelectedDrawerItem;
+    private MenuItem mServiceToggle;
 
-    private final IntentFilter mFilter = new IntentFilter();
+
+    /**
+     * Receives a broadcast about CommunicationService state changes
+     * @see MainActivity#setServiceState(boolean)
+     */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if (action.equals(CommunicationService.SERVICE_STATE_CHANGED)) {
+            if (CommunicationService.SERVICE_STATE_CHANGED.equals(action)) {
                 setServiceState(intent.getBooleanExtra(CommunicationService.EXTRA_SERVICE_SATE, false));
             }
         }
     };
 
+    /**
+     * Sets the state of UI depending on the state of CommunicationService
+     * @param serviceRunning CommunicationService state (running or not)
+     */
     private void setServiceState(boolean serviceRunning) {
-
         mServiceRunning = serviceRunning;
 
         if (mServiceToggle == null)
@@ -76,57 +84,42 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
 
     }
 
-
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolBar = findViewById(R.id.activity_main_toolbar);
-        //enableOptionMenuIcons(toolBar);
-
         setSupportActionBar(toolBar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        else
+            Log.w(TAG, "Toolbar is not properly initialized");
 
         setUpNavigationDrawer();
 
         mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
-
-        if (savedInstanceState != null)
-            setServiceState(savedInstanceState.getBoolean(SERVICE_STATE, false));
     }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(SERVICE_STATE, mServiceRunning);
-    }
 
-    /*
-     * Hack to display option menu icons
-     * TODO: not used anymore
-     * Copied from https://stackoverflow.com/questions/30076392/how-does-this-strange-condition-happens-when-show-menu-item-icon-in-toolbar-over/30337653#30337653
+    /**
+     * Initializes NavigationDrawer
      */
-
-    /*@SuppressLint("RestrictedApi")
-    public void enableOptionMenuIcons(Toolbar toolbar){
-        MenuBuilder menuBuilder = (MenuBuilder) toolbar.getMenu();
-        menuBuilder.setOptionalIconsVisible(true);
-    }*/
-
     private void setUpNavigationDrawer() {
         mDrawerLayout = findViewById(R.id.activity_main_drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
-            /** Called when a drawer has settled in a completely open state. */
+            //Called when a drawer has settled in a completely opened state.
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
             }
 
-            /** Called when a drawer has settled in a completely closed state. */
+            //Called when a drawer has settled in a completely closed state.
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
             }
@@ -143,16 +136,17 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
             }
         });
 
-        mNavigationView = findViewById(R.id.activity_main_nav_view);
+        NavigationView mNavigationView = findViewById(R.id.activity_main_nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
     }
 
+    /**
+     * Postpones NavigationDrawer action.
+     * Action is doing after NavigationDrawer is completely closed (for better user experience).
+     * @see MainActivity#doDrawerAction()
+     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        //We want to do action after drawer is completely closed (for better user experience)
-        //See doDrawerAction()
-
         //Used by doDrawerAction()
         mSelectedDrawerItem = item;
 
@@ -162,8 +156,10 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         return true;
     }
 
+    /**
+     * Performs a postponed NavigationDrawer action.
+     */
     private void doDrawerAction() {
-
         if (mSelectedDrawerItem == null)
             return;
 
@@ -173,21 +169,16 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
                 startActivity(new Intent(this, DeviceManageActivity.class));
                 mSelectedDrawerItem = null;
                 break;
-
-            /*case R.id.menu_main_preferences:
-                break;
-
-            case R.id.menu_main_about:
-                break;*/
         }
     }
 
+    /**
+     * Handles NavigationDrawer item selection.
+     */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         mDrawerToggle.onOptionsItemSelected(item);
 
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_toggle_sharing:
                 toggleCommunicationService();
@@ -205,31 +196,34 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+
         mDrawerToggle.syncState();
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
     protected void onResume() {
+        super.onResume();
+
         setServiceState(AppUtils.isServiceRunning(this, CommunicationService.class));
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, mFilter);
-        super.onResume();
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
         super.onPause();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu_main, menu);
 
         mServiceToggle = menu.findItem(R.id.action_toggle_sharing);
@@ -247,29 +241,10 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
         return true;
     }
 
-    /*@Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        MenuItem serviceToggle = menu.findItem(R.id.action_toggle_sharing);
-
-        boolean serviceRunning = AppUtils.isServiceRunning(getApplication(), CommunicationService.class);
-
-        if (serviceRunning) {
-            Log.d(TAG, "Service running");
-            serviceToggle.setTitle(R.string.menu_stopSharing);
-            serviceToggle.setIcon(R.drawable.ic_service_off_24dp);
-        }
-        else
-        {
-            Log.d(TAG, "Service NOT running");
-            serviceToggle.setTitle(R.string.menu_startSharing);
-            serviceToggle.setIcon(R.drawable.ic_service_on_24dp);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }*/
-
+    /**
+     * Toggles CommunicationService state (running or not)
+     */
     private void toggleCommunicationService() {
-
         boolean serviceRunning = AppUtils.isServiceRunning(getApplication(), CommunicationService.class);
 
         if (serviceRunning) {
@@ -286,8 +261,6 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
             Intent intent = new Intent(this, CommunicationService.class);
             startService(intent);
         }
-
-
     }
 
 }

@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,7 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -40,33 +38,93 @@ import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AddDeviceHelper;
 import com.naloaty.syncshare.util.AppUtils;
-import com.naloaty.syncshare.util.DNSSDHelper;
 import com.naloaty.syncshare.util.DeviceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * This fragment displays current devices on the network.
+ */
 public class NearbyDiscoveryFragment extends Fragment {
 
     private static final String TAG = "NearbyDiscoveryFragment";
-    
-    private List<NetworkDevice> mList = new ArrayList<>();
-    private RecyclerView mRecyclerView;
-    private DiscoveredDevicesAdapter mRVAdapter;
-    private NetworkDeviceViewModel networkDeviceViewModel;
-
-    LinearLayout mRootLayout;
-
-    private DNSSDHelper mDNSSDHelper;
 
     private final IntentFilter mFilter = new IntentFilter();
+    private List<NetworkDevice> mList = new ArrayList<>();
+    private DiscoveredDevicesAdapter mRVAdapter;
+    private NetworkDeviceViewModel mNetworkDeviceViewModel;
 
+    /* UI elements */
+    private LinearLayout mRootLayout;
+    private RecyclerView mRecyclerView;
+
+    private final AddDeviceHelper.AddDeviceCallback addDeviceCallback = new AddDeviceHelper.AddDeviceCallback() {
+        @Override
+        public void onSuccessfullyAdded() {
+            DialogInterface.OnClickListener btnClose = (dialog, which) -> requireActivity().onBackPressed();
+
+            new AlertDialog.Builder(requireContext())
+                    .setMessage(R.string.text_onSuccessfullyAdded)
+                    .setPositiveButton(R.string.btn_close, btnClose)
+                    .setTitle(R.string.title_success)
+                    .show();
+        }
+
+        @Override
+        public void onException(int errorCode) {
+            Log.w(TAG, String.format("Device added with exception (code %s)", errorCode));
+
+            DialogInterface.OnClickListener btnClose = (dialog, which) -> requireActivity().onBackPressed();
+
+            int helpResource = R.string.text_defaultValue;
+            int titleResource = R.string.text_defaultValue;
+
+            switch (errorCode) {
+                case AddDeviceHelper.ERROR_ALREADY_ADDED:
+                    Toast.makeText(requireContext(), R.string.toast_alreadyAdded, Toast.LENGTH_LONG).show();
+                    return;
+
+                case AddDeviceHelper.ERROR_UNTRUSTED_DEVICE:
+                    break;
+
+                case AddDeviceHelper.ERROR_DEVICE_OFFLINE:
+                    helpResource = R.string.text_offlineDevice;
+                    break;
+
+                case AddDeviceHelper.ERROR_BAD_RESPONSE:
+                case AddDeviceHelper.ERROR_HANDSHAKE_EXCEPTION:
+                    helpResource = R.string.text_handShakeException;
+                    titleResource = R.string.title_step2;
+                    break;
+
+                case AddDeviceHelper.ERROR_REQUEST_FAILED:
+                case AddDeviceHelper.ERROR_SENDING_FAILED:
+                    helpResource = R.string.text_oExchangeFailed;
+                    break;
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext())
+                    .setMessage(helpResource)
+                    .setPositiveButton(R.string.btn_close, btnClose);
+
+            if (titleResource != R.string.text_defaultValue)
+                builder.setTitle(titleResource);
+
+            builder.show();
+        }
+    };
+
+    /**
+     * Receives a broadcast about CommunicationService state changes
+     * @see NearbyDiscoveryFragment#setServiceState(boolean)
+     */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if (action.equals(CommunicationService.SERVICE_STATE_CHANGED)) {
+            if (CommunicationService.SERVICE_STATE_CHANGED.equals(action)) {
                 setServiceState(intent.getBooleanExtra(CommunicationService.EXTRA_SERVICE_SATE, false));
             }
         }
@@ -76,49 +134,46 @@ public class NearbyDiscoveryFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mDNSSDHelper = new DNSSDHelper(getContext());
-
-        this.networkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
+        mNetworkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
         mFilter.addAction(CommunicationService.SERVICE_STATE_CHANGED);
     }
 
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
-        setServiceState(AppUtils.isServiceRunning(getContext(), CommunicationService.class));
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mReceiver, mFilter);
+
+        setServiceState(AppUtils.isServiceRunning(requireContext(), CommunicationService.class));
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(mReceiver, mFilter);
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mReceiver);
+
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(mReceiver);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_nearby_discovery_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_nearby_discovery_fragment, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initMessage(view.findViewById(R.id.message_placeholder));
-
         mRecyclerView = view.findViewById(R.id.nearby_discovery_recycler_view);
         mRootLayout = view.findViewById(R.id.root_linear_layout);
+
+        initMessage(view.findViewById(R.id.message_placeholder));
         setupRecyclerView();
         setupView();
     }
 
-    /*
-     * This fixes minHeight of view inside of ScrollView
+    /**
+     * Fixes the minHeight property of a fragment layout when it is inside ScrollView
      */
     private void setupView() {
         ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -127,14 +182,16 @@ public class NearbyDiscoveryFragment extends Fragment {
                 if (!isAdded())
                     return;
 
-                Log.d(TAG, "Layout adjusted");
-                mRootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 int height = mRootLayout.getMeasuredHeight();
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mRootLayout.getLayoutParams();
+
+                mRootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
                 if(height < (int)getResources().getDimension(R.dimen.nearby_discovery_min_height)) {
                     params.height = (int) getResources().getDimension(R.dimen.nearby_discovery_min_height);
                     mRootLayout.setLayoutParams(params);
+
+                    Log.d(TAG, "Layout adjusted");
                 }
 
             }
@@ -144,86 +201,21 @@ public class NearbyDiscoveryFragment extends Fragment {
         viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener);
     }
 
+    /**
+     * Initializes a list of current devices on the network.
+     * @see AddDeviceHelper
+     */
     private void setupRecyclerView() {
-        final AddDeviceHelper.AddDeviceCallback callback = new AddDeviceHelper.AddDeviceCallback() {
-            @Override
-            public void onSuccessfullyAdded() {
-                DialogInterface.OnClickListener btnClose = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getActivity().onBackPressed();
-                    }
-                };
+        final OnRVClickListener clickListener = itemIndex -> {
+            NetworkDevice device = mList.get(itemIndex);
 
-                new AlertDialog.Builder(getContext())
-                        .setMessage(R.string.text_onSuccessfullyAdded)
-                        .setPositiveButton(R.string.btn_close, btnClose)
-                        .setTitle(R.string.title_success)
-                        .show();
-            }
+            SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
+            ssDevice.setDeviceId(device.getDeviceId());
+            ssDevice.setNickname(device.getDeviceName());
+            ssDevice.setAppVersion(device.getAppVersion());
 
-            @Override
-            public void onException(int errorCode) {
-                Log.w(TAG, "Device added with exception. Error code is " + errorCode);
-
-                DialogInterface.OnClickListener btnClose = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getActivity().onBackPressed();
-                    }
-                };
-
-                int helpResource = R.string.text_defaultValue;
-                int titleResource = R.string.text_defaultValue;
-
-                switch (errorCode) {
-                    case AddDeviceHelper.ERROR_ALREADY_ADDED:
-                        Toast.makeText(getContext(), R.string.toast_alreadyAdded, Toast.LENGTH_LONG).show();
-                        return;
-
-                    case AddDeviceHelper.ERROR_UNTRUSTED_DEVICE:
-                        break;
-
-                    case AddDeviceHelper.ERROR_DEVICE_OFFLINE:
-                        helpResource = R.string.text_offlineDevice;
-                        break;
-
-                    case AddDeviceHelper.ERROR_BAD_RESPONSE:
-                    case AddDeviceHelper.ERROR_HANDSHAKE_EXCEPTION:
-                        helpResource = R.string.text_handShakeException;
-                        titleResource = R.string.title_step2;
-                        break;
-
-                    case AddDeviceHelper.ERROR_REQUEST_FAILED:
-                    case AddDeviceHelper.ERROR_SENDING_FAILED:
-                        helpResource = R.string.text_oExchangeFailed;
-                        break;
-                }
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
-                        .setMessage(helpResource)
-                        .setPositiveButton(R.string.btn_close, btnClose);
-
-                if (titleResource != R.string.text_defaultValue)
-                    builder.setTitle(titleResource);
-
-                builder.show();
-            }
-        };
-
-        final OnRVClickListener clickListener = new OnRVClickListener() {
-            @Override
-            public void onClick(int itemIndex) {
-                NetworkDevice device = mList.get(itemIndex);
-
-                SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
-                ssDevice.setDeviceId(device.getDeviceId());
-                ssDevice.setNickname(device.getDeviceName());
-                ssDevice.setAppVersion(device.getAppVersion());
-
-                AddDeviceHelper helper = new AddDeviceHelper(getContext(), ssDevice, callback);
-                helper.processDevice();
-            }
+            AddDeviceHelper helper = new AddDeviceHelper(getContext(), ssDevice, addDeviceCallback);
+            helper.processDevice();
         };
 
         RecyclerView.LayoutManager layoutManager;
@@ -238,19 +230,16 @@ public class NearbyDiscoveryFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mRVAdapter);
 
-        networkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<NetworkDevice>>() {
-
-            @Override
-            public void onChanged(List<NetworkDevice> networkDevices) {
-                mList = networkDevices;
-                mRVAdapter.setDevicesList(networkDevices);
-                updateUIState();
-            }
+        mNetworkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), networkDevices -> {
+            mList = networkDevices;
+            mRVAdapter.setDevicesList(networkDevices);
+            updateUIState();
         });
     }
 
     /*
-     * UI State Machine
+     * Following section represents the UI state machine
+     * TODO: Wrap ViewMessage into widget
      */
 
     /* Message view */
@@ -274,18 +263,29 @@ public class NearbyDiscoveryFragment extends Fragment {
     private enum UIState {
         OnlineShown,
         NoDevicesFound,
-        ServiceNotRunning;
+        ServiceNotRunning
     }
 
+    /**
+     * Sets the optimal state of the UI
+     */
     private void updateUIState() {
         setUIState(getRequiredState());
     }
 
-    private void setServiceState(boolean serviceStarted) {
-        isServiceRunning = serviceStarted;
+    /**
+     * Sets the state of the UI depending on the state of CommunicationService
+     * @param serviceRunning CommunicationService state (running or not)
+     */
+    private void setServiceState(boolean serviceRunning) {
+        isServiceRunning = serviceRunning;
         updateUIState();
     }
 
+    /**
+     * Returns the optimal state of the UI.
+     * @return Optimal UI state
+     */
     private UIState getRequiredState() {
         if (isServiceRunning) {
             boolean hasItems = mList.size() > 0;
@@ -299,6 +299,10 @@ public class NearbyDiscoveryFragment extends Fragment {
             return UIState.ServiceNotRunning;
     }
 
+    /**
+     * Sets the state of the UI
+     * @param state Required UI state
+     */
     private void setUIState(UIState state)
     {
         if (currentUIState == state)
@@ -317,7 +321,7 @@ public class NearbyDiscoveryFragment extends Fragment {
             case ServiceNotRunning:
                 View.OnClickListener listener = (v -> {
                     Intent intent = new Intent(getContext(), CommunicationService.class);
-                    getActivity().startService(intent);
+                    requireActivity().startService(intent);
                 });
 
                 replaceMessage(R.drawable.ic_service_off_24dp, R.string.text_serviceNotStarted, R.string.btn_start, listener);
@@ -329,10 +333,22 @@ public class NearbyDiscoveryFragment extends Fragment {
         currentUIState = state;
     }
 
+    /**
+     * Replaces one message with another (action button disabled)
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int iconResource, int textResource) {
         replaceMessage(iconResource, textResource, 0, null);
     }
 
+    /**
+     * Replaces one message with another
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     * @param btnResource Action button text resource
+     * @param listener Action button click listener
+     */
     private void replaceMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
 
         int currState = mMessageHolder.getVisibility();
@@ -356,6 +372,13 @@ public class NearbyDiscoveryFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets the message
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     * @param btnResource Action button text resource
+     * @param listener Action button click listener
+     */
     private void setMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
         mMessageIcon.setImageResource(iconResource);
         mMessageText.setText(textResource);
@@ -381,6 +404,10 @@ public class NearbyDiscoveryFragment extends Fragment {
         }
     }
 
+    /**
+     * Toggles message visibility
+     * @param isVisible Required message visibility
+     */
     private void toggleMessage(boolean isVisible) {
 
         int currentState = mMessageHolder.getVisibility();

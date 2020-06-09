@@ -1,9 +1,6 @@
 package com.naloaty.syncshare.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.icu.util.Measure;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +10,6 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
@@ -21,16 +17,11 @@ import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.Allocator;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.material.appbar.AppBarLayout;
 import com.naloaty.syncshare.R;
@@ -38,18 +29,19 @@ import com.naloaty.syncshare.app.SSActivity;
 import com.naloaty.syncshare.communication.SSOkHttpClient;
 import com.naloaty.syncshare.media.Media;
 import com.naloaty.syncshare.util.AppUtils;
-import com.naloaty.syncshare.util.DeviceUtils;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 
 import okhttp3.OkHttpClient;
 
+/**
+ * This activity loads and displays the selected video file.
+ *
+ * Related activity:
+ * @see ImageViewActivity
+ */
 public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.VisibilityListener {
 
-    //TODO: remove this functionality
-    //This feature is temporary. Only for exclusive build for Mikil.
     private boolean insecureMode = false;
 
     private static final String TAG = "VideoPlayerActivity";
@@ -60,20 +52,23 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
     private static int MIN_BUFFERSIZE_MS = 10 * 1000;
     private static int MAX_BUFFERSIZE_MS = 25 * 1000;
 
-    //Length of media that should be buffered after seeking
+    /* Length of media that should be buffered after seeking */
     private static int BUFFER_FOR_PLAYBACK_MS = 2 * 1000;
 
-    //Length of media that should be buffered after buffer is depleted
+    /* Length of media that should be buffered after buffer is depleted */
     private static int BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 5 * 1000;
 
     public static final String EXTRA_REMOTE_URL = "remoteUrl";
     public static final String EXTRA_VIDEO_INFO = "videoInfo";
-    private CustomPlayerView playerView;
     private SimpleExoPlayer simpleExoPlayer;
 
+    private boolean fullScreenMode = false;
+
+    /* UI elements */
     private Toolbar mToolbar;
     private AppBarLayout mAppbarLayout;
-    private boolean fullScreenMode = false;
+    private CustomPlayerView playerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +77,6 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
 
         mToolbar = findViewById(R.id.toolbar);
         mAppbarLayout = findViewById(R.id.appbar_layout);
-
         mToolbar.setTitle("");
 
         //Important to call this BEFORE setNavigationOnClickListener()
@@ -91,15 +85,15 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
         //To make "close" animation (this instead of using "parent activity")
         mToolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        else
+            Log.w(TAG, "Toolbar is not properly initialized");
 
-        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
+        //Allows requests from any ip
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true );
 
         String remoteURL;
         Media videoInfo;
@@ -110,18 +104,29 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
         }
         else
         {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.title_noVideoSource)
-                    .setMessage(R.string.text_noVideoSource)
-                    .setPositiveButton(R.string.btn_close, (dialog, which) -> onBackPressed())
-                    .show();
+            onSourceError();
+            return;
+        }
 
+        if (videoInfo == null) {
+            onSourceError();
             return;
         }
 
         playerView = findViewById(R.id.player_view);
         playerView.setBackground(getDrawable(R.color.colorBlack));
         setupPlayer(Uri.parse(remoteURL + videoInfo.getFilename()), videoInfo.getMimeType());
+    }
+
+    /**
+     * When there is no video source, this method is used to display an error message.
+     */
+    private void onSourceError() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.title_noVideoSource)
+                .setMessage(R.string.text_noVideoSource)
+                .setPositiveButton(R.string.btn_close, (dialog, which) -> onBackPressed())
+                .show();
     }
 
     private void setupPlayer(Uri videoUri, String mime) {
@@ -131,7 +136,7 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
                 .setBufferDurationsMs(MIN_BUFFERSIZE_MS, MAX_BUFFERSIZE_MS, BUFFER_FOR_PLAYBACK_MS, BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS)
                 .createDefaultLoadControl();
 
-        //TODO: replace with smth else
+        //TODO: add more types of errors to handle
         ExoPlayer.EventListener listener = new ExoPlayer.EventListener() {
             @Override
             public void onPlayerError(ExoPlaybackException error) {
@@ -152,16 +157,11 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
                                     .setTitle(R.string.title_unsupportedVideo)
                                     .setMessage(R.string.text_unsupportedVideoInsecure)
                                     .setNegativeButton(R.string.btn_no, (dialog, which) -> onBackPressed())
-                                    .setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which)
-                                        {
-                                            onBackPressed();
-                                            Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(videoUri, mime);
-                                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                            startActivity(intent);
-                                        }
+                                    .setPositiveButton(R.string.btn_yes, (dialog, which) -> {
+                                        onBackPressed();
+                                        Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(videoUri, mime);
+                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        startActivity(intent);
                                     }).show();
                         }
                         break;
@@ -186,10 +186,6 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
         playerView.setPlayer(simpleExoPlayer);
 
         OkHttpClient client = SSOkHttpClient.getOkHttpClient(this);
-
-        // Produces DataSource instances through which media data is loaded.
-        //DataSource.Factory dataSourceFactory = new DefaultHttpDataSourceFactory(Util.getUserAgent(this, "SyncShare"));
-
         DataSource.Factory dataSourceFactory = new OkHttpDataSourceFactory(client, Util.getUserAgent(this, "SyncShare"));
 
         // This is the MediaSource representing the media to be played.
@@ -209,6 +205,9 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
             showControls();
     }
 
+    /**
+     * Hides toolbar, status bar and navigation bar
+     */
     private void hideControls() {
         runOnUiThread(() -> {
             getWindow().getDecorView().setSystemUiVisibility(
@@ -226,10 +225,12 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
                     .start();
 
             fullScreenMode = true;
-            //changeBackGroundColor();
         });
     }
 
+    /**
+     * Shows toolbar, status bar and navigation bar
+     */
     private void showControls(){
         runOnUiThread(() -> {
             int rotation = (((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay()).getRotation();
@@ -255,7 +256,6 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
                     .start();
 
             fullScreenMode = false;
-            //changeBackGroundColor();
         });
     }
 

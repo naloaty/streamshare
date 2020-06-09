@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,25 +30,29 @@ import com.naloaty.syncshare.util.DeviceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * This fragment displays a list of trusted devices.
+ */
 public class MyDevicesFragment extends Fragment {
 
     private List<SSDevice> mList = new ArrayList<>();
-    private RecyclerView mRecyclerView;
     private MyDevicesAdapter mRVAdapter;
-    private SSDeviceViewModel ssDeviceViewModel;
+    private SSDeviceViewModel mDeviceViewModel;
+
+    /* UI elements */
+    private RecyclerView mRecyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ssDeviceViewModel = new ViewModelProvider(this).get(SSDeviceViewModel.class);
+        mDeviceViewModel = new ViewModelProvider(this).get(SSDeviceViewModel.class);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_my_devices_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_my_devices_fragment, container, false);
     }
 
     @Override
@@ -57,21 +60,21 @@ public class MyDevicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerView = view.findViewById(R.id.my_devices_recycler_view);
+
         initMessage(view.findViewById(R.id.message_placeholder));
         setupRecyclerView();
     }
 
+    /**
+     * Initializes a list of trusted devices
+     */
     private void setupRecyclerView() {
+        OnRVClickListener clickListener = itemIndex -> {
+            SSDevice ssDevice = mList.get(itemIndex);
 
-        OnRVClickListener clickListener = new OnRVClickListener() {
-            @Override
-            public void onClick(int itemIndex) {
-                SSDevice ssDevice = mList.get(itemIndex);
-
-                MyDeviceDetailsDialog details = new MyDeviceDetailsDialog(getContext());
-                details.setSSDevice(ssDevice);
-                details.show();
-            }
+            MyDeviceDetailsDialog details = new MyDeviceDetailsDialog(requireContext());
+            details.setSSDevice(ssDevice);
+            details.show();
         };
 
         RecyclerView.LayoutManager layoutManager;
@@ -86,21 +89,20 @@ public class MyDevicesFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mRVAdapter);
 
-        ssDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), new Observer<List<SSDevice>>() {
-            @Override
-            public void onChanged(List<SSDevice> ssDevices) {
-                mList = ssDevices;
-                mRVAdapter.setDevicesList(ssDevices);
-                updateUIState();
-            }
+        mDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), ssDevices ->
+        {
+            mList = ssDevices;
+            mRVAdapter.setDevicesList(ssDevices);
+            updateUIState();
         });
     }
 
     /*
-     * UI State Machine
+     * Following section represents the UI state machine
+     * TODO: Wrap ViewMessage into widget
      */
 
-    /* Message view */
+    /* View Message */
     private ImageView mMessageIcon;
     private TextView mMessageText;
     private AppCompatButton mMessageActionBtn;
@@ -122,10 +124,17 @@ public class MyDevicesFragment extends Fragment {
         NoDevicesAdded,
     }
 
+    /**
+     * Sets the optimal state of the UI
+     */
     private void updateUIState() {
         setUIState(getRequiredState());
     }
 
+    /**
+     * Returns the optimal state of the UI.
+     * @return Optimal UI state
+     */
     private UIState getRequiredState() {
         boolean hasItems = mList.size() > 0;
 
@@ -135,8 +144,11 @@ public class MyDevicesFragment extends Fragment {
             return UIState.NoDevicesAdded;
     }
 
-    private void setUIState(UIState state)
-    {
+    /**
+     * Sets the state of the UI
+     * @param state Required UI state
+     */
+    private void setUIState(UIState state) {
         if (currentUIState == state)
             return;
 
@@ -154,11 +166,23 @@ public class MyDevicesFragment extends Fragment {
         currentUIState = state;
     }
 
+    /**
+     * Replaces one message with another (action button disabled)
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int iconResource, int textResource) {
         replaceMessage(iconResource, textResource, 0, null);
     }
 
-    private void replaceMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
+    /**
+     * Replaces one message with another
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     * @param btnResource Action button text resource
+     * @param listener Action button click listener
+     */
+    private void replaceMessage(int iconResource, int textResource, int btnResource, @Nullable View.OnClickListener listener) {
 
         int currState = mMessageHolder.getVisibility();
 
@@ -181,6 +205,13 @@ public class MyDevicesFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets the message
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     * @param btnResource Action button text resource
+     * @param listener Action button click listener
+     */
     private void setMessage(int iconResource, int textResource, int btnResource, View.OnClickListener listener) {
         mMessageIcon.setImageResource(iconResource);
         mMessageText.setText(textResource);
@@ -206,8 +237,11 @@ public class MyDevicesFragment extends Fragment {
         }
     }
 
+    /**
+     * Toggles message visibility
+     * @param isVisible Required message visibility
+     */
     private void toggleMessage(boolean isVisible) {
-
         int currentState = mMessageHolder.getVisibility();
 
         if (isVisible) {

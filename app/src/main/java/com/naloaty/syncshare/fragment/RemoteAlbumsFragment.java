@@ -2,14 +2,12 @@ package com.naloaty.syncshare.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -47,42 +45,39 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 
+/*
+ * This fragment displays a list of albums on the remote device.
+ */
 public class RemoteAlbumsFragment extends Fragment {
 
-    private static final String TAG = "RemoteAlbumsFragment";
-
     private List<Album> mList;
-    private RecyclerView mRecyclerView;
     private RemoteAlbumsAdapter mRVadapter;
-
-    private TextView mHelpText;
-
-    private SSDeviceViewModel ssDeviceVM;
-    private NetworkDeviceViewModel netDeviceVM;
-
-    private CompositeDisposable disposables;
-
+    private SSDeviceViewModel mDeviceViewModel;
+    private NetworkDeviceViewModel mNetworkDeviceViewModel;
+    private CompositeDisposable mDisposables;
     private NetworkDevice mNetworkDevice;
     private SSDevice mSSDevice;
+    private String mDeviceId;
 
-    private String deviceId;
+    /* UI elements*/
+    private RecyclerView mRecyclerView;
+    private TextView mHelpText;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        disposables = new CompositeDisposable();
-
-        ssDeviceVM = new ViewModelProvider(this).get(SSDeviceViewModel.class);
-        netDeviceVM = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
+        mDisposables = new CompositeDisposable();
+        mDeviceViewModel = new ViewModelProvider(this).get(SSDeviceViewModel.class);
+        mNetworkDeviceViewModel = new ViewModelProvider(this).get(NetworkDeviceViewModel.class);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.layout_remote_albums_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.layout_remote_albums_fragment, container, false);
     }
 
     @Override
@@ -91,14 +86,13 @@ public class RemoteAlbumsFragment extends Fragment {
 
         mHelpText = view.findViewById(R.id.remote_albums_help);
         mRecyclerView = view.findViewById(R.id.remote_albums_recycler_view);
-        initMessage(view.findViewById(R.id.message_placeholder));
 
         Bundle bundle = getArguments();
-        String deviceNickname;
 
-        if (bundle != null){
-            deviceNickname = bundle.getString(RemoteViewActivity.EXTRA_DEVICE_NICKNAME);
-            deviceId = bundle.getString(RemoteViewActivity.EXTRA_DEVICE_ID);
+        if (bundle != null) {
+            String deviceNickname = bundle.getString(RemoteViewActivity.EXTRA_DEVICE_NICKNAME);
+            mDeviceId = bundle.getString(RemoteViewActivity.EXTRA_DEVICE_ID);
+            mHelpText.setText(String.format(getString(R.string.text_remoteAlbumsHelp), deviceNickname));
         }
         else
         {
@@ -106,68 +100,60 @@ public class RemoteAlbumsFragment extends Fragment {
             return;
         }
 
-        mHelpText.setText(String.format(getString(R.string.text_remoteAlbumsHelp), deviceNickname));
-
+        initMessage(view.findViewById(R.id.message_placeholder));
         initDevice();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        disposables.clear();
+
+        mDisposables.clear();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        disposables.dispose();
+
+        mDisposables.dispose();
     }
 
+    /**
+     * Initializes a list of albums on remote device
+     */
     private void setupRecyclerView() {
+        OnRVClickListener clickListener = itemIndex -> {
+            Album album = mList.get(itemIndex);
 
-        Log.d(TAG, "setupRecyclerView()");
+            Gson gson = new Gson();
+            Intent intent = new Intent(RemoteViewActivity.ACTION_CHANGE_FRAGMENT);
+            intent.putExtra(RemoteViewActivity.EXTRA_TARGET_FRAGMENT, RemoteViewFragment.MediaGridView.toString());
+            intent.putExtra(RemoteViewActivity.EXTRA_ALBUM_NAME, album.getName());
+            intent.putExtra(RemoteViewActivity.EXTRA_ALBUM, gson.toJson(album));
 
-        OnRVClickListener clickListener = new OnRVClickListener() {
-            @Override
-            public void onClick(int itemIndex) {
-                Album album = mList.get(itemIndex);
-
-                Intent intent = new Intent(RemoteViewActivity.ACTION_CHANGE_FRAGMENT);
-                intent.putExtra(RemoteViewActivity.EXTRA_TARGET_FRAGMENT, RemoteViewFragment.MediaGridView.toString());
-                intent.putExtra(RemoteViewActivity.EXTRA_ALBUM_NAME, album.getName());
-                Gson gson = new Gson();
-                intent.putExtra(RemoteViewActivity.EXTRA_ALBUM, gson.toJson(album));
-                LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
-            }
+            LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent);
         };
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRVadapter = new RemoteAlbumsAdapter(clickListener, mNetworkDevice);
-
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mRVadapter);
     }
 
-
+    /**
+     * Loads general information about a remote device from a database
+     * TODO: replace by class-helper
+     */
     private void initDevice() {
-        Log.d(TAG, "initDevice()");
-        /*mProgressDialog.setMessage(R.string.progress_checkingOnline);
-
-        if (!mProgressDialog.isShowing()){
-            mProgressDialog.show();
-        }*/
-
         setUIState(UIState.LoadingAlbums);
+        Single<NetworkDevice> netDeviceObs = mNetworkDeviceViewModel.findDevice(null, mDeviceId, null);
 
-        Single<NetworkDevice> netDeviceObs = netDeviceVM.findDevice(null, deviceId, null);
-
-        disposables.add(netDeviceObs
+        mDisposables.add(netDeviceObs
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableSingleObserver<NetworkDevice>() {
                     @Override
                     public void onSuccess(NetworkDevice networkDevice) {
-                        Log.d(TAG, "initDevice(): success");
                         mNetworkDevice = networkDevice;
                         setupRecyclerView();
                         initSSDevice();
@@ -175,101 +161,81 @@ public class RemoteAlbumsFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, "initDevice(): error -> " + e);
                         setUIState(UIState.CannotLoadAlbums);
-                        new AlertDialog.Builder(getContext())
+
+                        new AlertDialog.Builder(requireContext())
                                 .setTitle(R.string.title_deviceOffline)
                                 .setMessage(R.string.text_deviceOffline)
                                 .setCancelable(false)
-                                .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        getActivity().onBackPressed();
-                                    }
-                                }).show();
+                                .setPositiveButton(R.string.btn_close, (dialog, which) -> requireActivity().onBackPressed())
+                                .show();
                     }
                 }));
 
-
     }
 
+    /**
+     * Loads network information about a remote device from a database
+     * TODO: replace by class-helper
+     */
     private void initSSDevice() {
+        Single<SSDevice> ssDeviceObs = mDeviceViewModel.findDevice(mDeviceId);
 
-        Log.d(TAG, "initSSDevice()");
-        /*mProgressDialog.setMessage(R.string.progress_loadingDevice);
-
-        if (!mProgressDialog.isShowing()){
-            mProgressDialog.show();
-        }*/
-
-        Single<SSDevice> ssDeviceObs = ssDeviceVM.findDevice(deviceId);
-
-        disposables.add(ssDeviceObs
+        mDisposables.add(ssDeviceObs
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableSingleObserver<SSDevice>() {
                     @Override
                     public void onSuccess(SSDevice ssDevice) {
-                        Log.d(TAG, "initSSDevice(): success");
                         mSSDevice = ssDevice;
                         requestAlbumsList();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, "initSSDevice(): error -> " + e);
                         setUIState(UIState.CannotLoadAlbums);
                         onInternalError("DEVICE_NOT_FOUND");
                     }
                 }));
     }
 
-    public void requestAlbumsList() {
-        //setUIState(UIState.LoadingMedia);
-
-        Log.d(TAG, "requestAlbumsList()");
-
+    /**
+     * Loads a list of albums on remote device
+     * @see CommunicationHelper#requestAlbumsList(Context, NetworkDevice) 
+     */
+    private void requestAlbumsList() {
         Call<List<Album>> request = CommunicationHelper.requestAlbumsList(getContext(), mNetworkDevice);
+
+        if (request == null) {
+            onInternalError("NULL_REQUEST");
+            return;
+        }
+
         request.enqueue(new Callback<List<Album>>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
-                //setUIState(UIState.MediaShown);
-
-                Log.d(TAG, "requestAlbumsList(): received response");
                 if (response.body() != null && response.body().size() > 0) {
                     mList = response.body();
                     mRVadapter.setAlbumsList(response.body());
                     setUIState(UIState.AlbumsShown);
-                    Log.d(TAG, "requestAlbumsList(): body has items. Message -> " + response.message());
                 }
                 else
-                {
-                    Log.d(TAG, "requestAlbumsList(): body null or do not have items. Message -> " + response.message());
                     setUIState(UIState.NoAlbumsFound);
-                }
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<List<Album>> call, Throwable t) {
-
-                Log.d(TAG, "requestAlbumsList(): failure ->  " + t);
                 setUIState(UIState.CannotLoadAlbums);
 
                 if (t instanceof SSLHandshakeException) {
-                    new AlertDialog.Builder(getContext())
+                    new AlertDialog.Builder(requireContext())
                             .setTitle(R.string.title_securityException)
                             .setCancelable(false)
                             .setMessage(String.format(getString(R.string.text_securityException), mSSDevice.getNickname()))
-                            .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    getActivity().onBackPressed();
-                                }
-                            }).show();
+                            .setPositiveButton(R.string.btn_close, (dialog, which) -> requireActivity().onBackPressed())
+                            .show();
                 }
                 else
                     onInternalError("ALBUMS_REQUEST_FAILURE");
@@ -277,27 +243,24 @@ public class RemoteAlbumsFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays an error code alert dialog.
+     * @param errorCode Error code
+     */
     private void onInternalError(String errorCode) {
-
-        Log.d(TAG, "onInternalError(): " + errorCode);
         setUIState(UIState.CannotLoadAlbums);
 
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.title_error)
                 .setCancelable(false)
                 .setMessage(String.format(getString(R.string.text_internalAppError), errorCode))
-                .setPositiveButton(R.string.btn_close, new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        getActivity().onBackPressed();
-                    }
-                }).show();
+                .setPositiveButton(R.string.btn_close, (dialog, which) -> requireActivity().onBackPressed())
+                .show();
     }
 
     /*
-     * UI State Machine
+     * Following section represents the UI state machine
+     * TODO: Wrap ViewMessage into widget
      */
 
     /* Message view */
@@ -322,8 +285,11 @@ public class RemoteAlbumsFragment extends Fragment {
         CannotLoadAlbums,
     }
 
-    private void setUIState(UIState state)
-    {
+    /**
+     * Sets the state of the UI
+     * @param state Required UI state
+     */
+    private void setUIState(UIState state) {
         if (currentUIState == state)
             return;
 
@@ -351,12 +317,20 @@ public class RemoteAlbumsFragment extends Fragment {
         currentUIState = state;
     }
 
+    /**
+     * Replaces one message with another (progressbar instead of icon)
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int textResource) {
         replaceMessage(0, textResource);
     }
 
+    /**
+     * Replaces one message with another
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void replaceMessage(int iconResource, int textResource) {
-
         int currState = mMessageHolder.getVisibility();
 
         if (currState == View.VISIBLE) {
@@ -378,6 +352,11 @@ public class RemoteAlbumsFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets the message
+     * @param iconResource Message icon resource
+     * @param textResource Message text resource
+     */
     private void setMessage(int iconResource, int textResource) {
         mMessageIcon.setImageResource(iconResource);
         mMessageText.setText(textResource);
@@ -398,8 +377,11 @@ public class RemoteAlbumsFragment extends Fragment {
         }
     }
 
+    /**
+     * Toggles message visibility
+     * @param isVisible Required message visibility
+     */
     private void toggleMessage(boolean isVisible) {
-
         int currentState = mMessageHolder.getVisibility();
 
         if (isVisible) {
