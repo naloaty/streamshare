@@ -260,6 +260,7 @@ public class RemoteMediaFragment extends Fragment {
                     mRVAdapter.setMediaList(response.body());
                     setUIState(UIState.MediaShown);
                 }
+                else
                     setUIState(UIState.NoMediaFound);
             }
 

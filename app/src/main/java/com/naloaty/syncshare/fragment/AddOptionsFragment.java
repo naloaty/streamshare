@@ -78,11 +78,11 @@ public class AddOptionsFragment extends Fragment {
      * @param targetFragment Required fragment
      */
     private void changeFragment(@NonNull OptionFragment targetFragment) {
-        Log.d(TAG, String.format("Requesting %s fragment", targetFragment));
+        Log.d(TAG, String.format("Requesting %s fragment", targetFragment.toString()));
 
 
         LocalBroadcastManager.getInstance(requireContext())
                 .sendBroadcast(new Intent(AddDeviceActivity.ACTION_CHANGE_FRAGMENT)
-                .putExtra(AddDeviceActivity.EXTRA_TARGET_FRAGMENT, targetFragment));
+                .putExtra(AddDeviceActivity.EXTRA_TARGET_FRAGMENT, targetFragment.toString()));
     }
 }
