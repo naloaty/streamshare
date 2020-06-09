@@ -158,6 +158,7 @@ public class RemoteViewActivity extends SSActivity {
     /**
      * Sets required fragment
      * @param targetFragment Required fragment
+     * @see RemoteViewActivity#setToolbar(RemoteViewFragment, String) 
      */
     private void setFragment(RemoteViewFragment targetFragment, String title) {
         Fragment candidate = null;

@@ -186,6 +186,8 @@ public class LocalAlbumsFragment extends Fragment {
     /**
      * NOTE: Deprecated. Should be replaced by Single (reactive component)
      * Asynchronous loader of albums on local device.
+     * @see AlbumViewModel#getAllAlbums()
+     * @see AlbumViewModel#getAllAlbumsList()
      */
     private static class LoadAlbumsAT extends AsyncTask<AlbumViewModel, Void, List<Album>> {
 

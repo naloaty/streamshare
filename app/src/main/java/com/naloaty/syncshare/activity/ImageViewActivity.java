@@ -109,6 +109,7 @@ public class ImageViewActivity extends MediaActivity {
 
     /**
      * Sets the index of the image to be displayed.
+     * @see ImageViewActivity#displayMediaInfo(int)
      */
     private void setCurrentItem(int position) {
         mViewPager.setCurrentItem(position, false);
@@ -139,6 +140,7 @@ public class ImageViewActivity extends MediaActivity {
     /**
      * TODO: add additional information about image such as date, name, etc
      * Displays the position of the image in the media list.
+     * @see MediaActivity#setTitle(String)
      */
     private void displayMediaInfo(int position) {
         setTitle(String.format(getString(R.string.text_imagePosition), position + 1, mList.size()));

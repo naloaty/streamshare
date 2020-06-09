@@ -137,6 +137,9 @@ public class MainFragment extends Fragment {
 
     /**
      * Initializes a list of online devices
+     * @see NetworkDeviceViewModel#getAllDevices() 
+     * @see SSDeviceViewModel#getAllDevices() 
+     * @see SSDeviceViewModel#findDeviceDep(String) 
      */
     private void setupRecyclerView() {
         OnRVClickListener clickListener = itemIndex -> {

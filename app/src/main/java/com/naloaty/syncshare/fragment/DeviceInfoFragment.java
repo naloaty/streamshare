@@ -76,6 +76,7 @@ public class DeviceInfoFragment extends Fragment{
     /**
      * Returns the optimal state of the UI.
      * @return Optimal UI state
+     * @see SecurityUtils
      */
     private UIState getRequiredState() {
         //Checks if SSL certificate is presented
@@ -88,6 +89,8 @@ public class DeviceInfoFragment extends Fragment{
     /**
      * Sets the state of the UI
      * @param state Required UI state
+     * @see DeviceInfoFragment#setDeviceInfo()
+     * @see DeviceInfoFragment#setQRCode()
      */
     private void setUIState(UIState state) {
         int helpTextResource;

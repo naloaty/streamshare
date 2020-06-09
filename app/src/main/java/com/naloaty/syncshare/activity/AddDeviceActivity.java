@@ -133,6 +133,7 @@ public class AddDeviceActivity extends SSActivity {
      * @see AddDeviceActivity#setFragment(OptionFragment)
      * @see AddDeviceActivity#openCodeScanner()
      * @see AddOptionsFragment#setServiceState(boolean)
+     * @see AddDeviceHelper
      */
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -275,7 +276,7 @@ public class AddDeviceActivity extends SSActivity {
     }
 
     /**
-     * Opens a QR code scanner activity
+     * Opens a QR code scanner activity (ZXing default)
      */
     private void openCodeScanner() {
         //TODO: it definitely should be replaced with customized scanner (with toolbar)
@@ -285,7 +286,6 @@ public class AddDeviceActivity extends SSActivity {
         integrator.setOrientationLocked(false);
         integrator.setBeepEnabled(false);
         integrator.initiateScan();
-
     }
 
     /**

@@ -59,6 +59,10 @@ public class NearbyDiscoveryFragment extends Fragment {
     private LinearLayout mRootLayout;
     private RecyclerView mRecyclerView;
 
+    /**
+     * This callback is called by AddDeviceHelper
+     * @see AddDeviceHelper
+     */
     private final AddDeviceHelper.AddDeviceCallback addDeviceCallback = new AddDeviceHelper.AddDeviceCallback() {
         @Override
         public void onSuccessfullyAdded() {
@@ -204,6 +208,7 @@ public class NearbyDiscoveryFragment extends Fragment {
     /**
      * Initializes a list of current devices on the network.
      * @see AddDeviceHelper
+     * @see NetworkDeviceViewModel#getAllDevices() 
      */
     private void setupRecyclerView() {
         final OnRVClickListener clickListener = itemIndex -> {

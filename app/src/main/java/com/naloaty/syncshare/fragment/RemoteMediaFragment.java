@@ -180,7 +180,8 @@ public class RemoteMediaFragment extends Fragment {
     }
 
     /**
-     * Loads general information about a remote device from a database
+     * Loads network information about a remote device from a database
+     * @see NetworkDeviceViewModel#findDevice(String, String, String) 
      * TODO: replace by class-helper
      */
     private void initDevice() {
@@ -212,9 +213,10 @@ public class RemoteMediaFragment extends Fragment {
 
 
     }
-
+    
     /**
-     * Loads network information about a remote device from a database
+     * Loads general information about a remote device from a database
+     * @see SSDeviceViewModel#findDevice(String) 
      * TODO: replace by class-helper
      */
     private void initSSDevice() {

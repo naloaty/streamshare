@@ -34,7 +34,12 @@ public class WelcomeActivity extends SSActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        //Do not initialize MainActivity until the Welcome Activity has been completed.
+        /**
+         * Do not initialize MainActivity until the Welcome Activity has been completed.
+         * @see SSActivity#setSkipPermissionRequest(boolean)
+         * @see SSActivity#setWelcomePageDisallowed(boolean)
+         * @see SSActivity#setSkipStuffGeneration(boolean)
+         */
         setSkipPermissionRequest(true);
         setWelcomePageDisallowed(true);
         setSkipStuffGeneration(true);
@@ -134,6 +139,7 @@ public class WelcomeActivity extends SSActivity {
 
     /**
      * Checks and displays the current status of required permissions
+     * @see PermissionHelper
      */
     private void checkPermissionsState()
     {
@@ -151,6 +157,7 @@ public class WelcomeActivity extends SSActivity {
 
     /**
      * Checks and displays the current status of battery optimization
+     * @see PermissionHelper
      */
     private void checkBatteryOptimizationState()
     {

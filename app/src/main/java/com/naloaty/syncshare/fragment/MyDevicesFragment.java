@@ -67,6 +67,7 @@ public class MyDevicesFragment extends Fragment {
 
     /**
      * Initializes a list of trusted devices
+     * @see SSDeviceViewModel#getAllDevices()
      */
     private void setupRecyclerView() {
         OnRVClickListener clickListener = itemIndex -> {
