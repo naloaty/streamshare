@@ -77,6 +77,10 @@ public class LocalAlbumsFragment extends Fragment {
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            if (getContext() == null)
+                return;
+            
             boolean securityStuffOk = SecurityUtils.checkSecurityStuff(requireContext().getFilesDir(), false);
             boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
 
