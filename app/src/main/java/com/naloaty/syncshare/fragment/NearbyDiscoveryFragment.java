@@ -43,8 +43,10 @@ import com.naloaty.syncshare.util.DeviceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
  * This fragment displays current devices on the network.
+ * @see com.naloaty.syncshare.activity.AddDeviceActivity
+ * @see AddOptionsFragment
  */
 public class NearbyDiscoveryFragment extends Fragment {
 
@@ -60,8 +62,8 @@ public class NearbyDiscoveryFragment extends Fragment {
     private RecyclerView mRecyclerView;
 
     /**
-     * This callback is called by AddDeviceHelper
-     * @see AddDeviceHelper
+     * This callback is called by {@link AddDeviceHelper}
+     * @see #setupRecyclerView()
      */
     private final AddDeviceHelper.AddDeviceCallback addDeviceCallback = new AddDeviceHelper.AddDeviceCallback() {
         @Override

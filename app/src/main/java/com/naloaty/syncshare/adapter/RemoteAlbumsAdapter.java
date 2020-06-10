@@ -1,7 +1,6 @@
 package com.naloaty.syncshare.adapter;
 
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,18 +11,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.syncshare.R;
-import com.naloaty.syncshare.activity.ImageViewActivity;
 import com.naloaty.syncshare.app.GlideApp;
 import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.database.device.NetworkDevice;
@@ -34,6 +29,10 @@ import java.util.List;
 
 import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
+/**
+ * Adapter class for RecyclerView that displays a list of albums on the remote device.
+ * @see com.naloaty.syncshare.fragment.RemoteAlbumsFragment
+ */
 public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapter.ViewHolder>{
 
     private static final String TAG = "LocalAlbumsAdapter";
@@ -47,10 +46,13 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
         mNetworkDevice = networkDevice;
     }
 
-    public void setAlbumsList(List<Album> albumsList) {
-
+    /**
+     * Updates the current list of albums
+     * @param albumsList New or updated albums list
+     */
+    public void setAlbumsList(@NonNull List<Album> albumsList) {
         /*
-         * TODO: when adding item to RV it flashes during message animation
+         * TODO: When adding item to RV it flashes during ViewMessage animation
          */
         if (albumsList.size() == 1 && mList.size() < 2){
             mList = albumsList;
@@ -111,7 +113,6 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         Album album = mList.get(position);
 
         holder.albumName.setText(album.getName());
@@ -125,30 +126,18 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
                 .error(R.drawable.ic_warning_24dp)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
 
+        String URL = CommunicationHelper.getThumbnailRequestURL(mNetworkDevice) + album.getLastItemFilename();
+        DrawableCrossFadeFactory factory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
+        Log.d(TAG, "Album icon url: " + URL);
+        Log.d(TAG, "Album lastItemFilename: " + album.getLastItemFilename());
 
-        try
-        {
-            Log.d(TAG, "Album lastItemFilename: " + album.getLastItemFilename());
-
-            String URL = CommunicationHelper.getThumbnailRequestURL(mNetworkDevice) + album.getLastItemFilename();
-
-            Log.d(TAG, "Album icon url: " + URL);
-
-            DrawableCrossFadeFactory factory =
-                    new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
-
-            GlideApp.with(holder.albumPreview.getContext())
-                    .asBitmap()
-                    .load(URL)
-                    .apply(options)
-                    .transition(withCrossFade(factory))
-                    .into(holder.albumPreview);
-
-        }
-        catch (Exception e) {
-            Log.d(TAG, "Cannot load album cover: " + e.getMessage());
-        }
+        GlideApp.with(holder.albumPreview.getContext())
+                .asBitmap()
+                .load(URL)
+                .apply(options)
+                .transition(withCrossFade(factory))
+                .into(holder.albumPreview);
     }
 
 
@@ -159,7 +148,7 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView albumPreview;
         TextView albumName;
@@ -169,7 +158,7 @@ public class RemoteAlbumsAdapter extends RecyclerView.Adapter<RemoteAlbumsAdapte
 
         OnRVClickListener clickListener;
 
-        public ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
+        ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
             super(itemView);
             albumPreview = itemView.findViewById(R.id.remote_album_image);
             albumName = itemView.findViewById(R.id.remote_album_name);

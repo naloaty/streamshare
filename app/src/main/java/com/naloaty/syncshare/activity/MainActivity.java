@@ -30,8 +30,8 @@ import com.naloaty.syncshare.util.AppUtils;
  * NOTE: LocalAlbumsActivity is not used on tablets. In this case, LocalAlbumsFragment is located on MainActivity.
  *
  * Related fragments:
- * {@link com.naloaty.syncshare.fragment.MainFragment}
- * {@link com.naloaty.syncshare.fragment.LocalAlbumsFragment}
+ * @see com.naloaty.syncshare.fragment.MainFragment
+ * @see com.naloaty.syncshare.fragment.LocalAlbumsFragment
  */
 public class MainActivity extends SSActivity implements NavigationView.OnNavigationItemSelectedListener {
 

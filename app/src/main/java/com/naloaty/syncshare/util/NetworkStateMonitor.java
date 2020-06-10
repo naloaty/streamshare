@@ -22,10 +22,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 
-/*
- * Based on https://stackoverflow.com/questions/36421930/connectivitymanager-connectivity-action-deprecated
- */
-
 public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
 
     private static final String TAG = "NetworkStateMonitor";
@@ -128,9 +124,6 @@ public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
         return null;
     }
 
-    /*
-     * Copied from https://stackoverflow.com/questions/16730711/get-my-wifi-ip-address-android
-     */
     private static String convertIpAddress(int ipAddress) {
 
         // Convert little-endian to big-endian if needed
@@ -151,9 +144,6 @@ public class NetworkStateMonitor extends ConnectivityManager.NetworkCallback {
         return ipAddressString;
     }
 
-    /*
-     * Based on https://stackoverflow.com/questions/59704596/how-to-use-connectivity-manager-networkcallback-to-get-network-type
-     */
     public int getCurrentNetworkType() {
         return getCurrentNetworkType(mContext);
     }

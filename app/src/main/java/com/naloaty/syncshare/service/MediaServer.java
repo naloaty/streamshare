@@ -314,9 +314,6 @@ public class MediaServer extends SimpleWebServer {
         }
     }
 
-    /*
-     * https://stackoverflow.com/questions/34943119/video-streaming-using-nanohttpd-error-java-net-socketexception-sendto-failed/
-     */
     private Response serveFile(Map<String, String> header, File file, String mime) {
         Response res;
         try {

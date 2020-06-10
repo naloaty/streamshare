@@ -5,8 +5,6 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
@@ -19,20 +17,20 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.util.AppUtils;
 
-public class MediaActivity extends SSActivity {
+/**
+ * This class helps manage the visibility of the System UI (such as status bar and navigation bar)
+ * @see com.naloaty.syncshare.activity.ImageViewActivity
+ */
+public abstract class MediaActivity extends SSActivity {
 
     private static final String TAG = "MediaActivity";
 
-    /*
-     * System UI state machine
-     * Borrowed from LeafPic
-     * https://github.com/HoraApps/LeafPic
-     */
+    private boolean fullScreenMode = false;
 
+    /* UI elements */
     private RelativeLayout mRootLayout;
     private Toolbar mToolbar;
     private AppBarLayout mAppbarLayout;
-    private boolean fullScreenMode = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,10 +40,9 @@ public class MediaActivity extends SSActivity {
         mAppbarLayout = findViewById(R.id.appbar_layout);
 
         mAppbarLayout.setOutlineProvider(null);
+        mToolbar.setTitle("");
 
         setupSystemUI();
-
-        mToolbar.setTitle("");
 
         //Important to call this BEFORE setNavigationOnClickListener()
         setSupportActionBar(mToolbar);
@@ -53,24 +50,34 @@ public class MediaActivity extends SSActivity {
         //To make "close" animation (this instead of using "parent activity")
         mToolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        else
+            Log.w(TAG, "Toolbar is not properly initialized");
     }
 
+    /**
+     * Sets toolbar title
+     * @param title Required toolbar title
+     */
     protected void setTitle(String title) {
         mToolbar.setTitle(title);
     }
 
-    public void toggleSystemUI() {
+    /**
+     * Toggles the System UI visibility
+     */
+    protected void toggleSystemUI() {
         if (fullScreenMode)
             showSystemUI();
         else
             hideSystemUI();
     }
 
-    /*
-     * Runnable required because user
-     * can close activity before animation end
+    /**
+     * Hides toolbar, status bar and navigation bar
      */
     private void hideSystemUI() {
         runOnUiThread(new Runnable() {
@@ -81,12 +88,7 @@ public class MediaActivity extends SSActivity {
                         .setDuration(200)
                         .start();
 
-                getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        Log.d(TAG, "ui changed: " + visibility);
-                    }
-                });
+                getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> Log.d(TAG, "ui changed: " + visibility));
 
                 getWindow().getDecorView().setSystemUiVisibility(
                                   View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -98,15 +100,13 @@ public class MediaActivity extends SSActivity {
                                 | View.SYSTEM_UI_FLAG_IMMERSIVE);
 
                 fullScreenMode = true;
-                //changeBackGroundColor();
             }
         });
     }
 
 
-    /*
-     * Runnable required because user
-     * can close activity before animation end
+    /**
+     * Shows toolbar, status bar and navigation bar
      */
     private void showSystemUI() {
         runOnUiThread(new Runnable() {
@@ -117,41 +117,35 @@ public class MediaActivity extends SSActivity {
                         .setDuration(240)
                         .start();
 
-                //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
                 getWindow().getDecorView().setSystemUiVisibility(
                                   View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
                 fullScreenMode = false;
-                //changeBackGroundColor();
             }
         });
     }
 
+    /**
+     * Sets the System UI to default state (all visible)
+     */
     private void setupSystemUI() {
         mAppbarLayout.animate()
                 .translationY(AppUtils.getStatusBarHeight(getResources()))
                 .setInterpolator(new DecelerateInterpolator())
                 .setDuration(240).start();
 
-       // getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         getWindow().getDecorView().setSystemUiVisibility(
                           View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-
-        /*getWindow().getDecorView().setOnSystemUiVisibilityChangeListener
-                (visibility -> {
-                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) showSystemUI();
-                    else hideSystemUI();
-                });*/
-
     }
 
 
+    /**
+     * Smoothly changes the background of activity from white to black and vice versa
+     */
     private void changeBackGroundColor() {
         int colorTo;
         int colorFrom;
@@ -169,12 +163,7 @@ public class MediaActivity extends SSActivity {
         ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
         colorAnimation.setDuration(240);
 
-        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animator) {
-                mRootLayout.setBackgroundColor((Integer) animator.getAnimatedValue());
-            }
-        });
+        colorAnimation.addUpdateListener(animator -> mRootLayout.setBackgroundColor((Integer) animator.getAnimatedValue()));
 
         colorAnimation.start();
     }

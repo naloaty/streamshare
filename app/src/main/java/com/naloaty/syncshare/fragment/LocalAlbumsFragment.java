@@ -39,8 +39,10 @@ import com.naloaty.syncshare.util.PermissionHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
  * This fragment displays a list of albums on the local device and allows user to manage them.
+ * @see com.naloaty.syncshare.activity.LocalDeviceActivity
+ * @see com.naloaty.syncshare.activity.MainActivity
  */
 public class LocalAlbumsFragment extends Fragment {
 
@@ -207,8 +209,8 @@ public class LocalAlbumsFragment extends Fragment {
 
         @Override
         protected List<Album> doInBackground(AlbumViewModel... viewModels) {
-            try 
-            {
+            /* Catches an exception that may be caused by albums retrieving error */
+            try {
                 if (viewModels[0] == null)
                     cancel(true);
 

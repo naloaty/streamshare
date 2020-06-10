@@ -37,9 +37,7 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 
 /**
  * This activity loads and displays the selected media file in full-resolution.
- *
- * Related fragments:
- * {@link com.naloaty.syncshare.fragment.RemoteMediaFragment}
+ * @see com.naloaty.syncshare.fragment.RemoteMediaFragment
  */
 public class ImageViewActivity extends MediaActivity {
 
@@ -199,21 +197,14 @@ public class ImageViewActivity extends MediaActivity {
                     .error(R.drawable.ic_warning_24dp)
                     .diskCacheStrategy(DiskCacheStrategy.NONE);
 
-            try
-            {
-                String URL = CommunicationHelper.getFullsizeImageRequestURL(mNetworkDevice) + media.getFilename();
-                DrawableCrossFadeFactory factory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+            String URL = CommunicationHelper.getFullsizeImageRequestURL(mNetworkDevice) + media.getFilename();
+            DrawableCrossFadeFactory factory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
-                GlideApp.with(ImageViewActivity.this)
-                        .load(URL)
-                        .apply(options)
-                        .transition(withCrossFade(factory))
-                        .into(image);
-
-            }
-            catch (Exception e) {
-                Log.d(TAG, "Cannot load image: " + e.getMessage());
-            }
+            GlideApp.with(ImageViewActivity.this)
+                    .load(URL)
+                    .apply(options)
+                    .transition(withCrossFade(factory))
+                    .into(image);
 
             container.addView(view);
             return view;

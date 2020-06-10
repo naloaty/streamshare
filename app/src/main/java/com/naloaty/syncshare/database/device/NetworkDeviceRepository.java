@@ -18,12 +18,20 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 
+/**
+ * This class represents extra abstract layer above {@link NetworkDeviceDao} of {@link NetworkDevice} in a StreamShare database.
+ * It allows you to retrieve information from the database.
+ * @see NetworkDevice
+ * @see NetworkDeviceDao
+ */
 public class NetworkDeviceRepository {
+
     private static final String TAG = "NetworkDeviceRepo";
 
     /*
-     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by rx)
+     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by ReactiveX objects)
      */
+
     private NetworkDeviceDao networkDeviceDao;
     private LiveData<List<NetworkDevice>> allDevices;
 
@@ -41,6 +49,10 @@ public class NetworkDeviceRepository {
         disposables.clear();
     }
 
+    /**
+     * Inserts network information about device into the database.
+     * @param networkDevice Network information about device. Instance of {@link NetworkDevice}.
+     */
     public void insert(NetworkDevice networkDevice) {
         Completable completable = networkDeviceDao.insert(networkDevice);
         disposables.add(completable
@@ -66,9 +78,12 @@ public class NetworkDeviceRepository {
                     }
                 }));
 
-        //disposable.dispose();
     }
 
+    /**
+     * Updates network information about device in the database.
+     * @param networkDevice Network information about device. Instance of {@link NetworkDevice}
+     */
     public void update(NetworkDevice networkDevice) {
         Completable completable = networkDeviceDao.update(networkDevice);
         disposables.add(completable
@@ -93,9 +108,12 @@ public class NetworkDeviceRepository {
                     }
                 }));
 
-        //disposable.dispose();
     }
 
+    /**
+     * Deletes network information about device from the database.
+     * @param networkDevice Network information about device. Instance of {@link NetworkDevice}
+     */
     public void delete(NetworkDevice networkDevice) {
         Completable completable = networkDeviceDao.delete(networkDevice);
         disposables.add(completable
@@ -121,20 +139,32 @@ public class NetworkDeviceRepository {
                     }
                 }));
 
-        //disposable.dispose();
     }
 
+    /**
+     * Returns all discovered network devices from database.
+     * @return A list containing all discovered network devices and wrapped into LiveData object.
+     */
     public LiveData<List<NetworkDevice>> getAllDevices() {
         return allDevices;
     }
 
-    public void deleteAllConnections() {
+    /**
+     * Deletes all records from database.
+     */
+    public void deleteAllDevices() {
         new DeleteAllDevicesAT(networkDeviceDao).execute();
     }
 
+    /**
+     * Searches for the required network device in the database. You can specify only one of three parameters.
+     * @param ipAddress Device ip address.
+     * @param deviceId Device StreamShare identifier.
+     * @param serviceName Device service name. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @return Returns network information about the device, if found, as instance of {@link NetworkDevice}
+     */
     public NetworkDevice findDeviceDep(String ipAddress, String deviceId, String serviceName) {
-        try
-        {
+        try {
             return new FindDeviceAT(networkDeviceDao).execute(ipAddress, deviceId, serviceName).get();
         }
         catch (Exception e) {
@@ -143,22 +173,36 @@ public class NetworkDeviceRepository {
         }
     }
 
+    /**
+     * Searches for the required network device in the database. You can specify only one of three parameters.
+     * @param ipAddress Device ip address.
+     * @param deviceId Device StreamShare identifier.
+     * @param serviceName Device service name. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @return Returns network information about the device, if found, as ReactiveX single object.
+     */
     public Single<NetworkDevice> findDevice(String ipAddress, String deviceId, String serviceName) {
         return networkDeviceDao.findDevice(ipAddress, deviceId, serviceName);
     }
 
+    /**
+     * Returns the number of records in the database.
+     * @return Number of records.
+     */
     public int getDeviceCount() {
-        try
-        {
+        try {
             return new GetDeviceCountAT(networkDeviceDao).execute().get();
         }
         catch (Exception e) {
             Log.d(TAG, "getDeviceCount() exception: " + e.getMessage());
-            return new Integer(0);
+            return 0;
         }
 
     }
 
+    /**
+     * Returns all discovered network devices from database.
+     * @return A list containing all discovered network devices.
+     */
     public List<NetworkDevice> getAllDevicesList() {
         try
         {

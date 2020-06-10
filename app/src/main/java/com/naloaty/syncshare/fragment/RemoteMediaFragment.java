@@ -54,6 +54,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
+/**
+ * This fragment displays a grid-list of media-files on the remote device.
+ * @see RemoteViewActivity
+ */
 public class RemoteMediaFragment extends Fragment {
 
     private static final String TAG = "RemoteMediaFragment";

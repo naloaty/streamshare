@@ -10,12 +10,18 @@ import com.naloaty.syncshare.database.SSDatabase;
 
 import java.util.List;
 
+/**
+ * This class represents extra abstract layer above {@link AlbumDao} of {@link Album} in a StreamShare database.
+ * It allows you to retrieve information from the database.
+ * @see Album
+ * @see AlbumDao
+ */
 public class AlbumRepository {
 
     private static final String TAG = "AlbumRepo";
 
     /*
-     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by rx)
+     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by ReactiveX object)
      */
 
     private AlbumDao albumDao;
@@ -29,14 +35,26 @@ public class AlbumRepository {
         allAlbums = albumDao.getAllAlbumsDep();
     }
 
+    /**
+     * Inserts information about album into the database.
+     * @param album Information about album. Instance of {@link Album}.
+     */
     public void insert(Album album) {
         new InsertAlbumAT(albumDao).execute(album);
     }
 
+    /**
+     * Updates information about album in the database.
+     * @param album Information about album. Instance of {@link Album}.
+     */
     public void update(Album album) {
         new UpdateAlbumAT(albumDao).execute(album);
     }
 
+    /**
+     * Decides whether to insert or update information about album.
+     * @param album Information about album. Instance of {@link Album}.
+     */
     public void publish(Album album) {
         Album foundedAlbum = findAlbum(album.getName(), album.getPath());
 
@@ -48,18 +66,28 @@ public class AlbumRepository {
             insert(album);
     }
 
-
+    /**
+     * Deletes information about album from the database.
+     * @param album Information about album. Instance of {@link Album}
+     */
     public void delete(Album album) {
         new DeleteAlbumAT(albumDao).execute(album);
     }
 
+    /**
+     * Returns all shared albums from database.
+     * @return A list containing all shared albums and wrapped into LiveData object.
+     */
     public LiveData<List<Album>> getAllAlbums () {
         return allAlbums;
     }
 
+    /**
+     * Returns the number of records in the database.
+     * @return Number of records.
+     */
     public int getAlbumCount() {
-        try
-        {
+        try {
             return new GetAlbumCountAT(albumDao).execute().get();
         }
         catch (Exception e) {
@@ -69,6 +97,13 @@ public class AlbumRepository {
 
     }
 
+    /**
+     * TODO: BUG! See in bug tracker.
+     * Searches for the required shared album in the database. You can specify only one of two parameters.
+     * @param name Album name.
+     * @param path Absolute path of album directory.
+     * @return Returns information about shared album, if found, as instance of {@link Album}.
+     */
     public Album findAlbum(String name, String path) {
         try{
             return new FindAlbumAT(albumDao).execute(name, path).get();
@@ -79,6 +114,10 @@ public class AlbumRepository {
         }
     }
 
+    /**
+     * Returns all shared albums from database.
+     * @return A list containing all shared albums.
+     */
     @Deprecated
     public List<Album> getAllAlbumListDep() {
         try{
@@ -90,8 +129,10 @@ public class AlbumRepository {
         }
     }
 
-    /*
-     * Used only outside of UI Thread
+    /**
+     * Returns all shared albums from database.
+     * NOTE: Should be used only outside of UI thread.
+     * @return A list containing all shared albums.
      */
     public List<Album> getAllAlbumsList() {
         return albumDao.getAllAlbumsList();

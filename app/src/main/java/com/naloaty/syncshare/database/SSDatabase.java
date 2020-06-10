@@ -1,6 +1,5 @@
 package com.naloaty.syncshare.database;
 
-
 import android.content.Context;
 
 import androidx.room.Database;
@@ -14,10 +13,14 @@ import com.naloaty.syncshare.database.device.SSDeviceDao;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.database.media.AlbumDao;
 
+/**
+ * This class represents StreamShare database.
+ * To understand how it works, you need to get acquainted with the Room library.
+ */
 @Database(entities = {NetworkDevice.class, SSDevice.class, Album.class}, version = 1)
 public abstract class SSDatabase extends RoomDatabase {
 
-    public static final String DATABASE_NAME = "syncshare_db";
+    private static final String DATABASE_NAME = "StreamShare_DB";
 
     private static SSDatabase instance;
 
@@ -32,10 +35,19 @@ public abstract class SSDatabase extends RoomDatabase {
         return instance;
     }
 
+    /**
+     * Network devices table. Contains network information about current devices on the network.
+     */
     public abstract NetworkDeviceDao NetworkDeviceDao();
 
+    /**
+     * Trusted devices table. Contains general information about devices marked by the user as trusted.
+     */
     public abstract SSDeviceDao ssDeviceDao();
 
+    /**
+     * Shared albums table. Contains albums marked by the user as shared.
+     */
     public abstract AlbumDao albumDao();
 
 }

@@ -18,8 +18,9 @@ import com.naloaty.syncshare.activity.AddDeviceActivity;
 import com.naloaty.syncshare.service.CommunicationService;
 import com.naloaty.syncshare.util.AppUtils;
 
-/*
+/**
  * This fragment displays a list of device adding options.
+ * @see AddDeviceActivity
  */
 public class AddOptionsFragment extends Fragment {
 

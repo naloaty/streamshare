@@ -30,8 +30,9 @@ import com.naloaty.syncshare.util.DeviceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
  * This fragment displays a list of trusted devices.
+ * @see com.naloaty.syncshare.activity.DeviceManageActivity
  */
 public class MyDevicesFragment extends Fragment {
 

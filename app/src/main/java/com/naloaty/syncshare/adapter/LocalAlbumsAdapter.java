@@ -28,27 +28,28 @@ import java.util.List;
 
 import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
-
+/**
+ * Adapter class for RecyclerView that displays a list of albums on the local device
+ * @see com.naloaty.syncshare.fragment.LocalAlbumsFragment
+ */
 public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.ViewHolder>{
 
     private static final String TAG = "LocalAlbumsAdapter";
 
-    List<Album> mList = new ArrayList<>();
+    private List<Album> mList = new ArrayList<>();
     private OnRVClickListener mClickListener;
 
     public LocalAlbumsAdapter(OnRVClickListener clickListener){
         mClickListener = clickListener;
     }
 
-    public void addAlbum(Album album) {
-        mList.add(album);
-        notifyItemInserted(mList.size() - 1);
-    }
-
-    public void setAlbumsList(List<Album> albumsList) {
-
+    /**
+     * Updates the current list of albums
+     * @param albumsList New or updated albums list
+     */
+    public void setAlbumsList(@NonNull List<Album> albumsList) {
         /*
-         * TODO: when adding item to RV it flashes during message animation
+         * TODO: When adding item to RV it flashes during ViewMessage animation
          */
         if (albumsList.size() == 1 && mList.size() < 2){
             mList = albumsList;
@@ -124,14 +125,12 @@ public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.
                 .error(R.drawable.ic_warning_24dp)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
 
-        try
-        {
-            Log.d(TAG, "Album lastItemFilename: " + album.getLastItemFilename());
-
-            DrawableCrossFadeFactory factory =
-                    new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+        /* Catches exceptions that may be caused by missing album cover */
+        try {
+            DrawableCrossFadeFactory factory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
             MediaObject cover = MediaProvider.getMediaObjectById(holder.albumPreview.getContext(), album.getLastItemFilename());
+            Log.d(TAG, "Album lastItemFilename: " + album.getLastItemFilename());
 
             Glide.with(holder.albumPreview.getContext())
                     .asBitmap()
@@ -151,7 +150,7 @@ public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView albumPreview;
         TextView albumName;
@@ -161,14 +160,13 @@ public class LocalAlbumsAdapter extends RecyclerView.Adapter<LocalAlbumsAdapter.
         OnRVClickListener clickListener;
         Album album;
 
-        public ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
+        ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
             super(itemView);
             albumPreview = itemView.findViewById(R.id.local_album_image);
             albumName = itemView.findViewById(R.id.local_album_name);
             itemsCount = itemView.findViewById(R.id.local_album_count);
             accessAllowed = itemView.findViewById(R.id.local_album_switch);
 
-            this.album = album;
             this.clickListener = clickListener;
             accessAllowed.setOnClickListener(this);
         }

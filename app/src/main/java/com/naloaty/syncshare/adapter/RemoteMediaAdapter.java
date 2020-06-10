@@ -1,6 +1,5 @@
 package com.naloaty.syncshare.adapter;
 
-import android.content.Context;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,12 +10,9 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -32,11 +28,13 @@ import java.util.List;
 
 import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
+/**
+ * Adapter class for RecyclerView that displays a grid-list of media-files on the remote device.
+ * @see com.naloaty.syncshare.fragment.RemoteMediaFragment
+ */
 public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.ViewHolder> {
 
     private static final String TAG = "RemoteMediaAdapter";
-
-    private int mCounter = 0;
 
     private List<Media> mList = new ArrayList<>();
     private OnRVClickListener mClickListener;
@@ -45,13 +43,15 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
     public RemoteMediaAdapter(OnRVClickListener clickListener, NetworkDevice networkDevice) {
         mClickListener = clickListener;
         mNetworkDevice = networkDevice;
-
     }
 
-    public void setMediaList(List<Media> mediaList) {
-
+    /**
+     * Updates the current list of media-files
+     * @param mediaList New or updated media-files list
+     */
+    public void setMediaList(@NonNull List<Media> mediaList) {
         /*
-         * TODO: when adding item to RV it flashes during message animation
+         * TODO: When adding item to RV it flashes during ViewMessage animation
          */
         if (mediaList.size() == 1 && mList.size() < 2){
             mList = mediaList;
@@ -124,30 +124,17 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
         else
             holder.videoText.setVisibility(View.INVISIBLE);
 
-        try
-        {
-            String URL = CommunicationHelper.getThumbnailRequestURL(mNetworkDevice) + media.getFilename();
+        String URL = CommunicationHelper.getThumbnailRequestURL(mNetworkDevice) + media.getFilename();
+        DrawableCrossFadeFactory factory = new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
-            Log.d(TAG, "Media url: " + URL);
+        Log.d(TAG, "Media url: " + URL);
 
-            DrawableCrossFadeFactory factory =
-                    new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
-
-
-            mCounter++;
-            Log.d(TAG, "Loaded item num " + mCounter);
-
-            GlideApp.with(holder.thumbnail.getContext())
-                    .asBitmap()
-                    .load(URL)
-                    .apply(options)
-                    .transition(withCrossFade(factory))
-                    .into(holder.thumbnail);
-
-        }
-        catch (Exception e) {
-            Log.d(TAG, "Cannot load thumbnail: " + e.getMessage());
-        }
+        GlideApp.with(holder.thumbnail.getContext())
+                .asBitmap()
+                .load(URL)
+                .apply(options)
+                .transition(withCrossFade(factory))
+                .into(holder.thumbnail);
     }
 
     @Override
@@ -155,13 +142,13 @@ public class RemoteMediaAdapter extends RecyclerView.Adapter<RemoteMediaAdapter.
         return mList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView thumbnail;
         CardView videoText;
         OnRVClickListener clickListener;
 
-        public ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
+        ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
             super(itemView);
 
             this.videoText = itemView.findViewById(R.id.text_video);

@@ -82,9 +82,7 @@ public class SecurityUtils {
         }
     }
 
-    /*
-     * Based on https://stackoverflow.com/questions/9711173/convert-ssl-pem-to-p12-with-or-without-openssl
-     */
+
     public static KeyStore getPKCS12KeyStore(File pemDirectory, String tempPassword)
             throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException
     {

@@ -14,14 +14,16 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
+/**
+ * This class is used to send and receive all things related to media-files.
+ * @see CommunicationHelper
+ */
 public interface MediaRequest {
-
     /*
-     * device/information
+     * media/albums
      */
     @GET(MediaServerKeyword.REQUEST_TARGET_MEDIA + "/" + MediaServerKeyword.REQUEST_ALBUMS)
     Call<List<Album>> getAlbumsList();
-
 
     /*
      * media/medialist?albumId=***

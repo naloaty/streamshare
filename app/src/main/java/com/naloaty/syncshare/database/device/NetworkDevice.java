@@ -5,16 +5,50 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 
+/**
+ * This class represents a table of network devices in a StreamShare database.
+ * It contains network information about current devices on the network.
+ * To understand how it works, you need to get acquainted with the Room library.
+ * @see com.naloaty.syncshare.util.DNSSDHelper
+ */
 @Entity(tableName = "network_devices_table")
 public class NetworkDevice implements Serializable {
 
+    /**
+     * Database row id
+     */
     @PrimaryKey(autoGenerate = true)
     private int id;
+
+    /**
+     * Current ip address of the discovered device.
+     */
     private String ipAddress;
+
+    /**
+     * StreamShare ID of the discovered device.
+     */
     private String deviceId;
+
+    /**
+     * Name of the discovered device.
+     */
     private String deviceName;
+
+    /**
+     * The time when the discovered device was last online.
+     */
     private Long lastCheckedDate;
+
+    /**
+     * Service name of the discovered device.
+     */
     private String serviceName;
+
+    /**
+     * StreamShare version on the discovered device.
+     * @see com.naloaty.syncshare.config.AppConfig
+     */
     private String appVersion;
 
 

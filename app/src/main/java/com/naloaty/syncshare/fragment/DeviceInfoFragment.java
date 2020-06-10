@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.naloaty.syncshare.R;
@@ -23,11 +24,13 @@ import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.security.SecurityUtils;
 import com.naloaty.syncshare.util.AppUtils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-/*
+/**
  * This fragment displays general information about the current device, including device ID and name.
  * All this information is encoded into a QR code.
+ * @see com.naloaty.syncshare.activity.AddDeviceActivity
  */
 public class DeviceInfoFragment extends Fragment{
 
@@ -147,6 +150,7 @@ public class DeviceInfoFragment extends Fragment{
      * @see #setQRCode(JSONObject)
      */
     private void setQRCode() {
+        /* Catches exceptions that may be caused by incorrect qr code content */
         try
         {
             JSONObject json = new JSONObject();
@@ -156,7 +160,7 @@ public class DeviceInfoFragment extends Fragment{
 
             setQRCode(json);
         }
-        catch (Exception e) {
+        catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -171,6 +175,7 @@ public class DeviceInfoFragment extends Fragment{
             return;
         }
 
+        /* Catches an exception that may be caused by a qr code write error */
         try {
             MultiFormatWriter formatWriter = new MultiFormatWriter();
 
@@ -182,7 +187,7 @@ public class DeviceInfoFragment extends Fragment{
                     .load(bitmap)
                     .into(mQRCode);
         }
-        catch (Exception e) {
+        catch (WriterException e) {
             e.printStackTrace();
         }
     }

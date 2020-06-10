@@ -22,11 +22,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-/*
- * Based on library example app
- * https://github.com/andriydruk/RxDNSSD/
- */
-
 public class DNSSDHelper {
 
     private static final String TAG = "DNSSDHelper";

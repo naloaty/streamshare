@@ -111,7 +111,7 @@ public class CommunicationService extends SSService {
         mNotification.cancelNotification();
 
         NetworkDeviceRepository repository = new NetworkDeviceRepository(this);
-        repository.deleteAllConnections();
+        repository.deleteAllDevices();
 
         Intent intent = new Intent(SERVICE_STATE_CHANGED);
         intent.putExtra(EXTRA_SERVICE_SATE, false);

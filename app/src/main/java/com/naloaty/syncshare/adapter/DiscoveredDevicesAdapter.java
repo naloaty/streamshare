@@ -20,19 +20,26 @@ import com.naloaty.syncshare.database.device.NetworkDevice;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter class for RecyclerView that displays current devices on the network.
+ * @see com.naloaty.syncshare.fragment.NearbyDiscoveryFragment
+ */
 public class DiscoveredDevicesAdapter extends RecyclerView.Adapter<DiscoveredDevicesAdapter.ViewHolder>{
 
-    List<NetworkDevice> mList = new ArrayList<>();
+    private List<NetworkDevice> mList = new ArrayList<>();
     private OnRVClickListener mClickListener;
 
     public DiscoveredDevicesAdapter(OnRVClickListener clickListener){
         mClickListener = clickListener;
     }
 
-    public void setDevicesList(List<NetworkDevice> devicesList) {
-
+    /**
+     * Updates the current list of devices
+     * @param devicesList New or updated device list
+     */
+    public void setDevicesList(@NonNull List<NetworkDevice> devicesList) {
         /*
-         * TODO: when adding item to RV it flashes during message animation
+         * TODO: When adding item to RV it flashes during ViewMessage animation
          */
         if (devicesList.size() == 1 && mList.size() < 2){
             mList = devicesList;
@@ -125,7 +132,7 @@ public class DiscoveredDevicesAdapter extends RecyclerView.Adapter<DiscoveredDev
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView deviceIcon;
         TextView deviceName;
@@ -134,7 +141,7 @@ public class DiscoveredDevicesAdapter extends RecyclerView.Adapter<DiscoveredDev
 
         OnRVClickListener clickListener;
 
-        public ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
+        ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
             super(itemView);
 
             deviceIcon = itemView.findViewById(R.id.discovered_device_icon);

@@ -42,6 +42,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Date;
 
+//TODO: add documentation
 public class KeyTool {
 
     private static final String TAG = "KeyTool";
@@ -83,9 +84,6 @@ public class KeyTool {
 
     /**
      * Generator of self-signed X509 v3 certificate
-     * Based on: https://www.programcreek.com/java-api-examples/?api=org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
-     * BC doc: https://www.bouncycastle.org/docs/pkixdocs1.5on/index.html
-     * Inspired by https://docs.syncthing.net/dev/device-ids.html
      */
     private static X509Certificate generateCertificate(final String provider, final CertificateConfig config) {
 
@@ -105,8 +103,6 @@ public class KeyTool {
             SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(config.getKeyPair().getPublic().getEncoded());
 
             X509v3CertificateBuilder builder = new X509v3CertificateBuilder(issuer, serialNumber, notBefore, notAfter, subject, publicKeyInfo);
-
-            //https://stackoverflow.com/questions/16412315/creating-custom-x509-v3-extensions-in-java-with-bouncy-castle
 
             //Key usage extension
             X509KeyUsage keyUsage = new X509KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);

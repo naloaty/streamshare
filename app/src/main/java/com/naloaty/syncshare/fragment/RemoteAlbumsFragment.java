@@ -47,8 +47,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
-/*
+/**
  * This fragment displays a list of albums on the remote device.
+ * @see RemoteViewActivity
  */
 public class RemoteAlbumsFragment extends Fragment {
 

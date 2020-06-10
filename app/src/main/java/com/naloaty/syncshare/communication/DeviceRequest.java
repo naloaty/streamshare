@@ -8,8 +8,11 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
+/**
+ * This class is used to send and receive device information.
+ * @see CommunicationHelper
+ */
 public interface DeviceRequest {
-
     /*
      * device/information
      */

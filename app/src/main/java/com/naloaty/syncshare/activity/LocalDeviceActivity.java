@@ -22,7 +22,7 @@ import com.naloaty.syncshare.R;
  * NOTE: This activity is not used on tablets. In this case, LocalAlbumsFragment is located on MainActivity.
  *
  * Related fragment:
- * {@link com.naloaty.syncshare.fragment.LocalAlbumsFragment}
+ * @see com.naloaty.syncshare.fragment.LocalAlbumsFragment
  */
 public class LocalDeviceActivity extends SSActivity {
 

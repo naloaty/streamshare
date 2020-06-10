@@ -21,6 +21,7 @@ import com.naloaty.syncshare.widget.DynamicViewPagerAdapter;
 
 /**
  * This activity welcomes the user the first time the application is launched.
+ * @see SSActivity
  */
 public class WelcomeActivity extends SSActivity {
 
@@ -30,7 +31,7 @@ public class WelcomeActivity extends SSActivity {
     private ViewGroup mBatteryOptimizationView;
 
     /**
-     * Do not initialize MainActivity until the Welcome Activity has been completed.
+     * Do not initialize other activities until the Welcome Activity has been completed.
      * @see SSActivity#setSkipPermissionRequest(boolean)
      * @see SSActivity#setWelcomePageDisallowed(boolean)
      * @see SSActivity#setSkipStuffGeneration(boolean)

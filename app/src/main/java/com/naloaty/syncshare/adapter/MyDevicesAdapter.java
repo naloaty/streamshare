@@ -24,19 +24,26 @@ import com.naloaty.syncshare.database.device.SSDevice;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter class for RecyclerView that displays a list of trusted devices.
+ * @see com.naloaty.syncshare.fragment.MyDevicesFragment
+ */
 public class MyDevicesAdapter extends RecyclerView.Adapter<MyDevicesAdapter.ViewHolder>{
 
-    List<SSDevice> mList = new ArrayList<>();
+    private List<SSDevice> mList = new ArrayList<>();
     private OnRVClickListener mClickListener;
 
     public MyDevicesAdapter(OnRVClickListener clickListener){
         mClickListener = clickListener;
     }
 
-    public void setDevicesList(List<SSDevice> devicesList) {
-
+    /**
+     * Updates the current list of devices
+     * @param devicesList New or updated device list
+     */
+    public void setDevicesList(@NonNull List<SSDevice> devicesList) {
         /*
-         * TODO: when adding item to RV it flashes during message animation
+         * TODO: When adding item to RV it flashes during ViewMessage animation
          */
         if (devicesList.size() == 1 && mList.size() < 2){
             mList = devicesList;
@@ -148,7 +155,7 @@ public class MyDevicesAdapter extends RecyclerView.Adapter<MyDevicesAdapter.View
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView deviceIcon;
         TextView deviceName;
@@ -158,7 +165,7 @@ public class MyDevicesAdapter extends RecyclerView.Adapter<MyDevicesAdapter.View
 
         OnRVClickListener clickListener;
 
-        public ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
+        ViewHolder(@NonNull View itemView, OnRVClickListener clickListener) {
             super(itemView);
 
             this.deviceIcon = itemView.findViewById(R.id.online_device_icon);

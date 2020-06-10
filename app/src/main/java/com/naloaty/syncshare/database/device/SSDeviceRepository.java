@@ -12,12 +12,18 @@ import java.util.List;
 
 import io.reactivex.Single;
 
+/**
+ * This class represents extra abstract layer above {@link SSDeviceDao} of {@link SSDevice} in a StreamShare database.
+ * It allows you to retrieve information from the database.
+ * @see SSDevice
+ * @see SSDeviceDao
+ */
 public class SSDeviceRepository {
 
     private static final String TAG = "SSDeviceRepo";
 
     /*
-     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by rx)
+     * TODO: AsyncTask get() method DOES NOT asynchronous (replace by ReactiveX objects)
      */
 
     private SSDeviceDao ssDeviceDao;
@@ -31,15 +37,26 @@ public class SSDeviceRepository {
         allDevices = ssDeviceDao.getAllDevices();
     }
 
+    /**
+     * Inserts general information about device into the database.
+     * @param device General information about device. Instance of {@link SSDevice}.
+     */
     public void insert(SSDevice device) {
         new InsertDeviceAT(ssDeviceDao).execute(device);
     }
 
+    /**
+     * Updates general information about device in the database.
+     * @param device General information about device. Instance of {@link SSDevice}.
+     */
     public void update(SSDevice device) {
         new UpdateDeviceAT(ssDeviceDao).execute(device);
     }
 
-    //Decides whether to add or update
+    /**
+     * Decides whether to insert or update general information about device.
+     * @param device General information about device. Instance of {@link SSDevice}.
+     */
     public void publish(SSDevice device) {
         SSDevice foundedDevice = findDeviceDep(device.getDeviceId());
 
@@ -55,26 +72,42 @@ public class SSDeviceRepository {
         }
     }
 
+    /**
+     * Deletes general information about device from the database.
+     * @param device General information about device. Instance of {@link SSDevice}
+     */
     public void delete(SSDevice device) {
         new DeleteDeviceAT(ssDeviceDao).execute(device);
     }
 
+    /**
+     * Returns all trusted devices from database.
+     * @return A list containing all trusted devices and wrapped into LiveData object.
+     */
     public LiveData<List<SSDevice>> getAllDevices () {
         return allDevices;
     }
 
+    /**
+     * Returns the number of records in the database.
+     * @return Number of records.
+     */
     public int getDeviceCount() {
-        try
-        {
+        try {
             return new GetDeviceCountAT(ssDeviceDao).execute().get();
         }
         catch (Exception e) {
             Log.d(TAG, "getDeviceCount() exception: " + e.getMessage());
-            return new Integer(0);
+            return 0;
         }
 
     }
 
+    /**
+     * Searches for the required trusted device in the database.
+     * @param deviceId Device StreamShare identifier.
+     * @return Returns general information about the device, if found, as instance of {@link SSDevice}
+     */
     @Deprecated
     public SSDevice findDeviceDep(String deviceId) {
         try{
@@ -86,6 +119,11 @@ public class SSDeviceRepository {
         }
     }
 
+    /**
+     * Searches for the required trusted device in the database.
+     * @param deviceId Device StreamShare identifier.
+     * @return Returns general information about the device, if found, as ReactiveX single object.
+     */
     public Single<SSDevice> findDevice(String deviceId) {
         return ssDeviceDao.findDevice(deviceId);
     }

@@ -3,6 +3,12 @@ package com.naloaty.syncshare.database.device;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+/**
+ * This class represents a table of trusted devices in a StreamShare database.
+ * It contains general information about devices marked by the user as trusted.
+ * To understand how it works, you need to get acquainted with the Room library.
+ * @see com.naloaty.syncshare.util.AddDeviceHelper
+ */
 @Entity(tableName = "ss_devices_table")
 public class SSDevice {
 
@@ -10,15 +16,51 @@ public class SSDevice {
     public static final int PLATFORM_DESKTOP = 1;
     public static final int PLATFORM_UNKNOWN = 2;
 
+    /**
+     * Database row id.
+     */
     @PrimaryKey(autoGenerate = true)
     private int id;
+
+    /**
+     * Brand of the trusted device.
+     */
     private String brand;
+
+    /**
+     * Model of the trusted device.
+     */
     private String model;
+
+    /**
+     * Nickname of the trusted device.
+     */
     private String nickname;
+
+    /**
+     * StreamShare ID of the trusted device.
+     */
     private String deviceId;
+
+    /**
+     * The time when the discovered device was last online.
+     */
     private long lastUsageTime;
+
+    /**
+     * StreamShare version on the discovered device.
+     * @see com.naloaty.syncshare.config.AppConfig
+     */
     private String appVersion;
+
+    /**
+     * True if user authenticated device.
+     */
     private boolean trusted;
+
+    /**
+     * True if the user has granted access to their media.
+     */
     private boolean accessAllowed;
 
     public SSDevice(String deviceId, String appVersion) {

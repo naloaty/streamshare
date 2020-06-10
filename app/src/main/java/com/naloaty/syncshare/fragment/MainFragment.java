@@ -40,8 +40,9 @@ import com.naloaty.syncshare.util.DeviceUtils;
 
 import java.util.ArrayList;
 
-/*
+/**
  * This fragment displays a list of current devices on the network (trusted devices only).
+ * @see MainFragment
  */
 public class MainFragment extends Fragment {
 

@@ -69,6 +69,7 @@ public class AddDeviceActivity extends SSActivity {
 
     /**
      * This callback is called by {@link AddDeviceHelper}
+     * @see #processQRCode(String)
      */
     private final AddDeviceHelper.AddDeviceCallback addDeviceCallback = new AddDeviceHelper.AddDeviceCallback() {
         @Override
@@ -296,9 +297,11 @@ public class AddDeviceActivity extends SSActivity {
         if (qrCodeContents == null)
             return;
 
+        /* Catches exceptions that may be caused by incorrect qr code content */
         try {
             JSONObject codeDevice = new JSONObject(qrCodeContents);
 
+            //TODO: create custom exception type
             if (!codeDevice.has(DeviceInfoFragment.QR_CODE_DEVICE_NICKNAME))
                 throw new Exception("Device nickname is missing");
 
@@ -308,9 +311,7 @@ public class AddDeviceActivity extends SSActivity {
             if (!codeDevice.has(DeviceInfoFragment.QR_CODE_DEVICE_ID))
                 throw new Exception("Device ID is missing");
 
-            /*
-             * QR code contains device id and main information, so it should be added
-             */
+            /* QR code contains device id and main information, so it should be added */
             SSDevice ssDevice = AddDeviceHelper.getEmptyDevice();
             ssDevice.setDeviceId(codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_ID));
             ssDevice.setNickname(codeDevice.getString(DeviceInfoFragment.QR_CODE_DEVICE_NICKNAME));

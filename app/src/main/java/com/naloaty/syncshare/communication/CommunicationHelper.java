@@ -3,16 +3,14 @@ package com.naloaty.syncshare.communication;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.config.MediaServerKeyword;
 import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.media.Media;
-import com.naloaty.syncshare.util.NetworkStateMonitor;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -21,80 +19,100 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * This class helps send requests to another device.
+ * @see com.naloaty.syncshare.activity.ImageViewActivity
+ * @see com.naloaty.syncshare.fragment.RemoteAlbumsFragment
+ * @see com.naloaty.syncshare.fragment.RemoteMediaFragment
+ * @see com.naloaty.syncshare.util.AddDeviceHelper
+ * @see com.naloaty.syncshare.adapter.RemoteAlbumsAdapter
+ * @see com.naloaty.syncshare.adapter.RemoteMediaAdapter
+ */
 public class CommunicationHelper {
 
-    private static final String TAG = "RemoteViewHelper";
     private static final String PROTOCOL = "https://";
 
-    public static Call<SSDevice> requestDeviceInformation(final Context context, final NetworkDevice networkDevice) {
-
-        if (networkDevice == null) {
-            Log.w(TAG, "Attempt to request device information of non-existent network device");
-            return null;
-        }
-
+    /**
+     * Requests general information about a remote device.
+     * @param context The Context in which this request should be executed.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @return Retrofit network call.
+     */
+    public static Call<SSDevice> requestDeviceInformation(@NonNull final Context context, @NonNull final NetworkDevice networkDevice) {
         String requestAddress = PROTOCOL + networkDevice.getIpAddress() + ":" + AppConfig.MEDIA_SERVER_PORT + "/";
-
         Retrofit retrofit = buildRetrofit(context, networkDevice, requestAddress);
         DeviceRequest request = retrofit.create(DeviceRequest.class);
+
         return request.getDeviceInformation();
     }
 
-    public static Call<SimpleServerResponse> sendDeviceInformation(final Context context, final NetworkDevice networkDevice, final SSDevice ssDevice) {
-
-        if (networkDevice == null) {
-            Log.w(TAG, "Attempt to send device information to non-existent network device");
-            return null;
-        }
-
+    /**
+     * Sends general information about a local device to a remote device.
+     * @param context The Context in which this request should be executed.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @param ssDevice Information about local device. See {@link com.naloaty.syncshare.util.AppUtils#getLocalDevice(Context)}                     
+     * @return Retrofit network call.
+     */
+    public static Call<SimpleServerResponse> sendDeviceInformation(@NonNull final Context context, @NonNull final NetworkDevice networkDevice, @NonNull final SSDevice ssDevice) {
         String requestAddress = PROTOCOL + networkDevice.getIpAddress() + ":" + AppConfig.MEDIA_SERVER_PORT + "/";
-
         Retrofit retrofit = buildRetrofit(context, networkDevice, requestAddress);
         DeviceRequest request = retrofit.create(DeviceRequest.class);
+
         return request.sendDeviceInformation(ssDevice);
     }
 
-    public static Call<List<Album>> requestAlbumsList (final Context context, final NetworkDevice networkDevice) {
-        if (networkDevice == null) {
-            Log.w(TAG, "Attempt to request albums list of non-existent network device");
-            return null;
-        }
-
+    /**
+     * Requests a list of shared albums on a remote device.
+     * @param context The Context in which this request should be executed.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @return Retrofit network call.
+     */
+    public static Call<List<Album>> requestAlbumsList (@NonNull final Context context, @NonNull final NetworkDevice networkDevice) {
         String requestAddress = PROTOCOL + networkDevice.getIpAddress() + ":" + AppConfig.MEDIA_SERVER_PORT + "/";
-
         Retrofit retrofit = buildRetrofit(context, networkDevice, requestAddress);
         MediaRequest request = retrofit.create(MediaRequest.class);
+
         return request.getAlbumsList();
     }
 
-    public static Call<List<Media>> requestMediaList (final Context context, final NetworkDevice networkDevice, final Album album) {
-        if (networkDevice == null) {
-            Log.w(TAG, "Attempt to request media list of non-existent network device");
-            return null;
-        }
-
+    /**
+     * Requests a list of media-files in a specific album on a remote device.
+     * @param context The Context in which this request should be executed.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @param album The album whose file list you want to receive.
+     * @return Retrofit network call.
+     */
+    public static Call<List<Media>> requestMediaList (@NonNull final Context context, @NonNull final NetworkDevice networkDevice, @NonNull final Album album) {
         String requestAddress = PROTOCOL + networkDevice.getIpAddress() + ":" + AppConfig.MEDIA_SERVER_PORT + "/";
-
         Retrofit retrofit = buildRetrofit(context, networkDevice, requestAddress);
         MediaRequest request = retrofit.create(MediaRequest.class);
-        Log.d(TAG, "Querying media list with albumId -> " + String.valueOf(album.getAlbumId()));
+
         return request.getMediaList(String.valueOf(album.getAlbumId()));
     }
 
-    private static Retrofit buildRetrofit(final Context context, final NetworkDevice networkDevice, final String requestAddress) {
-
+    /**
+     * Builds Retrofit instance with OkHttpClient that uses StreamShare SSL certificate.
+     * @param context The Context in which this request should be executed.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @param requestAddress Address to which the request will be sent.
+     * @return Retrofit instance.
+     */
+    private static Retrofit buildRetrofit(@NonNull final Context context, @NonNull final NetworkDevice networkDevice, @NonNull final String requestAddress) {
         OkHttpClient client = SSOkHttpClient.getOkHttpClient(context);
 
-        Retrofit retrofit = new Retrofit.Builder()
+        return new Retrofit.Builder()
                 .baseUrl(requestAddress)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
-        return retrofit;
     }
 
-    public static String getThumbnailRequestURL(NetworkDevice networkDevice) {
+    /**
+     * Builds a request URL to retrieve a small thumbnail of media-file.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @return Request URL.
+     */
+    public static String getThumbnailRequestURL(@NonNull NetworkDevice networkDevice) {
         return PROTOCOL
                 + networkDevice.getIpAddress()
                 + ":"
@@ -106,7 +124,12 @@ public class CommunicationHelper {
                 + "/";
     }
 
-    public static String getFullsizeImageRequestURL(NetworkDevice networkDevice) {
+    /**
+     * Builds a request URL to retrieve a full-size thumbnail of media-file.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @return Request URL.
+     */
+    public static String getFullsizeImageRequestURL(@NonNull NetworkDevice networkDevice) {
         return PROTOCOL
                 + networkDevice.getIpAddress()
                 + ":"
@@ -118,7 +141,12 @@ public class CommunicationHelper {
                 + "/";
     }
 
-    public static String getServeRequestURL(NetworkDevice networkDevice) {
+    /**
+     * Builds a request URL to retrieve a media-file itself.
+     * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
+     * @return Request URL.
+     */
+    public static String getServeRequestURL(@NonNull NetworkDevice networkDevice) {
         return PROTOCOL
                 + networkDevice.getIpAddress()
                 + ":"

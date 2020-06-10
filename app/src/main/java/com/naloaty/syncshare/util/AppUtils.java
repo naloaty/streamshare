@@ -121,9 +121,6 @@ public class AppUtils {
         return mDNSSDHelper;
     }
 
-    /*
-     * Copied from https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android/5921190#5921190
-     */
     public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
         final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
@@ -136,9 +133,6 @@ public class AppUtils {
         return false;
     }
 
-    /*
-     * Copied from https://tips.androidhive.info/2015/04/android-how-to-check-if-the-app-is-in-background-or-foreground/
-     */
     public static boolean isAppIsInBackground(Context context) {
         boolean isInBackground = true;
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

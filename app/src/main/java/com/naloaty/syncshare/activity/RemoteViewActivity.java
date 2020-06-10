@@ -26,8 +26,8 @@ import com.naloaty.syncshare.fragment.RemoteViewFragment;
  * This activity represents a screen for viewing a list of albums and media files on a remote device.
  *
  * Related fragments:
- * {@link RemoteAlbumsFragment}
- * {@link RemoteMediaFragment}
+ * @see RemoteAlbumsFragment
+ * @see RemoteMediaFragment
  */
 public class RemoteViewActivity extends SSActivity {
 
