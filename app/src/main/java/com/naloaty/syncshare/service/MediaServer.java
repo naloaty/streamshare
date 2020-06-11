@@ -2,16 +2,13 @@ package com.naloaty.syncshare.service;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
-import android.net.Uri;
-import android.provider.MediaStore;
+import android.os.Environment;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
-import com.naloaty.syncshare.communication.CommunicationHelper;
 import com.naloaty.syncshare.communication.SimpleServerResponse;
-import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.config.MediaServerKeyword;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.device.SSDeviceRepository;
 import com.naloaty.syncshare.database.media.Album;
@@ -27,11 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,279 +35,260 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.SimpleWebServer;
+import retrofit2.internal.EverythingIsNonNull;
 
+/**
+ * This class represents a server that provides access to media files for trusted devices.
+ * @see CommunicationService
+ */
 public class MediaServer extends SimpleWebServer {
 
+    /*
+     * TODO: get rid of SimpleWebServer
+     */
     private static final String TAG = "MediaServer";
 
     private Context mContext;
 
-    public MediaServer(Context context, int port, boolean secureMode) {
-        super(null, port, new File("/sdcard/"), true);
+    /**
+     * @param context The Context in which this instance should be created.
+     * @param port The port that the server will listen.
+     */
+    MediaServer(@NonNull Context context, int port) throws Exception {
+        super(null, port, new File(Environment.getExternalStorageDirectory().getPath()), true);
 
         mContext = context;
+        makeSecure();
+    }
 
-        SSLContext sslContext = SecurityUtils.getSSLContext(new SecurityManager(context), context.getFilesDir());
+    /**
+     * Forces the server to use the https protocol
+     */
+    private void makeSecure() throws Exception {
+        SSLContext sslContext = SecurityUtils.getSSLContext(new SecurityManager(mContext), mContext.getFilesDir());
 
         if (sslContext != null) {
             SSLServerSocketFactory factory = sslContext.getServerSocketFactory();
             setServerSocketFactory(new CustomServerSocketFactory(factory, null));
         }
         else
-            Log.w(TAG, "Cannot start media server in secure mode");
+            throw new Exception("Cannot start media server in secure mode");
     }
 
+    /**
+     * Serves a client requests
+     */
     @Override
     public Response serve(IHTTPSession session) {
+        //Remove URL arguments
+        String uri = session.getUri().trim().replace(File.separatorChar, '/');
+        uri = uri.substring(1);
+        if (uri.indexOf('?') >= 0) {
+            uri = uri.substring(0, uri.indexOf('?'));
+        }
 
-        Log.d(TAG, "Serve URI: " + session.getUri());
-        Log.d(TAG, "Serve HEADERS: " + session.getHeaders());
-        Log.d(TAG, "Serve PARAMS: " + session.getParameters());
+        String[] request = uri.split("/");
 
-        Log.d(TAG, "Hostname: " + session.getRemoteHostName() + " IP: " + session.getRemoteIpAddress());
+        if (request.length < 2)
+            return getBadRequestResponse();
 
-        Map<String, String> map = new HashMap<String, String>();
-        Method method = session.getMethod();
+        switch (request[0]) {
+            case Requests.DEVICE:
+                return getDeviceRespond(session, request);
 
-        if (Method.PUT.equals(method) || Method.POST.equals(method)) {
-            try
-            {
+            case Requests.MEDIA:
+                return getMediaRespond(session, request);
+
+            default:
+                return getBadRequestResponse();
+        }
+    }
+
+    /**
+     * Serves requests about device
+     */
+    @EverythingIsNonNull
+    private Response getDeviceRespond(IHTTPSession session, String[] request) {
+
+        if (Method.POST.equals(session.getMethod())) {
+            Map<String, String> map = new HashMap<>();
+
+            try {
                 session.parseBody(map);
             }
-            catch (IOException e)
-            {
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + e.getMessage());
+            catch (IOException e) {
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal error: " + e.getMessage());
             }
-            catch (ResponseException e)
-            {
+            catch (ResponseException e) {
                 return newFixedLengthResponse(e.getStatus(), MIME_PLAINTEXT, e.getMessage());
             }
-        }
 
-        if (session.getMethod().equals(Method.GET))
-            return defaultGETRespond(Collections.unmodifiableMap(session.getHeaders()), session, session.getUri());
-        else
-            return defaultPOSTRespond(Collections.unmodifiableMap(map), session, session.getUri());
-    }
+            String postParams = map.get("postData");
 
-    private Response defaultPOSTRespond(Map<String, String> postBody, IHTTPSession session, String uri) {
-
-        // Remove URL arguments
-        uri = uri.trim().replace(File.separatorChar, '/');
-        uri = uri.substring(1);
-        if (uri.indexOf('?') >= 0) {
-            uri = uri.substring(0, uri.indexOf('?'));
-        }
-
-        Log.d(TAG, "Parsing request: " + uri);
-        String[] request = uri.split("/");
-
-        if (request.length < 2){
-            Log.w(TAG, "Bad request from remote device");
-            return getBadRequestResponse();
-        }
-
-
-        switch (request[0]) {
-            case MediaServerKeyword.REQUEST_TARGET_DEVICE:
-                if (request.length > 2)
-                    return getBadRequestResponse();
-
-                return devicePOSTRespond(request[1], postBody.get("postData").toString());
-
-            default:
+            if (postParams == null)
                 return getBadRequestResponse();
-        }
-    }
 
-    private Response devicePOSTRespond(String request, String postParams) {
-
-        if (postParams == null)
-            return getBadRequestResponse();
-
-        switch (request) {
-            case MediaServerKeyword.REQUEST_INFORMATION:
-                Gson converter = new Gson();
-                SSDevice ssDevice = converter.fromJson(postParams, SSDevice.class);
-                ssDevice.setAccessAllowed(true);
-
-                SSDeviceRepository repository = new SSDeviceRepository(mContext);
-                repository.publish(ssDevice);
-
-                SimpleServerResponse resp = new SimpleServerResponse();
-                resp.setDescription("Device added");
-
-                return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, converter.toJson(resp));
-
-            default:
-                return getNotFoundResponse();
-        }
-    }
-
-
-    private Response defaultGETRespond(Map<String, String> headers, IHTTPSession session, String uri) {
-        // Remove URL arguments
-        uri = uri.trim().replace(File.separatorChar, '/');
-        uri = uri.substring(1);
-        if (uri.indexOf('?') >= 0) {
-            uri = uri.substring(0, uri.indexOf('?'));
-        }
-
-        Log.d(TAG, "Parsing request: " + uri);
-        String[] request = uri.split("/");
-
-        if (request.length < 2){
-            Log.w(TAG, "Bad request from remote device");
-            return getBadRequestResponse();
-        }
-
-
-        switch (request[0]) {
-            case MediaServerKeyword.REQUEST_TARGET_DEVICE:
-
-                if (request.length > 2)
-                    return getBadRequestResponse();
-
-                return deviceGETRespond(request[1]);
-
-            case MediaServerKeyword.REQUEST_TARGET_MEDIA:
-                if (request.length > 3)
-                    return getBadRequestResponse();
-
-                return mediaGETRespond(request, headers, session);
-
-            default:
-                return getBadRequestResponse();
-        }
-
-    }
-
-    private Response deviceGETRespond(String request) {
-
-        switch (request) {
-            case MediaServerKeyword.REQUEST_INFORMATION:
-                SSDevice myDevice = AppUtils.getLocalDevice(mContext);
-                Gson converter = new Gson();
-                String json = converter.toJson(myDevice);
-
-                return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, json);
-
-            default:
-                return getNotFoundResponse();
-        }
-    }
-
-    private Response mediaGETRespond(String[] request, Map<String, String> headers, IHTTPSession session) {
-
-        switch (request[1]) {
-            case MediaServerKeyword.REQUEST_ALBUMS:
-
-                try
-                {
-                    List<Album> albums = MediaProvider.getSharedAlbums(mContext);
-
+            switch (request[1]) {
+                case Requests.INFORMATION:
                     Gson converter = new Gson();
-                    String json = converter.toJson(albums);
+                    SSDevice ssDevice = converter.fromJson(postParams, SSDevice.class);
+                    ssDevice.setAccessAllowed(true);
 
-                    Log.d(TAG, "Albums fetched with success. Items count is " + albums.size());
-                    Log.d(TAG, "Response is " + json);
+                    SSDeviceRepository repository = new SSDeviceRepository(mContext);
+                    repository.publish(ssDevice);
+
+                    SimpleServerResponse resp = new SimpleServerResponse();
+                    resp.setDescription("Device added");
+
+                    return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, converter.toJson(resp));
+
+                default:
+                    return getNotFoundResponse();
+            }
+        }
+        else if (Method.GET.equals(session.getMethod())) {
+
+            switch (request[1]) {
+
+                case Requests.INFORMATION:
+                    SSDevice myDevice = AppUtils.getLocalDevice(mContext);
+                    Gson converter = new Gson();
+                    String json = converter.toJson(myDevice);
 
                     return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, json);
-                }
-                catch (Exception e) {
-                    Log.w(TAG, "Cannot serve albums list: " + e);
-                    return getInternalErrorResponse();
-                }
 
-            case MediaServerKeyword.REQUEST_MEDIA_LIST:
-                Map<String, List<String>> parameters = session.getParameters();
-
-                Log.d(TAG, "params: " + parameters);
-
-                if (!parameters.containsKey(MediaServerKeyword.GET_ALBUM_ID))
-                    return getBadRequestResponse();
-
-                String albumId = parameters.get(MediaServerKeyword.GET_ALBUM_ID).get(0);
-
-                try
-                {
-                    List<Media> media = MediaProvider.getMediaFromMediaStore(mContext, albumId);
-
-                    Gson converter = new Gson();
-                    String json = converter.toJson(media);
-
-                    Log.d(TAG, "Media fetched with success. Items count is " + media.size());
-
-                    return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, json);
-                }
-                catch (Exception e) {
-                    Log.w(TAG, "Cannot serve media list: " + e);
-                    return getInternalErrorResponse();
-                }
-
-            case MediaServerKeyword.REQUEST_THUMBNAIL:
-                try {
-                    MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
-
-                    /*Bitmap thumb;
-                    if (mediaObject.isVideo()) {
-                        thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
-                    }
-                    else
-                    {
-                        thumb = ThumbnailUtils.createImageThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
-                    }*/
-
-                    Bitmap thumb = MediaProvider.getCorrectlyOrientedThumbnail(mContext, mediaObject, false);
-
-                    Log.d(TAG, "Serving thumbnail " + request[2] + " by path " + mediaObject.getPath());
-                    return returnThumbnailResponse(thumb);
-                    //return serveFile(headers, new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
-                }
-                catch (Exception e) {
-                    Log.d(TAG, "Cannot serve file " + request[2] + " because " + e);
-                    return getInternalErrorResponse();
-                }
-
-            case MediaServerKeyword.REQUEST_FULLSIZE_IMAGE:
-                try {
-                    MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
-
-                    if (mediaObject.isVideo()) {
-                        Log.d(TAG, "Serving video fullsize thumbnail " + request[2] + " by path");
-                        //Bitmap thumb = ThumbnailUtils.createVideoThumbnail(mediaObject.getPath(), MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
-                        Bitmap thumb = MediaProvider.getCorrectlyOrientedThumbnail(mContext, mediaObject, true);
-                        return returnThumbnailResponse(thumb);
-                    }
-
-                    Log.d(TAG, "Serving fullsize image" + request[2] + " by path " + mediaObject.getPath());
-                    return serveFile(headers, new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
-                }
-                catch (Exception e) {
-                    Log.d(TAG, "Cannot serve file " + request[2] + " because " + e);
-                    return getInternalErrorResponse();
-                }
-
-            case MediaServerKeyword.REQUEST_SERVE_FILE:
-
-                try {
-                    MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
-
-                    Log.d(TAG, "Serving file" + request[2] + " by path " + mediaObject.getPath());
-                    return serveFile(headers, new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
-
-                }
-                catch (Exception e) {
-                    Log.d(TAG, "Cannot serve file " + request[2] + " because " + e);
-                    e.printStackTrace();
-                    return getInternalErrorResponse();
-                }
-
-            default:
-                return getNotFoundResponse();
+                default:
+                    return getNotFoundResponse();
+            }
         }
+
+        return getBadRequestResponse();
     }
 
+    /**
+     * Serves requests about media files.
+     */
+    @EverythingIsNonNull
+    private Response getMediaRespond(IHTTPSession session, String[] request) {
+
+        if (Method.GET.equals(session.getMethod())) {
+            switch (request[1]) {
+
+                /*
+                 * Responds albums list
+                 */
+                case Requests.ALBUMS:
+                    try {
+                        List<Album> albums = MediaProvider.getSharedAlbums(mContext);
+                        Log.i(TAG, String.format("Albums fetched with success. Items count is %d", albums.size()));
+
+                        Gson gson = new Gson();
+                        String json = gson.toJson(albums);
+
+                        return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, json);
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, String.format("Cannot fetch albums list. Reason: %s", e.toString()));
+                        return getInternalErrorResponse();
+                    }
+
+
+                /*
+                 * Responds media list
+                 */
+                case Requests.MEDIA_LIST:
+                    Map<String, List<String>> parameters = session.getParameters();
+
+                    if (!parameters.containsKey(Requests.ALBUM_ID))
+                        return getBadRequestResponse();
+
+                    List<String> albumParams = parameters.get(Requests.ALBUM_ID);
+
+                    if (albumParams == null)
+                        return getBadRequestResponse();
+
+                    String albumId = albumParams.get(0);
+
+                    try {
+                        List<Media> media = MediaProvider.getMediaFromMediaStore(mContext, albumId);
+                        Log.i(TAG, String.format("Responding with albums list. Items count is %d", media.size()));
+
+                        Gson gson = new Gson();
+                        String json = gson.toJson(media);
+
+                        return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, json);
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, String.format("Cannot respond with albums list. Reason: %s", e.toString()));
+                        return getInternalErrorResponse();
+                    }
+
+                /*
+                 * Responds small-size bitmap thumbnail
+                 */
+                case Requests.THUMBNAIL:
+                    try {
+                        MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
+                        Bitmap thumbnail = MediaProvider.getCorrectlyOrientedThumbnail(mContext, mediaObject, false);
+                        Log.i(TAG, String.format("Responding thumbnail of %s located by path %s", request[2], mediaObject.getPath()));
+
+                        return getBitmapResponse(thumbnail);
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, String.format("Cannot respond thumbnail of %s. Reason: %s", request[2], e.toString()));
+                        return getInternalErrorResponse();
+                    }
+
+                /*
+                 * Responds full-size bitmap thumbnail
+                 */
+                case Requests.FULL_SIZE_IMAGE:
+                    try {
+                        MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
+
+                        if (mediaObject.isVideo()) {
+                            Bitmap thumb = MediaProvider.getCorrectlyOrientedThumbnail(mContext, mediaObject, true);
+                            Log.i(TAG, String.format("Responding full-size thumbnail of video %s located by path %s", request[2], mediaObject.getPath()));
+
+                            return getBitmapResponse(thumb);
+                        }
+
+                        Log.i(TAG, String.format("Responding full-size thumbnail of image %s located by path %s", request[2], mediaObject.getPath()));
+                        return serveFile(session.getHeaders(), new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, String.format("Cannot respond full-size thumbnail of %s. Reason: %s", request[2], e.toString()));
+                        return getInternalErrorResponse();
+                    }
+
+                /*
+                 * Responds file
+                 */
+                case Requests.SERVE_FILE:
+                    try {
+                        MediaObject mediaObject = MediaProvider.getMediaObjectById(mContext, request[2]);
+                        Log.i(TAG, String.format("Responding file %s located by path %s", request[2], mediaObject.getPath()));
+
+                        return serveFile(session.getHeaders(), new File(mediaObject.getPath()), getMimeTypeForFile(mediaObject.getPath()));
+
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, String.format("Cannot respond file %s. Reason: %s", request[2], e.toString()));
+                        return getInternalErrorResponse();
+                    }
+
+                default:
+                    return getNotFoundResponse();
+            }
+        }
+
+        return getBadRequestResponse();
+    }
+    
+    /**
+     * Responds by file
+     */
+    @EverythingIsNonNull
     private Response serveFile(Map<String, String> header, File file, String mime) {
         Response res;
         try {
@@ -346,7 +321,9 @@ public class MediaServer extends SimpleWebServer {
                     res = newFixedLengthResponse(Response.Status.RANGE_NOT_SATISFIABLE, MIME_PLAINTEXT, "");
                     res.addHeader("Content-Range", "bytes 0-0/" + fileLen);
                     res.addHeader("ETag", etag);
-                } else {
+                }
+                else
+                {
                     if (endAt < 0) {
                         endAt = fileLen - 1;
                     }
@@ -358,82 +335,80 @@ public class MediaServer extends SimpleWebServer {
                     final long dataLen = newLen;
                     FileInputStream fis = new FileInputStream(file) {
                         @Override
-                        public int available() throws IOException {
+                        public int available() {
                             return (int) dataLen;
                         }
                     };
                     fis.skip(startFrom);
 
-                    res = createResponse(Response.Status.PARTIAL_CONTENT, mime, fis);
+                    res = getChunkedResponse(Response.Status.PARTIAL_CONTENT, mime, fis);
                     res.addHeader("Content-Length", "" + dataLen);
                     res.addHeader("Content-Range", "bytes " + startFrom + "-" +
                             endAt + "/" + fileLen);
                     res.addHeader("ETag", etag);
                 }
-            } else {
+            }
+            else
+            {
                 if (etag.equals(header.get("if-none-match")))
                     res = newFixedLengthResponse(Response.Status.NOT_MODIFIED, mime, "");
-                else {
-                    res = createResponse(Response.Status.OK, mime, new FileInputStream(file));
+                else
+                {
+                    res = getChunkedResponse(Response.Status.OK, mime, new FileInputStream(file));
                     res.addHeader("Content-Length", "" + fileLen);
                     res.addHeader("ETag", etag);
                 }
             }
-        } catch (IOException ioe) {
+        }
+        catch (IOException e) {
             res = newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "Forbidden: Reading file failed");
         }
 
-        return (res == null) ? newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "Error 404: File not found") : res;
+        return res;
     }
 
-    private Response returnThumbnailResponse(Bitmap bitmap) throws IOException {
-        /*int width = 360;
-        int height = 360;
-
-        if (nativeSize) {
-            width = bitmap.getWidth();
-            height = bitmap.getHeight();
-        }
-
-        bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height);*/
+    /**
+     * Responds by bitmap
+     */
+    private Response getBitmapResponse(@NonNull Bitmap bitmap) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
         byte[] bitmapData = bos.toByteArray();
         bos.close();
 
         ByteArrayInputStream bs = new ByteArrayInputStream(bitmapData);
-        return createResponse(Response.Status.OK, MIME_TYPES.get("png"), bs);
+        return getChunkedResponse(Response.Status.OK, MIME_TYPES.get("png"), bs);
     }
 
-    // Announce that the file server accepts partial content requests
-    private Response createResponse(Response.Status status, String mimeType, InputStream message) {
+    /**
+     * Announce that the media server accepts partial content requests
+     */
+    @EverythingIsNonNull
+    private Response getChunkedResponse(Response.Status status, String mimeType, InputStream message) {
         Response res = newChunkedResponse(status, mimeType, message);
         res.addHeader("Accept-Ranges", "bytes");
         return res;
     }
 
-    private Response newFixedFileResponse(File file, String mime) throws FileNotFoundException {
-        Response res;
-        res = newFixedLengthResponse(Response.Status.OK, mime, new FileInputStream(file), (int) file.length());
-        res.addHeader("Accept-Ranges", "bytes");
-        return res;
-    }
-
+    /**
+     * Responds by bad request error code (400)
+     */
     private Response getBadRequestResponse() {
         return newFixedLengthResponse(Response.Status.BAD_REQUEST, NanoHTTPD.MIME_PLAINTEXT,
-                "Error 400, request doesn't match SyncShare requirements");
+                "Error 400, request doesn't match StreamShare requirements");
     }
 
-    private Response getForbiddenResponse() {
-        return newFixedLengthResponse(Response.Status.FORBIDDEN, NanoHTTPD.MIME_PLAINTEXT,
-                "Error 403, access to media not allowed by user");
-    }
-
+    /**
+     * Responds by internal error code (500)
+     */
     private Response getInternalErrorResponse() {
         return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT,
                 "Error 500, request execution error");
     }
 
+    /**
+     * Responds by not found error code (404)
+     */
     protected Response getNotFoundResponse() {
         return newFixedLengthResponse(Response.Status.NOT_FOUND, NanoHTTPD.MIME_PLAINTEXT, "Error 404, requested resource not found");
     }

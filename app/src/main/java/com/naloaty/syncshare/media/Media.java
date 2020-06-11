@@ -5,13 +5,42 @@ import android.provider.MediaStore;
 
 import java.io.Serializable;
 
+/**
+ * TODO: create separate classes for photo, video and audio
+ * This class represents a single media file and contains all the necessary information about it.
+ * @see MediaProvider
+ */
 public class Media implements Serializable {
 
+    /**
+     * The name of the media file as an identifier in the Android Media Store database.
+     * Example: 5241.jpg
+     */
     private String filename;
-    private long dateTaken;;
+
+    /**
+     * Date the media-file was created.
+     */
+    private long dateTaken;
+
+    /**
+     * MIME type of media-file.
+     */
     private String mimeType;
+
+    /**
+     * Size of media-file.
+     */
     private long size;
+
+    /**
+     * Orientation of media-file (photo and video only).
+     */
     private int orientation;
+
+    /**
+     * Type of media-file (e.g. image, video, audio)
+     */
     private int mediaType;
 
     public Media(Cursor cursor) {
@@ -75,6 +104,11 @@ public class Media implements Serializable {
         this.mediaType = mediaType;
     }
 
+    /**
+     * Returns the projection in order to retrieve media-file list from android media store database.
+     * @return Projection for media-files request.
+     * @see MediaProvider
+     */
     public static String[] getProjection() {
         return new String[] {
                 MediaStore.Files.FileColumns._ID,       //media id

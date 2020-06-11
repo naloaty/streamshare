@@ -8,6 +8,10 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import fi.iki.elonen.NanoHTTPD;
 
+/**
+ * This class represents custom server socket factory, which creates a socket that requires client authentication.
+ * @see com.naloaty.syncshare.service.MediaServer
+ */
 public class CustomServerSocketFactory implements NanoHTTPD.ServerSocketFactory {
 
     private SSLServerSocketFactory sslServerSocketFactory;
@@ -21,17 +25,19 @@ public class CustomServerSocketFactory implements NanoHTTPD.ServerSocketFactory 
 
     @Override
     public ServerSocket create() throws IOException {
-        SSLServerSocket ss = null;
+        SSLServerSocket ss;
+
         ss = (SSLServerSocket) this.sslServerSocketFactory.createServerSocket();
+
         if (this.sslProtocols != null) {
             ss.setEnabledProtocols(this.sslProtocols);
         } else {
             ss.setEnabledProtocols(ss.getSupportedProtocols());
         }
 
-        //Client certificate is required by SyncShare
         ss.setUseClientMode(false);
-        //ss.setWantClientAuth(true);
+
+        //Enable client authentication
         ss.setNeedClientAuth(true);
         return ss;
     }

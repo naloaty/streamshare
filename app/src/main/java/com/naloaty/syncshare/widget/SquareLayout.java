@@ -6,6 +6,9 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
+/**
+ * This class represents a RelativeLayout, but it always has square shape.
+ */
 public class SquareLayout extends RelativeLayout {
 
     public SquareLayout(Context context) {

@@ -9,6 +9,10 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.naloaty.syncshare.R;
 
+/**
+ * This class helps to display notifications in the status bar.
+ * @see CommunicationNotification
+ */
 public class NotificationUtils {
 
     public static final String NOTIFICATION_CHANNEL_HIGH = "ssHighPriority";
@@ -17,6 +21,9 @@ public class NotificationUtils {
     private Context mContext;
     private NotificationManagerCompat mNotificationManager;
 
+    /**
+     * @param context The Context in which this instance should be created.
+     */
     public NotificationUtils(Context context) {
         this.mContext = context;
         this.mNotificationManager = NotificationManagerCompat.from(context);
@@ -44,10 +51,19 @@ public class NotificationUtils {
         }
     }
 
+    /**
+     * Creates a new notification.
+     * @param channelId ID of the channel on which the notification will be displayed.
+     * @param notificationId ID of the notification.
+     */
     public SSNotification createNotification(String channelId, int notificationId) {
         return new SSNotification(mContext, mNotificationManager, channelId, notificationId);
     }
 
+    /**
+     * Cancels an existing notification.
+     * @param notificationId ID of the notification.
+     */
     public void cancelNotification(int notificationId) {
         mNotificationManager.cancel(notificationId);
     }

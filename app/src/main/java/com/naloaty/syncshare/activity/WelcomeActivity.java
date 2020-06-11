@@ -178,7 +178,7 @@ public class WelcomeActivity extends SSActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == AppUtils.OPTIMIZATION_DISABLE)
+        if (requestCode == AppUtils.BATTERY_OPTIMIZATION_DISABLE)
             checkBatteryOptimizationState();
     }
 

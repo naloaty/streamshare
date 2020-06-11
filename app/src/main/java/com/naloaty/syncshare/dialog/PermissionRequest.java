@@ -1,7 +1,6 @@
 package com.naloaty.syncshare.dialog;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
@@ -14,10 +13,14 @@ import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.app.SSActivity;
 import com.naloaty.syncshare.util.PermissionHelper;
 
+/**
+ * This class represents a dialog that asks the user for permission.
+ * Also displays a short description of the permission.
+ * @see PermissionHelper
+ */
+public class PermissionRequest extends AlertDialog.Builder {
 
-public class PermissionRequest extends AlertDialog.Builder
-{
-    public PermissionHelper.Permission mPermission;
+    private PermissionHelper.Permission mPermission;
 
     public PermissionRequest(final Activity activity, @NonNull PermissionHelper.Permission permission, boolean killActivityOtherwise)
     {
@@ -30,39 +33,20 @@ public class PermissionRequest extends AlertDialog.Builder
         setMessage(permission.getMessageResource());
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, mPermission.getPermission())){
-            setNeutralButton(R.string.btn_settings, new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i)
-                {
-                    Intent intent = new Intent()
-                            .setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                            .setData(Uri.fromParts("package", activity.getPackageName(), null));
+            setNeutralButton(R.string.btn_settings, (dialog, which) -> {
+                Intent intent = new Intent()
+                        .setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        .setData(Uri.fromParts("package", activity.getPackageName(), null));
 
-                    activity.startActivity(intent);
-                }
-            });
+                activity.startActivity(intent);
+            } );
         }
 
-
-        setPositiveButton(R.string.btn_ask, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i)
-            {
-                ActivityCompat.requestPermissions(activity, new String[]{mPermission.getPermission()}, SSActivity.PERMISSION_REQUEST);
-            }
-        });
+        setPositiveButton(R.string.btn_ask, (dialog, which)
+                -> ActivityCompat.requestPermissions(activity, new String[]{mPermission.getPermission()}, SSActivity.PERMISSION_REQUEST));
 
         if (killActivityOtherwise)
-            setNegativeButton(R.string.btn_reject, new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i)
-                {
-                    activity.finish();
-                }
-            });
+            setNegativeButton(R.string.btn_reject, (dialog, which) -> activity.finish());
         else
             setNegativeButton(R.string.btn_close, null);
     }

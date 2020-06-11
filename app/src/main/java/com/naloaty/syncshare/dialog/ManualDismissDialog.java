@@ -1,11 +1,16 @@
 package com.naloaty.syncshare.dialog;
 
 import android.content.Context;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
+/**
+ * This class represents a dialog that can only be dismissed by code.
+ * Dialogs by default automatically dismisses when you click action buttons.
+ * @see MyDeviceDetailsDialog
+ * @see SingleTextInputDialog
+ */
 public abstract class ManualDismissDialog extends AlertDialog.Builder {
 
     private OnClickListener mPositiveListener;
@@ -16,48 +21,42 @@ public abstract class ManualDismissDialog extends AlertDialog.Builder {
         super(context);
     }
 
-    //Control over dialog dismissing is in hands of ManualDismissDialog.OnClickListener();
+    /**
+     * Shows the dialog.
+     * NOTE: Control over dialog dismissing is in hands of ManualDismissDialog.OnClickListener();
+     * @return Showed dialog.
+     */
     @Override
     public AlertDialog show()
     {
         AlertDialog dialog = super.show();
 
         if (mPositiveListener != null)
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    if (mPositiveListener.onClick(dialog))
-                        dialog.dismiss();
-                }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                if (mPositiveListener.onClick(dialog))
+                    dialog.dismiss();
             });
 
         if (mNeutralListener != null)
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    if (mNeutralListener.onClick(dialog))
-                        dialog.dismiss();
-                }
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
+                if (mNeutralListener.onClick(dialog))
+                    dialog.dismiss();
             });
 
         if (mNegativeListener != null)
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    if (mNegativeListener.onClick(dialog))
-                        dialog.dismiss();
-                }
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
+                if (mNegativeListener.onClick(dialog))
+                    dialog.dismiss();
             });
 
         return dialog;
     }
 
+    /**
+     * Setups positive action button.
+     * @param textId Button text resource.
+     * @param listener Button click listener. Instance of {@link ManualDismissDialog.OnClickListener}.
+     */
     public ManualDismissDialog setPositiveButtonS(int textId, ManualDismissDialog.OnClickListener listener) {
 
         mPositiveListener = listener;
@@ -68,6 +67,11 @@ public abstract class ManualDismissDialog extends AlertDialog.Builder {
         return this;
     }
 
+    /**
+     * Setups neutral action button.
+     * @param textId Button text resource.
+     * @param listener Button click listener. Instance of {@link ManualDismissDialog.OnClickListener}.
+     */
     public ManualDismissDialog setNeutralButtonS(int textId, ManualDismissDialog.OnClickListener listener) {
         mNeutralListener = listener;
 
@@ -77,6 +81,11 @@ public abstract class ManualDismissDialog extends AlertDialog.Builder {
         return this;
     }
 
+    /**
+     * Setups negative action button.
+     * @param textId Button text resource.
+     * @param listener Button click listener. Instance of {@link ManualDismissDialog.OnClickListener}.
+     */
     public ManualDismissDialog setNegativeButtonS(int textId, ManualDismissDialog.OnClickListener listener) {
         mNegativeListener = listener;
 
@@ -86,6 +95,9 @@ public abstract class ManualDismissDialog extends AlertDialog.Builder {
         return this;
     }
 
+    /**
+     * Action button click listener.
+     */
     public interface OnClickListener {
         boolean onClick(AlertDialog dialog);
     }

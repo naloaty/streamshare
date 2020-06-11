@@ -1,23 +1,15 @@
 package com.naloaty.syncshare.security;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.X509TrustManager;
 
+/**
+ * Custom X509TrustManager that uses {@link SecurityManager} to verify certificates.
+ */
 public class SSTrustManager implements X509TrustManager {
 
     private static final String TAG = "SSTrustManager";
@@ -52,6 +44,5 @@ public class SSTrustManager implements X509TrustManager {
         Log.d(TAG, "getAcceptedIssuers");
 
         return new X509Certificate[0];
-
     }
 }

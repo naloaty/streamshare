@@ -1,7 +1,7 @@
 package com.naloaty.syncshare.communication;
 
 import com.naloaty.syncshare.database.device.SSDevice;
-import com.naloaty.syncshare.config.MediaServerKeyword;
+import com.naloaty.syncshare.service.Requests;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,13 +16,13 @@ public interface DeviceRequest {
     /*
      * device/information
      */
-    @GET(MediaServerKeyword.REQUEST_TARGET_DEVICE + "/" + MediaServerKeyword.REQUEST_INFORMATION)
+    @GET(Requests.DEVICE + "/" + Requests.INFORMATION)
     Call<SSDevice> getDeviceInformation();
 
     /*
      * device/information
      */
-    @POST(MediaServerKeyword.REQUEST_TARGET_DEVICE + "/" + MediaServerKeyword.REQUEST_INFORMATION)
+    @POST(Requests.DEVICE + "/" + Requests.INFORMATION)
     Call<SimpleServerResponse> sendDeviceInformation(@Body SSDevice ssDevice);
 
 }

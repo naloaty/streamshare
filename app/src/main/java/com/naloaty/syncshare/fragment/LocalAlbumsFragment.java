@@ -80,7 +80,7 @@ public class LocalAlbumsFragment extends Fragment {
 
             if (getContext() == null)
                 return;
-            
+
             boolean securityStuffOk = SecurityUtils.checkSecurityStuff(requireContext().getFilesDir(), false);
             boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(getContext());
 
@@ -222,8 +222,8 @@ public class LocalAlbumsFragment extends Fragment {
 
                 Log.w(TAG, "Count: " + albums.size());
 
-                if (albums == null)
-                    cancel(true);
+                if (albums.size() == 0)
+                    return albums;
 
                 ArrayList<Album> resultAlbums = new ArrayList<>();
                 List<Album> databaseAlbums = viewModels[0].getAllAlbumsList();

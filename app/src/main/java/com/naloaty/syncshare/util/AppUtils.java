@@ -1,9 +1,7 @@
 package com.naloaty.syncshare.util;
 
 import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Build;
@@ -20,25 +18,22 @@ import java.io.File;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-
+/**
+ * This class contains useful utilities.
+ */
 public class AppUtils {
 
-    private static final String TAG = AppUtils.class.getSimpleName();
-    private static int mUniqueNumber = 0;
-    private static SharedPreferences mSharedPreferences;
-    private static final String DEFAULT_PREF = "default";
-    public static final int OPTIMIZATION_DISABLE = 756;
+    private static final String TAG = "AppUtils";
 
-    private static DNSSDHelper mDNSSDHelper;
+    public static final int BATTERY_OPTIMIZATION_DISABLE = 756;
+    private static int mUniqueNumber                     = 0;
 
-    public static SharedPreferences getDefaultSharedPreferences(final Context context) {
-        if (mSharedPreferences == null) {
-            mSharedPreferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE);
-        }
-
-        return mSharedPreferences;
-    }
-
+    /**
+     * @param r Resources.
+     * @return The height of the status bar in pixels.
+     * @see com.naloaty.syncshare.activity.VideoPlayerActivity
+     * @see com.naloaty.syncshare.app.MediaActivity
+     */
     public static int getStatusBarHeight(Resources r) {
         int resourceId = r.getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0)
@@ -47,42 +42,71 @@ public class AppUtils {
         return 0;
     }
 
+    /**
+     * @param context The Context in which this operation should be executed.
+     * @return The height of the navigation bar in pixels.
+     * @see com.naloaty.syncshare.activity.VideoPlayerActivity
+     * @see com.naloaty.syncshare.app.MediaActivity
+     */
     public static int getNavigationBarHeight(Context context) {
         Point appUsableSize = getAppUsableScreenSize(context);
         Point realScreenSize = getRealScreenSize(context);
 
-        // navigation bar on the right
+        //navigation bar on the right
         if (appUsableSize.x < realScreenSize.x) {
             return new Point(realScreenSize.x - appUsableSize.x, appUsableSize.y).y;
         }
 
-        // navigation bar at the bottom
+        //navigation bar at the bottom
         if (appUsableSize.y < realScreenSize.y) {
             return new Point(appUsableSize.x, realScreenSize.y - appUsableSize.y).y;
         }
 
-        // navigation bar is not present
+        //navigation bar is not present
         return 0;
     }
 
+    /**
+     * @param context The Context in which this operation should be executed.
+     * @return Usable screen size.
+     * @see #getNavigationBarHeight(Context)
+     */
     private static Point getAppUsableScreenSize(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+
+        if (windowManager == null)
+            return size;
+
+        Display display = windowManager.getDefaultDisplay();
         display.getSize(size);
+
         return size;
     }
 
+    /**
+     * @param context The Context in which this operation should be executed.
+     * @return Real screen size.
+     * @see #getNavigationBarHeight(Context)
+     */
     private static Point getRealScreenSize(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+
+        if (windowManager == null)
+            return size;
+
+        Display display = windowManager.getDefaultDisplay();
         display.getRealSize(size);
+
         return size;
     }
 
-    public static SSDevice getLocalDevice(Context context)
-    {
+    /**
+     * @param context The Context in which this operation should be executed.
+     * @return Information about local device.
+     */
+    public static SSDevice getLocalDevice(Context context) {
         SSDevice device = new SSDevice(getDeviceId(context), AppConfig.APP_VERSION);
 
         device.setBrand(Build.BRAND);
@@ -92,38 +116,50 @@ public class AppUtils {
         return device;
     }
 
-    public static String getDeviceId(Context context)
-    {
+    /**
+     * TODO: see in bug tracker
+     * @param context The Context in which this operation should be executed.
+     * @return The StreamShare ID of local device.
+     */
+    public static String getDeviceId(Context context) {
         File certFile = new File(context.getFilesDir(), KeyConfig.CERTIFICATE_FILENAME);
-        X509Certificate myCert = SecurityUtils.loadCertificate(KeyConfig.CRYPTO_PROVIDER, certFile);
+        X509Certificate myCert = SecurityUtils.loadCertificate(certFile);
 
-        Log.w(TAG, "My device id: " + SecurityUtils.calculateDeviceId(myCert));
-        //Log.w(TAG, "My certificate: " + myCert.toString());
+        if (myCert == null) {
+            Log.i(TAG, "Cannot calculate local device id");
+            return "undefined";
+        }
 
         return SecurityUtils.calculateDeviceId(myCert);
     }
 
-    public static String getLocalDeviceName()
-    {
+    /**
+     * @return The name of local device.
+     */
+    public static String getLocalDeviceName() {
         //TODO: add ability to change name
         return Build.MODEL.toUpperCase();
     }
 
-    public static int getUniqueNumber()
-    {
+    /**
+     * @return Unique number.
+     */
+    public static int getUniqueNumber() {
         return (int) (System.currentTimeMillis() / 1000) + (++mUniqueNumber);
     }
 
-    public static DNSSDHelper getDNSSDHelper(Context context) {
-        if (mDNSSDHelper == null)
-            mDNSSDHelper = new DNSSDHelper(context);
-
-        return mDNSSDHelper;
-    }
-
+    /**
+     * Checks if the service is running.
+     * @param context The Context in which this operation should be executed.
+     * @param serviceClass The class of service you want to check.
+     */
     public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
-        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        if (activityManager == null)
+            return false;
+
+        List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
 
         for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
             if (runningServiceInfo.service.getClassName().equals(serviceClass.getName())){
@@ -131,30 +167,5 @@ public class AppUtils {
             }
         }
         return false;
-    }
-
-    public static boolean isAppIsInBackground(Context context) {
-        boolean isInBackground = true;
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
-            List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
-            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
-                if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    for (String activeProcess : processInfo.pkgList) {
-                        if (activeProcess.equals(context.getPackageName())) {
-                            isInBackground = false;
-                        }
-                    }
-                }
-            }
-        } else {
-            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-            ComponentName componentInfo = taskInfo.get(0).topActivity;
-            if (componentInfo.getPackageName().equals(context.getPackageName())) {
-                isInBackground = false;
-            }
-        }
-
-        return isInBackground;
     }
 }

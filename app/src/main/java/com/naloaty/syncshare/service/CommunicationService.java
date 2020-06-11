@@ -11,22 +11,34 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.naloaty.syncshare.app.SSService;
 import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.database.device.NetworkDeviceRepository;
-import com.naloaty.syncshare.util.AppUtils;
 import com.naloaty.syncshare.util.CommunicationNotification;
 import com.naloaty.syncshare.util.DNSSDHelper;
 import com.naloaty.syncshare.util.PermissionHelper;
 
+/**
+ * This class represents the main StreamShare service.
+ * The main tasks of this class:
+ *      - Holding a {@link MediaServer} in running state;
+ *      - Providing nearby device discovery regardless of activity lifecycle. See {@link com.github.druk.dnssd.DNSSD}.
+ */
 public class CommunicationService extends SSService {
 
     private static final String TAG = "CommunicationService";
 
-    public static final String ACTION_STOP_SHARING = "com.naloaty.intent.action.STOP_SHARING";
-    public static final String EXTRA_SERVICE_SATE = "serviceState";
+    public static final String ACTION_STOP_SHARING   = "com.naloaty.intent.action.STOP_SHARING";
     public static final String SERVICE_STATE_CHANGED = "com.naloaty.intent.state.SERVICE_STATE_CHANGED";
+    public static final String EXTRA_SERVICE_SATE    = "serviceState";
+
+    private State mServiceState = State.Stopped;
 
     private CommunicationNotification mNotification;
     private DNSSDHelper mDNSSDHelper;
     private MediaServer mMediaServer;
+
+    private enum State {
+        Running,
+        Stopped
+    }
 
     @Nullable
     @Override
@@ -38,54 +50,38 @@ public class CommunicationService extends SSService {
     public void onCreate() {
         super.onCreate();
 
-        Log.d(TAG, "Registering DNSSD");
+        Log.i(TAG, "Starting StreamShare service");
 
-        mDNSSDHelper = AppUtils.getDNSSDHelper(getApplicationContext());
-        mDNSSDHelper.register();
-        mDNSSDHelper.startBrowse();
+        if (!PermissionHelper.checkRequiredPermissions(this)) {
+            Log.i(TAG, "No required running conditions met. Shutting down the service");
+
+            stopSelf();
+            return;
+        }
+
+        if (!runMediaServer()) {
+            stopSelf();
+            return;
+        }
+
+        setupDiscoveryService();
 
         mNotification = new CommunicationNotification(getNotificationUtils());
+        mNotification.showServiceNotification();
+        setServiceState(State.Running);
 
-        if (!PermissionHelper.checkRequiredPermissions(this)){
-            Log.i(TAG, "Aborting CommunicationService");
-            stopSelf();
-        }
-
-        /*
-         * TODO: Think about insecure server practice
-         */
-
-        Log.d(TAG, "Starting MediaServer");
-        mMediaServer = new MediaServer(this, AppConfig.MEDIA_SERVER_PORT, true);
-
-        try { mMediaServer.start(); }
-        catch (Exception e) {
-            Log.d(TAG, "Cannot start MediaServer: ");
-            e.printStackTrace();
-        }
-
-        mNotification.getServiceNotification().build();
-
-        Intent intent = new Intent(SERVICE_STATE_CHANGED);
-        intent.putExtra(EXTRA_SERVICE_SATE, true);
-
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        Log.i(TAG, "Communication service started");
+        Log.i(TAG, "StreamShare service is started successfully");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        if (intent != null)
-            Log.d(TAG, "onStartCommand() with action = " + intent.getAction());
+        String action = intent.getAction();
 
-        if (intent != null && intent.getAction() != null && PermissionHelper.checkRequiredPermissions(this)) {
-
-            if (intent.getAction().equals(ACTION_STOP_SHARING)) {
-                Log.d(TAG, "User stopped service");
-                stopSelf();
-            }
+        if (ACTION_STOP_SHARING.equals(action)) {
+            Log.i(TAG, "Shutting down the service by user");
+            stopSelf();
         }
 
         return START_STICKY;
@@ -95,31 +91,105 @@ public class CommunicationService extends SSService {
     public void onDestroy() {
         super.onDestroy();
 
-        Log.d(TAG, "Unregistering DNSSD");
+        stopMediaServer();
+        stopDiscoveryService();
+        clearNearbyDevices();
+
+        mNotification.cancelNotification();
+        setServiceState(State.Stopped);
+
+        Log.d(TAG, "StreamShare service is stopped");
+    }
+
+    /**
+     * Starts the {@link MediaServer}.
+     * @return True if the media server is started successfully.
+     */
+    private boolean runMediaServer() {
+        try {
+            mMediaServer = new MediaServer(this, AppConfig.MEDIA_SERVER_PORT);
+            mMediaServer.start();
+
+            Log.i(TAG, "Media server is started");
+            return true;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+
+            Log.i(TAG, "Cannot start media server");
+            return false;
+        }
+    }
+
+    /**
+     * Stops the {@link MediaServer}.
+     */
+    private void stopMediaServer() {
+        mMediaServer.stop();
+        Log.i(TAG, "Media server is stopped");
+    }
+
+    /**
+     * Setups nearby discovery service.
+     */
+    private void setupDiscoveryService() {
+        mDNSSDHelper = new DNSSDHelper(getApplicationContext());
+        mDNSSDHelper.register();
+        mDNSSDHelper.startBrowse();
+
+        Log.i(TAG, "Discovery service is registered");
+    }
+
+    /**
+     * Stops nearby discovery service.
+     */
+    private void stopDiscoveryService() {
         mDNSSDHelper.unregister();
         mDNSSDHelper.stopBrowse();
 
-        try
-        {
-            mMediaServer.stop();
-        }
-        catch (Exception e) {
-            Log.d(TAG, "Cannot stop MediaServer: ");
-            e.printStackTrace();
-        }
+        Log.i(TAG, "Discovery service is unregistered");
+    }
 
-        mNotification.cancelNotification();
-
+    /**
+     * Clears a table of network devices in the database.
+     * @see com.naloaty.syncshare.database.device.NetworkDevice
+     */
+    private void clearNearbyDevices() {
         NetworkDeviceRepository repository = new NetworkDeviceRepository(this);
         repository.deleteAllDevices();
 
-        Intent intent = new Intent(SERVICE_STATE_CHANGED);
-        intent.putExtra(EXTRA_SERVICE_SATE, false);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
-        Log.d(TAG, "Destroy :(");
+        Log.i(TAG, "Nearby devices table is cleared");
     }
 
+    /**
+     * Toggles the service to the required state.
+     * @see #broadcastServiceState()
+     */
+    private void setServiceState(State serviceState) {
+        if (mServiceState == serviceState)
+            return;
 
+        mServiceState = serviceState;
+        broadcastServiceState();
+    }
+
+    /**
+     * Broadcasts the state of the service
+     */
+    private void broadcastServiceState() {
+        Intent intent = new Intent(SERVICE_STATE_CHANGED);
+
+        switch (mServiceState) {
+            case Running:
+                intent.putExtra(EXTRA_SERVICE_SATE, true);
+                break;
+
+            case Stopped:
+                intent.putExtra(EXTRA_SERVICE_SATE, false);
+                break;
+        }
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
 }

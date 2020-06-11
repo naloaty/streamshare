@@ -17,19 +17,24 @@ import com.naloaty.syncshare.database.media.Album;
 import com.naloaty.syncshare.database.media.AlbumRepository;
 import com.naloaty.syncshare.util.PermissionHelper;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
-
+/**
+ * This class helps to make requests to the Android Media Store database
+ * and allows to retrieve a list of albums and media-files.
+ */
 public class MediaProvider {
 
     private static final String TAG = "MediaProvider";
 
-    public static List<Album> getAlbums(Context context) throws Exception {
-
+    /**
+     * TODO: add ability to select sorting parameters
+     * Returns a list of albums on the local device.
+     * @param context The Context in which this request should be executed.
+     * @return A list of albums on the local device.
+     */
+    public static List<Album> getAlbums(Context context) {
         if (!PermissionHelper.checkRequiredPermissions(context))
             return new ArrayList<>();
 
@@ -58,7 +63,6 @@ public class MediaProvider {
         for (int i = 0; i < args.length; i++)
             argsStr[i] = String.valueOf(args[i]);
 
-
         ContentResolver contentResolver = context.getContentResolver();
 
         Cursor cursor = contentResolver.query(uri, projection, selection, argsStr, sort);
@@ -71,11 +75,14 @@ public class MediaProvider {
 
         cursor.close();
         return albumsList;
-
     }
 
-    public static List<Album> getSharedAlbums(Context context) throws Exception {
-
+    /**
+     * Returns a list of those albums on the local device that the user has marked as shared.
+     * @param context The Context in which this request should be executed.
+     * @return A list of shared albums on the local device.
+     */
+    public static List<Album> getSharedAlbums(Context context) {
         if (!PermissionHelper.checkRequiredPermissions(context))
             return new ArrayList<>();
 
@@ -85,7 +92,6 @@ public class MediaProvider {
         List<Album> actualAlbums = getAlbums(context);
 
         /* Here we check if album exists and access to it is granted */
-
         List<Album> sharedAlbums = new ArrayList<>();
 
         for (Album dbAlbum: dbAlbums) {
@@ -97,7 +103,6 @@ public class MediaProvider {
             for (Album actualAlbum: actualAlbums) {
                 boolean exists = dbAlbum.getAlbumId() == actualAlbum.getAlbumId() &&
                                  TextUtils.equals(dbAlbum.getPath(), actualAlbum.getPath());
-
                 if (exists)
                 {
                     isFound = true;
@@ -115,6 +120,10 @@ public class MediaProvider {
 
     }
 
+    /**
+     * Deletes those shared albums from the database that no longer exist.
+     * @param context The Context in which this operation should be executed.
+     */
     public static void clearGhostAlbums(Context context) throws Exception {
         if (!PermissionHelper.checkRequiredPermissions(context))
             return;
@@ -138,16 +147,29 @@ public class MediaProvider {
         }
     }
 
+    /**
+     * Returns the absolute path of the album by the media file that it contains.
+     * @param path Absolute path of media-file.
+     * @return Absolute path of album.
+     */
     public static String getBucketPathByImagePath(String path) {
-        String b[] = path.split("/");
+        String[] b = path.split("/");
         String c = "";
-        for (int x = 0; x < b.length - 1; x++) c += b[x] + "/";
+
+        for (int i = 0; i < b.length - 1; i++)
+            c += b[i] + "/";
+
         c = c.substring(0, c.length() - 1);
         return c;
     }
 
+    /**
+     * Returns a list of media files from the required album.
+     * @param context The Context in which this request should be executed.
+     * @param albumId Id of the album in the Android Media Store database.
+     * @return A list of media files.
+     */
     public static List<Media> getMediaFromMediaStore(Context context, String albumId) {
-
         if (!PermissionHelper.checkRequiredPermissions(context))
             return new ArrayList<>();
 
@@ -193,16 +215,23 @@ public class MediaProvider {
         return mediaList;
     }
 
-    /*
-     * filename has following structure:
-     * 12345.jpg
-     *  ^
-     * media (row) id
+
+    /**
+     * Converts media file name to its absolute path.
+     * @param context The Context in which this operation should be executed.
+     * @param filename Filename of the media-file in StreamShare format (see {@link Media}).
+     * @see MediaObject
      */
     public static MediaObject getMediaObjectById(Context context, String filename) throws Exception{
-
         if (!PermissionHelper.checkRequiredPermissions(context))
             throw new Exception("Not found");
+
+        /*
+         * filename has following structure:
+         * 12345.jpg
+         *  ^
+         * media (row) id
+         */
 
         // Remove extension
         int dot = filename.lastIndexOf('.');
@@ -246,16 +275,20 @@ public class MediaProvider {
         throw new Exception("Not found");
     }
 
-
+    /**
+     * Returns a correctly oriented thumbnail of a media-file.
+     * @param context The Context in which this operation should be executed.
+     * @param mediaObject Media-file in form of {@link MediaObject}.
+     * @param nativeSize True if thumbnail should not be compressed and resized.
+     * @return Thumbnail bitmap.
+     */
     public static Bitmap getCorrectlyOrientedThumbnail(Context context, MediaObject mediaObject, boolean nativeSize) {
-
         if (!PermissionHelper.checkRequiredPermissions(context)){
             Log.d(TAG, "Permissions not granted");
 
             return BitmapFactory.decodeResource(context.getResources(),
                     R.drawable.ic_warning_24dp);
         }
-
 
         Bitmap srcBitmap;
 

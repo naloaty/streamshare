@@ -137,6 +137,7 @@ public class Album {
     /**
      * Returns the projection in order to retrieve albums list from android media store database.
      * @return Projection for albums request.
+     * @see MediaProvider
      */
     public static String[] getProjection() {
         return new String[]{

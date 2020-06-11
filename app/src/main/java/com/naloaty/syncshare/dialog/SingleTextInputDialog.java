@@ -7,11 +7,17 @@ import android.widget.EditText;
 
 import com.naloaty.syncshare.R;
 
+/**
+ * This class represents a dialog with a single text input field.
+ * @see EnterDeviceIdDialog
+ */
 public abstract class SingleTextInputDialog extends ManualDismissDialog {
 
+    private OnEnteredListener mListener;
+
+    /* UI elements */
     private EditText mEditText;
     private ViewGroup mView;
-    private OnEnteredListener mListener;
 
     public SingleTextInputDialog(Context context,OnEnteredListener listener)
     {
@@ -28,15 +34,25 @@ public abstract class SingleTextInputDialog extends ManualDismissDialog {
         mEditText.requestFocus();
     }
 
-    protected EditText getEditText()
-    {
+    /**
+     * Returns text input field.
+     * @return Input field.
+     */
+    protected EditText getEditText() {
         return mEditText;
     }
 
+    /**
+     * Returns input listener.
+     * @return Input listener.
+     */
     protected OnEnteredListener getOnEnteredListener() {
         return mListener;
     }
 
+    /**
+     * Listener for input. Called when the action button is clicked.
+     */
     public interface OnEnteredListener {
         void onEntered(String text);
     }

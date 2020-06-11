@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.security.keystore.KeyProperties;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.naloaty.syncshare.config.KeyConfig;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -42,33 +44,58 @@ import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Date;
 
-//TODO: add documentation
+import retrofit2.internal.EverythingIsNonNull;
+
+/**
+ * This class helps to create a StreamShare security elements such as an SSL certificate and RSA key pair.
+ */
 public class KeyTool {
 
     private static final String TAG = "KeyTool";
 
+    /*
+     * Replaces the default crypto provider.
+     */
     static {
         SecurityUtils.initBCProvider();
     }
 
-    public static void createSecurityStuff(final File saveDirectory, final KeyGeneratorCallback callback) {
+    /**
+     * Initializes certificate creation.
+     * @param saveDirectory Directory where certificate will be saved.
+     * @param callback Key generator callback. See {@link KeyGeneratorCallback}.
+     * @see com.naloaty.syncshare.app.SSActivity
+     */
+    public static void createSecurityStuff(@NonNull final File saveDirectory, final KeyGeneratorCallback callback) {
         new GenerateSecurityStuffAT(saveDirectory, callback).execute();
     }
 
-    private static void saveStuff(File file, Object stuff) throws IOException{
+    /**
+     * Writes a security object to a file.
+     * @param file The file to which the object will be written.
+     * @param stuff The object to be written to the file.
+     * @see GenerateSecurityStuffAT
+     */
+    @EverythingIsNonNull
+    private static void saveStuff(File file, Object stuff) throws IOException {
         FileWriter fileWriter = new FileWriter(file);
         JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter);
         pemWriter.writeObject(stuff);
         pemWriter.flush();
         pemWriter.close();
         fileWriter.close();
-
     }
 
-    private static KeyPair generateKeyPair(String provider, int keysize) throws NoSuchProviderException
-    {
-        try
-        {
+    /**
+     * Generates RSA key pair.
+     * @param provider Crypto provider to be used for generation.
+     * @param keysize RSA key size.
+     * @return RSA key pair.
+     * @throws NoSuchProviderException Throws an exception if the specified crypto provider does not exist.
+     */
+    @EverythingIsNonNull
+    private static KeyPair generateKeyPair(String provider, int keysize) throws NoSuchProviderException {
+        try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, provider);
             RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(keysize, RSAKeyGenParameterSpec.F4);
             keyPairGenerator.initialize(spec, new SecureRandom());
@@ -83,12 +110,14 @@ public class KeyTool {
     }
 
     /**
-     * Generator of self-signed X509 v3 certificate
+     * Generates self-signed X509 v3 certificate.
+     * @param provider Crypto provider to be used for generation.
+     * @param config Certificate configuration. See {@link CertificateConfig}.
+     * @return Self-signed X509 v3 certificate.
      */
+    @EverythingIsNonNull
     private static X509Certificate generateCertificate(final String provider, final CertificateConfig config) {
-
-        try
-        {
+        try {
             AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find(config.getSignatureAlgorithm());
             AlgorithmIdentifier digAlgId = new DefaultDigestAlgorithmIdentifierFinder().find(sigAlgId);
             AsymmetricKeyParameter privateKeyAsymKeyParam = PrivateKeyFactory.createKey(config.getKeyPair().getPrivate().getEncoded());
@@ -126,42 +155,51 @@ public class KeyTool {
         }
         catch (IOException | CertificateException | OperatorCreationException e)
         {
-            Log.w(TAG, "Cannot create security certificate: " + e.getMessage());
+            Log.w(TAG, "Cannot create SSL certificate: " + e.getMessage());
             return null;
         }
 
     }
 
+    /**
+     * A task that asynchronously generates the necessary security elements (certificate and key pair)
+     * and stores them in the specified directory.
+     */
     private static class GenerateSecurityStuffAT extends AsyncTask<Void, Void, Void> {
 
         private final KeyGeneratorCallback callback;
         private final File saveDirectory;
 
-        public GenerateSecurityStuffAT(final File saveDirectory, final KeyGeneratorCallback callback) {
+        GenerateSecurityStuffAT(@NonNull final File saveDirectory, final KeyGeneratorCallback callback) {
             this.callback = callback;
             this.saveDirectory = saveDirectory;
         }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            callback.onStart();
+
+            if (callback != null)
+                callback.onStart();
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
 
-            try
-            {
+            try {
                 KeyPair keyPair = generateKeyPair(KeyConfig.CRYPTO_PROVIDER, KeyConfig.KEY_SIZE);
 
-                if (keyPair == null)
+                if (keyPair == null){
                     cancel(true);
+                    return null;
+                }
 
                 CertificateConfig certConfig = new CertificateConfig(keyPair);
                 X509Certificate certificate = generateCertificate(KeyConfig.CRYPTO_PROVIDER, certConfig);
 
-                if (certificate == null)
+                if (certificate == null){
                     cancel(true);
+                    return null;
+                }
 
                 File key = new File(saveDirectory, KeyConfig.KEY_FILENAME);
                 File cert = new File(saveDirectory, KeyConfig.CERTIFICATE_FILENAME);
@@ -187,26 +225,56 @@ public class KeyTool {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            callback.onFinish();
+
+            if (callback != null)
+                callback.onFinish();
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
-            callback.onFail();
+
+            if (callback != null)
+                callback.onFail();
         }
     }
 
-    public static class CertificateConfig
-    {
+    /**
+     * X509 v3 certificate configuration used during generation process.
+     * @see KeyConfig
+     */
+    public static class CertificateConfig {
+        /**
+         * RSA key pair
+         */
         private KeyPair keyPair;
+
+        /**
+         * The name of the signature algorithm
+         */
         private String signatureAlgorithm = null;
+
+        /**
+         * The certificate issuer.
+         */
         private String issuer = null;
+
+        /**
+         * The certificate subject.
+         */
         private String subject = null;
+
+        /**
+         * The Time before which the certificate is not valid.
+         */
         private Date notBefore = null;
+
+        /**
+         * The Time after which the certificate is not valid.
+         */
         private Date notAfter = null;
 
-        public CertificateConfig(KeyPair keyPair) {
+        public CertificateConfig(@NonNull KeyPair keyPair) {
             this.keyPair = keyPair;
         }
 
@@ -255,6 +323,9 @@ public class KeyTool {
         }
     }
 
+    /**
+     * Callback for {@link GenerateSecurityStuffAT}
+     */
     public interface KeyGeneratorCallback {
         void onStart();
         void onFinish();

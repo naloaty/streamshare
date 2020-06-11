@@ -8,16 +8,25 @@ import androidx.core.app.NotificationCompat;
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.service.CommunicationService;
 
+/**
+ * This class helps display a notification for {@link CommunicationService} in the status bar.
+ */
 public class CommunicationNotification {
 
-    public static int SERVICE_NOTIFICATION_ID = 12345;
+    private static int SERVICE_NOTIFICATION_ID = 247830;
     private NotificationUtils notificationUtils;
 
+    /**
+     * @param notificationUtils The instance {@link NotificationUtils} that is used to display notifications.
+     */
     public CommunicationNotification (NotificationUtils notificationUtils) {
         this.notificationUtils = notificationUtils;
     }
 
-    public SSNotification getServiceNotification() {
+    /**
+     * Shows a notification in the status bar.
+     */
+    public void showServiceNotification() {
         SSNotification notification =
                 notificationUtils.createNotification(NotificationUtils.NOTIFICATION_CHANNEL_LOW, SERVICE_NOTIFICATION_ID);
 
@@ -39,15 +48,18 @@ public class CommunicationNotification {
                 .setContentTitle(titleContent)
                 .setContentText(textContent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                //.setAutoCancel(true) //After tap notification will be auto canceled
+                //.setAutoCancel(true) //Notification will be automatically canceled after tap
                 .setContentIntent(contentAction)
                 .setOngoing(true);
 
 
-        return notification.show();
+        notification.show();
     }
 
 
+    /**
+     * Dismisses a notification in the status bar.
+     */
     public void cancelNotification() {
         notificationUtils.cancelNotification(SERVICE_NOTIFICATION_ID);
     }

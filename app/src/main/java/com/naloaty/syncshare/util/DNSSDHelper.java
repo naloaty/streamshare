@@ -22,14 +22,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+/**
+ * This class helps to manage the discovery service.
+ * @see com.naloaty.syncshare.service.CommunicationService
+ */
 public class DNSSDHelper {
 
     private static final String TAG = "DNSSDHelper";
 
-    private static final String
-                    TXT_RECORD_DEVICE_ID = "deviceId",
-                    TXT_RECORD_DEVICE_NICKNAME = "deviceNickname",
-                    TXT_RECORD_APP_VERSION = "appVersion";
+    private static final String TXT_RECORD_DEVICE_ID       = "deviceId";
+    private static final String TXT_RECORD_DEVICE_NICKNAME = "deviceNickname";
+    private static final String TXT_RECORD_APP_VERSION     = "appVersion";
 
     private DNSSD mDNSSD;
     private Handler mHandler;
@@ -40,51 +43,113 @@ public class DNSSDHelper {
     private DNSSDService mBrowseService;
     private DNSSDService mRegisterService;
 
+    /**
+     * @param context The Context in which this request should be executed.
+     */
     public DNSSDHelper(Context context) {
         this.mDNSSD = new DNSSDBindable(context);
         this.mHandler = new Handler(Looper.getMainLooper());
         this.mContext = context;
     }
 
+    /**
+     * Starts a search for nearby devices
+     */
     public void startBrowse() {
-        Log.d(TAG, "Start browse");
+        Log.i(TAG, "Starting to browse nearby devices");
+
         try {
             mBrowseService = mDNSSD.browse(AppConfig.DNSSD_SERVICE_TYPE, new BrowseListener() {
                 @Override
                 public void serviceFound(DNSSDService browser, int flags, int ifIndex, final String serviceName, String regType, String domain) {
-                    Log.d(TAG, "Found " + serviceName);
-
+                    Log.i(TAG, String.format("Found device. Service name is %s", serviceName));
                     startResolve(flags, ifIndex, serviceName, regType, domain);
                 }
 
                 @Override
                 public void serviceLost(DNSSDService browser, int flags, int ifIndex, String serviceName, String regType, String domain) {
+                    Log.i(TAG, String.format("Lost device. Service name is %s", serviceName));
                     NetworkDeviceManager.manageLostDevice(mContext, serviceName);
                 }
 
                 @Override
                 public void operationFailed(DNSSDService service, int errorCode) {
-                    Log.e("TAG", "error: " + errorCode);
+                    Log.e(TAG, String.format("Error: %d ", errorCode));
                 }
             });
         } catch (DNSSDException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error", e);
+            Log.e(TAG, String.format("Error: %s ", e.toString()));
         }
     }
 
+    /**
+     * Stops a search for nearby devices
+     */
+    public void stopBrowse() {
+        Log.d("TAG", "Stopping to browse nearby devices");
+        mBrowseService.stop();
+        mBrowseService = null;
+    }
+
+    /**
+     * Registers the local device service on the current network.
+     */
+    public void register() {
+        Log.i(TAG, "Registering service");
+
+        try {
+            mServiceName = AppConfig.DNSSD_SERVICE_NAME + "_" + AppUtils.getUniqueNumber();
+
+            TXTRecord extraData = new TXTRecord();
+            extraData.set(TXT_RECORD_DEVICE_ID, AppUtils.getDeviceId(mContext));
+            extraData.set(TXT_RECORD_DEVICE_NICKNAME, AppUtils.getLocalDeviceName());
+            extraData.set(TXT_RECORD_APP_VERSION, AppConfig.APP_VERSION);
+
+            mRegisterService = mDNSSD.register(0, 0, mServiceName, AppConfig.DNSSD_SERVICE_TYPE, null, null, AppConfig.DNSSD_SERVER_PORT, extraData,  new RegisterListener() {
+                @Override
+                public void serviceRegistered(DNSSDRegistration registration, int flags, String serviceName, String regType, String domain) {
+                    Log.i(TAG, String.format("Service registered successfully. Service name is %s", serviceName));
+                }
+
+                @Override
+                public void operationFailed(DNSSDService service, int errorCode) {
+                    Log.e(TAG, String.format("Cannot register service. Error code: %d", errorCode));
+                }
+            });
+        } catch (DNSSDException e) {
+            Log.e(TAG, String.format("Error during registering service: %s", e.toString()));
+        }
+    }
+
+    /**
+     * Unregisters the local device service on the current network.
+     */
+    public void unregister() {
+        Log.i(TAG, "Unregistering service");
+
+        mRegisterService.stop();
+        mRegisterService = null;
+    }
+
+    /**
+     * Resolves the found service.
+     */
     private void startResolve(int flags, int ifIndex, final String serviceName, final String regType, final String domain) {
+
+        Log.i(TAG, "Resolving the found service");
+
         try {
             mDNSSD.resolve(flags, ifIndex, serviceName, regType, domain, new ResolveListener() {
                 @Override
                 public void serviceResolved(DNSSDService resolver, int flags, int ifIndex, String fullName, String hostName, int port, Map<String, String> txtRecord) {
-                    Log.d("TAG", "Resolved " + hostName);
+                    Log.i(TAG, String.format("Resolved service with hostname %s", hostName));
                     startQueryRecords(flags, ifIndex, serviceName, regType, domain, hostName, port, txtRecord);
                 }
 
                 @Override
                 public void operationFailed(DNSSDService service, int errorCode) {
-
+                    Log.e(TAG, String.format("Cannot resolve service. Error code: %d", errorCode));
                 }
             });
         } catch (DNSSDException e) {
@@ -92,12 +157,17 @@ public class DNSSDHelper {
         }
     }
 
+    /**
+     * Queries TXT records from the found service.
+     */
     private void startQueryRecords(int flags, int ifIndex, final String serviceName, final String regType, final String domain, final String hostName, final int port, final Map<String, String> txtRecord) {
+
+        Log.i(TAG, "Querying TXT Records of the found service");
+
         try {
             QueryListener listener = new QueryListener() {
                 @Override
                 public void queryAnswered(DNSSDService query, int flags, int ifIndex, String fullName, int rrtype, int rrclass, byte[] rdata, int ttl) {
-                    Log.d(TAG, "Query address " + fullName);
                     mHandler.post(() -> {
                         //BonjourService.Builder builder = new BonjourService.Builder(flags, ifIndex, serviceName, regType, domain).dnsRecords(txtRecord).port(port).hostname(hostName);
                         try {
@@ -109,8 +179,11 @@ public class DNSSDHelper {
                             device.setAppVersion(txtRecord.get(TXT_RECORD_APP_VERSION));
                             NetworkDeviceManager.manageDevice(mContext, device);
 
+                            Log.i(TAG, String.format("Recognized the found service: SN: %s;  IP: %s; Name: %s; ID: %s; App: %s;", serviceName, device.getIpAddress(),
+                                    device.getDeviceName(), device.getDeviceId(), device.getAppVersion()));
+
                         } catch (UnknownHostException e) {
-                            e.printStackTrace();
+                            Log.e(TAG, String.format("Cannot resolve ipv4 of the found service. Reason: %s", e.toString()));
                         }
 
                     });
@@ -118,7 +191,7 @@ public class DNSSDHelper {
 
                 @Override
                 public void operationFailed(DNSSDService service, int errorCode) {
-
+                    Log.e(TAG, String.format("Cannot resolve TXT Records of the found service. Error code: %s", errorCode));
                 }
             };
             //ip v4 query
@@ -130,45 +203,5 @@ public class DNSSDHelper {
             e.printStackTrace();
         }
     }
-
-    public void stopBrowse() {
-        Log.d("TAG", "Stop browsing");
-        mBrowseService.stop();
-        mBrowseService = null;
-    }
-
-    public void register() {
-        Log.d(TAG, "register");
-        try {
-            mServiceName = AppConfig.DNSSD_SERVICE_NAME + "_" + AppUtils.getUniqueNumber();
-
-            TXTRecord extraData = new TXTRecord();
-            extraData.set(TXT_RECORD_DEVICE_ID, AppUtils.getDeviceId(mContext));
-            extraData.set(TXT_RECORD_DEVICE_NICKNAME, AppUtils.getLocalDeviceName());
-            extraData.set(TXT_RECORD_APP_VERSION, AppConfig.APP_VERSION);
-
-            //mServiceName, AppConfig.DNSSD_SERVICE_TYPE, AppConfig.DNSSD_SERVER_PORT
-            mRegisterService = mDNSSD.register(0, 0, mServiceName, AppConfig.DNSSD_SERVICE_TYPE, null, null, AppConfig.DNSSD_SERVER_PORT, extraData,  new RegisterListener() {
-                @Override
-                public void serviceRegistered(DNSSDRegistration registration, int flags, String serviceName, String regType, String domain) {
-                    Log.d(TAG, "Register successfully " + serviceName);
-                }
-
-                @Override
-                public void operationFailed(DNSSDService service, int errorCode) {
-                    Log.e(TAG, "Error " + errorCode);
-                }
-            });
-        } catch (DNSSDException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void unregister() {
-        Log.d(TAG, "Unregister");
-        mRegisterService.stop();
-        mRegisterService = null;
-    }
-
 
 }

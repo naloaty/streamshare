@@ -1,10 +1,8 @@
 package com.naloaty.syncshare.dialog;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -17,20 +15,24 @@ import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.device.SSDeviceRepository;
 
+/**
+ * This class represents a dialog that displays general information about a trusted device.
+ * @see com.naloaty.syncshare.fragment.MyDevicesFragment
+ */
 public class MyDeviceDetailsDialog extends ManualDismissDialog {
 
-    private ViewGroup mView;
+    private Context mContext;
+    private AlertDialog mDialog;
+    private SSDevice mSSDevice;
 
+    /* UI elements */
+    private ViewGroup mView;
     private ImageView mDeviceIcon;
     private TextView mDeviceNickname;
     private TextView mDeviceId;
     private TextView mDeviceName;
     private TextView mAppVersion;
     private Switch mAllowAccess;
-
-    private Context mContext;
-    private AlertDialog mDialog;
-    private SSDevice mSSDevice;
 
     public MyDeviceDetailsDialog(@NonNull Context context) {
         super(context);
@@ -45,56 +47,54 @@ public class MyDeviceDetailsDialog extends ManualDismissDialog {
 
         setPositiveButton(R.string.btn_close, null);
 
-        setNegativeButtonS(R.string.btn_remove, new OnClickListener() {
-            @Override
-            public boolean onClick(AlertDialog dialog) {
-                removeDevice();
-                return false;
-            }
+        setNegativeButtonS(R.string.btn_remove, dialog -> {
+            removeDevice();
+            return false;
         });
 
-        mAllowAccess.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setAccessAllowed(isChecked);
-            }
-        });
+        mAllowAccess.setOnCheckedChangeListener((buttonView, isChecked) -> setAccessAllowed(isChecked));
 
         setView(mView);
         mContext = context;
     }
 
+    /**
+     * Writes the status of the device (access is allowed or not) to the database.
+     * @param accessAllowed True if this device has access to local albums.
+     */
     private void setAccessAllowed(boolean accessAllowed) {
         mSSDevice.setAccessAllowed(accessAllowed);
-
         SSDeviceRepository repository = new SSDeviceRepository(mContext);
         repository.update(mSSDevice);
     }
 
+    /**
+     * Removes a trusted device from the database.
+     * Also shows a dialog that asks the user to confirm the removal of the device.
+     */
     private void removeDevice() {
-
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                if (mDialog != null && mDialog.isShowing())
-                    mDialog.dismiss();
-
-                if (mSSDevice != null) {
-                    SSDeviceRepository repository = new SSDeviceRepository(mContext);
-                    repository.delete(mSSDevice);
-                }
-            }
-        };
+        if (mDialog != null && mDialog.isShowing())
+            mDialog.dismiss();
 
         new AlertDialog.Builder(mContext)
                 .setMessage(R.string.text_confirmRemoval)
-                .setNegativeButton(R.string.btn_cancel, null)
-                .setPositiveButton(R.string.btn_remove, listener)
+                .setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
+                    if (mDialog != null && !mDialog.isShowing())
+                        mDialog.show();
+                })
+                .setPositiveButton(R.string.btn_remove, (dialog, which) -> {
+                    if (mSSDevice != null) {
+                        SSDeviceRepository repository = new SSDeviceRepository(mContext);
+                        repository.delete(mSSDevice);
+                    }
+                })
                 .show();
     }
 
+    /**
+     * Sets the trusted device whose general information will be displayed.
+     * @param device Trusted device. Instance of {@link SSDevice}.
+     */
     public void setSSDevice(SSDevice device) {
         if (device == null)
             return;
@@ -102,7 +102,7 @@ public class MyDeviceDetailsDialog extends ManualDismissDialog {
         mSSDevice = device;
 
         int iconResource;
-        String[] appVersion = device.getAppVersion().split("::");;
+        String[] appVersion = device.getAppVersion().split("::");
         switch (appVersion[1]) {
 
             case AppConfig.PLATFORM_MOBILE:
@@ -130,10 +130,15 @@ public class MyDeviceDetailsDialog extends ManualDismissDialog {
         mAllowAccess.setChecked(device.isAccessAllowed());
     }
 
+    /**
+     * Shows the dialog.
+     * NOTE: Control over dialog dismissing is in hands of ManualDismissDialog.OnClickListener();
+     * @return Showed dialog.
+     * @see ManualDismissDialog
+     */
     @Override
     public AlertDialog show() {
         mDialog = super.show();
-
         return mDialog;
     }
 }

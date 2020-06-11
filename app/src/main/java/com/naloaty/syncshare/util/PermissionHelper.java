@@ -3,7 +3,6 @@ package com.naloaty.syncshare.util;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -22,12 +21,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.POWER_SERVICE;
-import static com.naloaty.syncshare.util.AppUtils.OPTIMIZATION_DISABLE;
+import static com.naloaty.syncshare.util.AppUtils.BATTERY_OPTIMIZATION_DISABLE;
 
+/**
+ * This class helps to request and check permissions.
+ */
 public class PermissionHelper {
 
-    public static boolean checkRequiredPermissions(Context context)
-    {
+    /**
+     * Checks if all required permissions are granted.
+     * @param context The Context in which this operation should be executed.
+     * @return True if all required permissions are granted.
+     */
+    public static boolean checkRequiredPermissions(Context context) {
         for (PermissionHelper.Permission request : getRequiredPermissions())
             if (ActivityCompat.checkSelfPermission(context, request.permission) != PackageManager.PERMISSION_GRANTED)
                 return false;
@@ -35,6 +41,11 @@ public class PermissionHelper {
         return true;
     }
 
+    /**
+     * Checks if battery optimization is disabled for StreamShare.
+     * @param context The Context in which this operation should be executed.
+     * @return True if battery optimization is disabled for StreamShare.
+     */
     public static boolean checkBatteryOptimizationDisabled(Context context) {
         if (Build.VERSION.SDK_INT < 23)
             return true;
@@ -42,9 +53,16 @@ public class PermissionHelper {
         String packageName = context.getPackageName();
         PowerManager pm = (PowerManager) context.getSystemService(POWER_SERVICE);
 
+        if (pm == null)
+            return false;
+
         return pm.isIgnoringBatteryOptimizations(packageName);
     }
 
+    /**
+     * Requests disabling battery optimization for StreamShare.
+     * @param activity The Activity in which context this request should be executed.
+     */
     public static void requestDisableBatteryOptimization(Activity activity) {
         if (Build.VERSION.SDK_INT < 23)
             return;
@@ -54,12 +72,14 @@ public class PermissionHelper {
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
         intent.setData(Uri.parse("package:" + packageName));
-        activity.startActivityForResult(intent, OPTIMIZATION_DISABLE);
+        activity.startActivityForResult(intent, BATTERY_OPTIMIZATION_DISABLE);
     }
 
 
-    public static List<Permission> getRequiredPermissions()
-    {
+    /**
+     * @return A list of all required permissions.
+     */
+    public static List<Permission> getRequiredPermissions() {
         List<Permission> permissions = new ArrayList<>();
 
         permissions.add(new Permission(
@@ -67,69 +87,46 @@ public class PermissionHelper {
                 R.string.title_storagePermission,
                 R.string.text_storagePermissionHelp));
 
-        /*if (Build.VERSION.SDK_INT >= 26) {
-            permissions.add(new Permission(
-                    Manifest.permission.READ_PHONE_STATE,
-                    R.string.title_readPhoneStatePermission,
-                    R.string.text_readPhoneStatePermissionHelp));
-        }*/
 
         return permissions;
     }
 
-    /*public static void requestLocationPermission(final Activity activity, final int requestId)
-    {
-        if (!checkLocationPermission(activity)) {
-            new AlertDialog.Builder(activity)
-                    .setMessage(R.string.text_locationPermissionHelp)
-                    .setNegativeButton(R.string.btn_close, null)
-                    .setPositiveButton(R.string.btn_ask, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            activity.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION}, requestId);
-                        }
-                    }).show();
-        }
-
-    }*/
-
-    public static boolean checkLocationPermission(Context context) {
-
-        if (Build.VERSION.SDK_INT < 23)
-            return true;
-
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
-
-    public static AlertDialog requestIfNotGranted(Activity activity, Permission permission, boolean killActivityOtherwise)
-    {
+    /**
+     * Shows permission request dialog if permission is not granted.
+     * @param activity The Activity in which context this request should be executed.
+     * @param killActivityOtherwise Kill activity if the user denied this permission.
+     * @see PermissionRequest
+     */
+    public static AlertDialog requestIfNotGranted(Activity activity, Permission permission, boolean killActivityOtherwise) {
         return ActivityCompat.checkSelfPermission(activity, permission.permission) == PackageManager.PERMISSION_GRANTED
                 ? null
                 : new PermissionRequest(activity, permission, killActivityOtherwise).show();
     }
 
-    public static class Permission
-    {
+    /**
+     * This class represents permission.
+     * @see #getRequiredPermissions()
+     */
+    public static class Permission {
+        /**
+         * Permission.
+         */
         String permission;
+
+        /**
+         * Dialog title resource.
+         */
         int titleResource;
+
+        /**
+         * Dialog message resource.
+         */
         int messageResource;
-        boolean required;
 
-        public Permission(String permission, int titleResource, int messageResource)
-        {
-            this(permission, titleResource, messageResource, true);
-        }
-
-        public Permission(String permission, int titleResource, int messageResource, boolean required)
-        {
+        public Permission(String permission, int titleResource, int messageResource) {
             this.permission = permission;
             this.titleResource = titleResource;
             this.messageResource = messageResource;
-            this.required = required;
         }
 
         public String getPermission() {
@@ -156,15 +153,6 @@ public class PermissionHelper {
             this.messageResource = messageResource;
         }
 
-        public boolean isRequired() {
-            return required;
-        }
-
-        public void setRequired(boolean required) {
-            this.required = required;
-        }
     }
-
-
 
 }

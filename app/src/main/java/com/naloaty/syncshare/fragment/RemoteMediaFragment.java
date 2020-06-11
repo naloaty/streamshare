@@ -178,9 +178,10 @@ public class RemoteMediaFragment extends Fragment {
     /**
      * TODO: add ability to change in settings
      * Returns the optimal number of columns for the grid layout depending on the screen size.
+     * @return The optimal number of columns.
      */
     private int getColumnsCount() {
-       return DeviceUtils.getOptimalColumsCount(getResources());
+       return DeviceUtils.getOptimalColumnsCount(getResources());
     }
 
     /**

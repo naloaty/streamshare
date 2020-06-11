@@ -1,12 +1,11 @@
 package com.naloaty.syncshare.communication;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.naloaty.syncshare.config.AppConfig;
-import com.naloaty.syncshare.config.MediaServerKeyword;
+import com.naloaty.syncshare.service.Requests;
 import com.naloaty.syncshare.database.device.NetworkDevice;
 import com.naloaty.syncshare.database.device.SSDevice;
 import com.naloaty.syncshare.database.media.Album;
@@ -50,7 +49,7 @@ public class CommunicationHelper {
      * Sends general information about a local device to a remote device.
      * @param context The Context in which this request should be executed.
      * @param networkDevice Network information about remote device. See {@link com.naloaty.syncshare.util.DNSSDHelper}.
-     * @param ssDevice Information about local device. See {@link com.naloaty.syncshare.util.AppUtils#getLocalDevice(Context)}                     
+     * @param ssDevice Information about local device. See {@link com.naloaty.syncshare.util.AppUtils#getLocalDevice(Context)}.
      * @return Retrofit network call.
      */
     public static Call<SimpleServerResponse> sendDeviceInformation(@NonNull final Context context, @NonNull final NetworkDevice networkDevice, @NonNull final SSDevice ssDevice) {
@@ -118,9 +117,9 @@ public class CommunicationHelper {
                 + ":"
                 + AppConfig.MEDIA_SERVER_PORT
                 + "/"
-                + MediaServerKeyword.REQUEST_TARGET_MEDIA
+                + Requests.MEDIA
                 + "/"
-                + MediaServerKeyword.REQUEST_THUMBNAIL
+                + Requests.THUMBNAIL
                 + "/";
     }
 
@@ -135,9 +134,9 @@ public class CommunicationHelper {
                 + ":"
                 + AppConfig.MEDIA_SERVER_PORT
                 + "/"
-                + MediaServerKeyword.REQUEST_TARGET_MEDIA
+                + Requests.MEDIA
                 + "/"
-                + MediaServerKeyword.REQUEST_FULLSIZE_IMAGE
+                + Requests.FULL_SIZE_IMAGE
                 + "/";
     }
 
@@ -152,9 +151,9 @@ public class CommunicationHelper {
                 + ":"
                 + AppConfig.MEDIA_SERVER_PORT
                 + "/"
-                + MediaServerKeyword.REQUEST_TARGET_MEDIA
+                + Requests.MEDIA
                 + "/"
-                + MediaServerKeyword.REQUEST_SERVE_FILE
+                + Requests.SERVE_FILE
                 + "/";
     }
 

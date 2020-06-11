@@ -1,5 +1,6 @@
 package com.naloaty.syncshare.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -12,6 +13,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.naloaty.syncshare.R;
 import com.naloaty.syncshare.activity.WelcomeActivity;
+import com.naloaty.syncshare.config.AppConfig;
 import com.naloaty.syncshare.dialog.SSProgressDialog;
 import com.naloaty.syncshare.security.KeyTool;
 import com.naloaty.syncshare.security.SecurityUtils;
@@ -123,10 +125,9 @@ public abstract class SSActivity extends AppCompatActivity {
 
     /**
      * @return StreamShare default settings store
-     * @see AppUtils
      */
     protected SharedPreferences getDefaultSharedPreferences() {
-        return AppUtils.getDefaultSharedPreferences(this);
+        return getSharedPreferences(AppConfig.DEFAULT_PREFERENCES, Context.MODE_PRIVATE);
     }
 
     /**
