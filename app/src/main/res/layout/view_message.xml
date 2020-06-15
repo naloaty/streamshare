@@ -23,7 +23,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_margin="8dp"
-                android:tint="@color/colorBlueDark"
+                android:tint="@color/colorAccent"
                 android:src="@drawable/ic_wifi_24dp"/>
         </LinearLayout>
 
@@ -54,7 +54,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 style="?borderlessButtonStyle"
                 android:id="@+id/message_action_button"
-                android:textColor="@color/colorBlue"
+                android:textColor="@color/colorAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_defaultValue"/>

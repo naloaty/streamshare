@@ -92,7 +92,7 @@ public class NearbyDiscoveryFragment extends Fragment {
                     return;
 
                 case AddDeviceHelper.ERROR_UNTRUSTED_DEVICE:
-                    break;
+                    return;
 
                 case AddDeviceHelper.ERROR_DEVICE_OFFLINE:
                     helpResource = R.string.text_offlineDevice;

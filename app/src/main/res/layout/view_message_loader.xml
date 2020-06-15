@@ -23,7 +23,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_margin="8dp"
-                android:tint="@color/colorBlueDark"
+                android:tint="@color/colorAccent"
                 android:src="@drawable/ic_wifi_24dp"/>
 
             <ProgressBar

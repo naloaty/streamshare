@@ -2,7 +2,7 @@
 <resources>
 
     <!-- light theme -->
-    <style name="Theme.SyncShare.Base.Light" parent="Theme.MaterialComponents.Light">
+    <style name="Theme.SyncShare.Base.Light" parent="@style/Theme.MaterialComponents.Light">
         <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -23,7 +23,8 @@
         <item name="dialogBackground">@drawable/dialog_background</item>
     </style>
 
-    <style name="Theme.SyncShare.Base.Light.NoActionBar" parent="@style/Theme.SyncShare.Base.Light">
+    <!-- TODO: This theme makes dialogs not responsible to keyboard -->
+    <style name="Theme.SyncShare.Base.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -53,7 +54,7 @@
         <item name="dialogBackground">@drawable/dialog_background_dark</item>
     </style>
 
-    <style name="Theme.SyncShare.Base.Dark.NoActionBar" parent="@style/Theme.SyncShare.Base.Dark">
+    <style name="Theme.SyncShare.Base.Dark.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

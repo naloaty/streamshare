@@ -3,10 +3,8 @@
     <!-- SyncShare themes -->
     <style name="Theme.SyncShare.Light.NoActionBar" parent="Theme.SyncShare.Base.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/white</item>
-        <!--item name="android:navigationBarColor">@android:color/white</item-->
 
         <item name="android:windowLightStatusBar">true</item>
-        <!--item name="android:windowLightNavigationBar">true</item-->
 
         <item name="android:windowTranslucentNavigation">true</item>
 

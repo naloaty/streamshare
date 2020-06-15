@@ -77,7 +77,7 @@ public class CommunicationService extends SSService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        String action = intent.getAction();
+        String action = intent == null ? null : intent.getAction();
 
         if (ACTION_STOP_SHARING.equals(action)) {
             Log.i(TAG, "Shutting down the service by user");
@@ -95,7 +95,9 @@ public class CommunicationService extends SSService {
         stopDiscoveryService();
         clearNearbyDevices();
 
-        mNotification.cancelNotification();
+        if (mNotification != null)
+            mNotification.cancelNotification();
+
         setServiceState(State.Stopped);
 
         Log.d(TAG, "StreamShare service is stopped");

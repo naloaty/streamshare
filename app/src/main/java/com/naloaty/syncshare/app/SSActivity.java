@@ -23,7 +23,7 @@ import com.naloaty.syncshare.util.PermissionHelper;
 
 /**
  * This class helps manage permissions and checks if SSL certificate is presented.
- * It also displays a “welcome screen,” if necessary.
+ * It also displays a welcome screen if necessary.
  * All activities in the StreamShare project extend this class.
  */
 public abstract class SSActivity extends AppCompatActivity {

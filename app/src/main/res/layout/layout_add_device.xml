@@ -41,7 +41,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
-                android:background="?rippleSelector"
                 android:gravity="center_vertical"
                 android:clickable="true">
 
@@ -68,7 +67,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
-                android:background="?rippleSelector"
                 android:gravity="center_vertical"
                 android:clickable="true">
 
@@ -95,7 +93,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
-                android:background="?rippleSelector"
                 android:gravity="center_vertical"
                 android:clickable="true">
 

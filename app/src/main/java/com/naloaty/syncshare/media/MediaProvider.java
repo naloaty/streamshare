@@ -41,7 +41,7 @@ public class MediaProvider {
         Uri      uri        = MediaStore.Files.getContentUri("external");
         String[] projection = Album.getProjection();
         String   sort       = "max(" + MediaStore.Images.Media.DATE_MODIFIED + ")";
-        boolean  ascending  = false; //По возрастанию
+        boolean  ascending  = false;
 
         if (!ascending)
             sort += " DESC ";
@@ -176,7 +176,7 @@ public class MediaProvider {
         Uri      uri        = MediaStore.Files.getContentUri("external");
         String[] projection = Media.getProjection();
         String   sort       = MediaStore.MediaColumns.DATE_MODIFIED;
-        boolean  ascending  = false; //По возрастанию
+        boolean  ascending  = false;
 
         if (!ascending)
             sort += " DESC ";

@@ -32,7 +32,7 @@
     <string name="title_batteryOptimization">Оптимизация\nэнергопотребления</string>
     <string name="btn_disable">Отключить</string>
 
-    <string name="title_enterDeviceId">Введите ID устройства</string>
+    <string name="title_enterDeviceId">Введите ID</string>
     <string name="btn_add">Добавить</string>
     <string name="msg_wrongDeviceId">Неправильный ID\n(должно быть 9 групп)</string>
 
@@ -95,7 +95,7 @@
     <string name="title_success">Успех</string>
     <string name="title_step2">Шаг 2</string>
     <string name="title_trustQuestion">Вы доверяете этому устройству?</string>
-    <string name="text_trustQuestionHelp">Совпадает ли данный ID с тем, что вы видите на экране второго устройства в разделе "информация об устройстве"?\n\n%s</string>
+    <string name="text_trustQuestionHelp">Совпадает ли данный ID с тем, что вы видите на экране второго устройства в разделе с QR кодом?\n\n%s</string>
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
 
@@ -142,7 +142,7 @@
     <string name="title_deviceOffline">Не в сети</string>
     <string name="text_deviceOffline">Не удалось связаться с устройством, поскольку оно не в сети</string>
 
-    <string name="title_securityException">Уведомление безопасности</string>
+    <string name="title_securityException">Ошибка безопасности</string>
 
     <string name="text_securityException">Не удалось подключиться к устройству. Это могло произойти по двум причинам. Первая заключается в том, что вы не добавили данное устройство на %s. Вторая - вы запретили доступ к медиа-файлам этому устройству</string>
 
@@ -160,5 +160,4 @@
     <string name="text_unsupportedVideoInsecure">Формат данного видео не поддерживается видео плеером &appname;. Желаете открыть его в стороннем плеере?</string>
 
     <string name="text_videoPlayerError">Произошла неожиданная ошибка. Пожалуйста, попробуйте ещё раз</string>
-
 </resources>

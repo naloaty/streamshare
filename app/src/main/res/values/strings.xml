@@ -32,7 +32,7 @@
     <string name="title_batteryOptimization">Battery optimization</string>
     <string name="btn_disable">Disable</string>
 
-    <string name="title_enterDeviceId">Enter Device ID</string>
+    <string name="title_enterDeviceId">Enter ID</string>
     <string name="btn_add">Add</string>
     <string name="msg_wrongDeviceId">Wrong Device ID\n(should be 9 groups)</string>
 
@@ -94,7 +94,7 @@
     <string name="title_success">Success</string>
     <string name="title_step2">Step 2</string>
     <string name="title_trustQuestion">Do you trust this device?</string>
-    <string name="text_trustQuestionHelp">Does the following device identifier match what is on the second device in the Device Information section?\n\n%s</string>
+    <string name="text_trustQuestionHelp">Does the following device identifier match what is on the second device in the QR code section?\n\n%s</string>
     <string name="btn_yes">Yes</string>
     <string name="btn_no">No</string>
 
@@ -158,6 +158,5 @@
     <string name="text_unsupportedVideoInsecure">Format of this video is not supported by &appname; video player. Do you want to open it in external player?</string>
 
     <string name="text_videoPlayerError">Unexpected video player error occurred. Please, try again</string>
-
 
 </resources>
