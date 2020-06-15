@@ -2,7 +2,7 @@
 <resources>
 
     <!-- light theme -->
-    <style name="Theme.SyncShare.Base.Light" parent="@style/Theme.MaterialComponents.Light">
+    <style name="Prototype.Theme.SyncShare.Light" parent="@style/Theme.MaterialComponents.Light">
         <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -23,14 +23,17 @@
         <item name="dialogBackground">@drawable/dialog_background</item>
     </style>
 
-    <!-- TODO: This theme makes dialogs not responsible to keyboard -->
-    <style name="Theme.SyncShare.Base.Light.NoActionBar">
+    <!-- Note: use this to change properties for different android versions -->
+    <style name="Base.Theme.SyncShare.Light" parent="Prototype.Theme.SyncShare.Light"/>
+
+    <style name="Base.Theme.SyncShare.Light.NoActionBar" parent="Base.Theme.SyncShare.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
+
     <!-- Dark theme -->
-    <style name="Theme.SyncShare.Base.Dark" parent="Theme.MaterialComponents">
+    <style name="Prototype.Theme.SyncShare.Dark" parent="Theme.MaterialComponents">
         <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -49,14 +52,17 @@
         <item name="android:windowBackground">@color/windowBackground</item>
 
         <item name="colorControlNormal">@android:color/white</item>
-        <!--item name="toolbarStyle">@style/Widget.SyncShare.ToolbarStyle.Dark</item-->
-
         <item name="dialogBackground">@drawable/dialog_background_dark</item>
     </style>
 
-    <style name="Theme.SyncShare.Base.Dark.NoActionBar">
+    <!-- Note: use this to change properties for different android versions -->
+    <style name="Base.Theme.SyncShare.Dark" parent="Prototype.Theme.SyncShare.Dark"/>
+
+    <style name="Base.Theme.SyncShare.Dark.NoActionBar" parent="Base.Theme.SyncShare.Dark">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
+
 
 </resources>

@@ -1,20 +1,38 @@
 <resources>
 
-    <!-- SyncShare themes -->
-    <style name="Theme.SyncShare.Light" parent="Theme.SyncShare.Base.Light" />
-    <style name="Theme.SyncShare.Dark" parent="Theme.SyncShare.Base.Dark" />
+    <!--
+    ===========================================================================
+    Note: if you want to change some properties for different android version,
+    then inherit style from Prototype.Theme.SyncShare.Light.
 
-    <style name="Theme.SyncShare.Light.NoActionBar" parent="Theme.SyncShare.Base.Light.NoActionBar">
+    Example:
+
+      <style name="Base.Theme.SyncShare.Light" parent="Prototype.Theme.SyncShare.Light">
+            change properties here
+      <style>
+
+      <style name="Theme.SyncShare.Light" parent="Base.Theme.SyncShare.Light"/>
+
+      <style name="Theme.SyncShare.Light.NoActionBar" parent="Theme.SyncShare.Light"/>
+    ===========================================================================
+    Also see styles_parents.xml
+    -->
+
+    <!-- SyncShare light theme -->
+    <style name="Theme.SyncShare.Light" parent="Base.Theme.SyncShare.Light"/>
+
+    <style name="Theme.SyncShare.Light.NoActionBar" parent="Base.Theme.SyncShare.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/white</item>
         <item name="android:navigationBarColor">@android:color/white</item>
-
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <style name="Theme.SyncShare.Dark.NoActionBar" parent="Theme.SyncShare.Base.Dark.NoActionBar">
+    <!-- SyncShare dark theme -->
+    <style name="Theme.SyncShare.Dark" parent="Base.Theme.SyncShare.Dark"/>
+
+    <style name="Theme.SyncShare.Dark.NoActionBar" parent="Base.Theme.SyncShare.Dark.NoActionBar">
         <item name="android:statusBarColor">@color/colorBlackTransparent</item>
         <item name="android:navigationBarColor">@color/colorBlackTransparent</item>
-
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
