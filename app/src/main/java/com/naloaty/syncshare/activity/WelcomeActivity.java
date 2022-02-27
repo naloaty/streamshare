@@ -60,7 +60,7 @@ public class WelcomeActivity extends SSActivity {
         pagerAdapter.addView(mPermissionsView);
         checkPermissionsState();
 
-        mPermissionsView.findViewById(R.id.layout_welcome_page_2_request_btn)
+        mPermissionsView.findViewById(R.id.action_button)
                 .setOnClickListener(v -> requestRequiredPermissions(false));
 
         /*--------- layout_welcome_page_3 ------------ */
@@ -69,7 +69,7 @@ public class WelcomeActivity extends SSActivity {
         pagerAdapter.addView(mBatteryOptimizationView);
         checkBatteryOptimizationState();
 
-        mBatteryOptimizationView.findViewById(R.id.welcome_page_3_request_btn)
+        mBatteryOptimizationView.findViewById(R.id.action_button)
                 .setOnClickListener(v -> PermissionHelper.requestDisableBatteryOptimization(WelcomeActivity.this));
 
         /*--------- layout_welcome_page_4 ------------ */
@@ -149,10 +149,10 @@ public class WelcomeActivity extends SSActivity {
 
         boolean permissionsGranted = PermissionHelper.checkRequiredPermissions(this);
 
-        mPermissionsView.findViewById(R.id.layout_welcome_page_2_perm_ok_img)
+        mPermissionsView.findViewById(R.id.setup_done_img)
                 .setVisibility(permissionsGranted ? View.VISIBLE : View.GONE);
 
-        mPermissionsView.findViewById(R.id.layout_welcome_page_2_request_btn)
+        mPermissionsView.findViewById(R.id.action_button)
                 .setVisibility(permissionsGranted ? View.GONE : View.VISIBLE);
     }
 
@@ -167,10 +167,10 @@ public class WelcomeActivity extends SSActivity {
 
         boolean batteryOptimizationDisabled = PermissionHelper.checkBatteryOptimizationDisabled(this);
 
-        mBatteryOptimizationView.findViewById(R.id.welcome_page_3_perm_ok_img)
+        mBatteryOptimizationView.findViewById(R.id.setup_done_img)
                 .setVisibility(batteryOptimizationDisabled ? View.VISIBLE : View.GONE);
 
-        mBatteryOptimizationView.findViewById(R.id.welcome_page_3_request_btn)
+        mBatteryOptimizationView.findViewById(R.id.action_button)
                 .setVisibility(batteryOptimizationDisabled ? View.GONE : View.VISIBLE);
     }
 

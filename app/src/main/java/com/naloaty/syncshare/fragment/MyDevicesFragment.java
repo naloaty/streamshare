@@ -3,9 +3,12 @@ package com.naloaty.syncshare.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,11 +39,14 @@ import java.util.List;
  */
 public class MyDevicesFragment extends Fragment {
 
+    private static final String TAG = "MyDevicesFragment";
+
     private List<SSDevice> mList = new ArrayList<>();
     private MyDevicesAdapter mRVAdapter;
     private SSDeviceViewModel mDeviceViewModel;
 
     /* UI elements */
+    private FrameLayout mRootLayout;
     private RecyclerView mRecyclerView;
 
     @Override
@@ -61,9 +67,40 @@ public class MyDevicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerView = view.findViewById(R.id.my_devices_recycler_view);
+        mRootLayout = view.findViewById(R.id.root_frame_layout);
 
         initMessage(view.findViewById(R.id.message_placeholder));
         setupRecyclerView();
+        setupView();
+    }
+
+    /**
+     * Fixes the minHeight property of a fragment layout when it is inside ScrollView
+     */
+    private void setupView() {
+        ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!isAdded())
+                    return;
+
+                int height = mRootLayout.getMeasuredHeight();
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mRootLayout.getLayoutParams();
+
+                mRootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+
+                if(height < (int)getResources().getDimension(R.dimen.manage_devices_min_height)) {
+                    params.height = (int) getResources().getDimension(R.dimen.manage_devices_min_height);
+                    mRootLayout.setLayoutParams(params);
+
+                    Log.d(TAG, "Layout adjusted");
+                }
+
+            }
+        };
+
+        ViewTreeObserver viewTreeObserver = mRootLayout.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener);
     }
 
     /**
@@ -79,16 +116,9 @@ public class MyDevicesFragment extends Fragment {
             details.show();
         };
 
-        RecyclerView.LayoutManager layoutManager;
-
-        if (DeviceUtils.isPortrait(getResources()))
-            layoutManager = new LinearLayoutManager(getContext());
-        else
-            layoutManager = new GridLayoutManager(getContext(), 2);
-
         mRVAdapter = new MyDevicesAdapter(clickListener);
 
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mRVAdapter);
 
         mDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), ssDevices ->

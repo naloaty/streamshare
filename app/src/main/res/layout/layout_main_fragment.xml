@@ -4,57 +4,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <LinearLayout
+        <include
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:visibility="visible"
+            layout="@layout/this_device_section" />
 
-            <include
-                android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/list_header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                style="?textAppearanceSubtitle2"
+                android:id="@+id/list_header_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
-                layout="@layout/local_device" />
-
-            <LinearLayout
-                android:id="@+id/main_wifi_area_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp"
-                android:layout_marginLeft="6dp"
-                android:layout_marginRight="6dp"
-                android:layout_marginBottom="6dp">
-
-                <TextView
-                    style="@style/TextAppearance.Primary"
-                    android:id="@+id/default_header_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_onlineDevices"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/font_size_secondary"/>
-
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/main_fragment_devices_online"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible"/>
+                android:text="@string/header_onlineDevices" />
 
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?colorDecorator" />
 
-    <include
-        android:id="@+id/message_placeholder"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:visibility="gone"
-        layout="@layout/view_message" />
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <FrameLayout
+                android:id="@+id/list_root_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/main_fragment_devices_online"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible"/>
+
+                <include
+                    android:id="@+id/message_placeholder"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    layout="@layout/view_message" />
+            </FrameLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
 </FrameLayout>

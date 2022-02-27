@@ -5,7 +5,7 @@ package com.naloaty.syncshare.config;
  */
 public class AppConfig {
 
-    public static final String APP_VERSION         = "0.3.5 indev::mobile";
+    public static final String APP_VERSION         = "0.4.1 indev::mobile";
     public static final String DNSSD_SERVICE_NAME  = "StreamShare";
     public static final String DNSSD_SERVICE_TYPE  = "_sscomm._tcp.";
     public static final String PLATFORM_MOBILE     = "mobile";

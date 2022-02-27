@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:cardCornerRadius="@dimen/corner_radius">
+
+        <!-- To make vertical align -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <!-- Options description -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/icon_padding_big"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_background"
+                    android:backgroundTint="@color/colorPrimaryLight">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_size_big"
+                        android:layout_height="@dimen/icon_size_big"
+                        android:src="@drawable/ic_syncshare_wb_full"
+                        android:tint="?colorAccent" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="?colorDecorator" />
+
+                <TextView
+                    style="?textAppearanceBody2"
+                    android:textColor="@color/colorTextSecondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_about" />
+            </LinearLayout>
+
+            <!-- Email -->
+            <FrameLayout
+                android:id="@+id/add_option_connection_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:background="?rippleSelector"
+                android:gravity="center_vertical"
+                android:clickable="true">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="4dp"
+                    android:tint="@color/colorAccent"
+                    android:src="@drawable/ic_email_24dp"/>
+
+                <TextView
+                    style="?textAppearanceBody1"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_email"/>
+
+            </FrameLayout>
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

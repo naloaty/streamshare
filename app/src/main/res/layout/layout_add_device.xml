@@ -28,7 +28,8 @@
                 android:padding="20dp">
 
                 <TextView
-                    style="@style/TextAppearance.Secondary"
+                    style="?textAppearanceBody2"
+                    android:textColor="@color/colorTextSecondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/text_addDeviceHelp" />
@@ -54,7 +55,7 @@
                     android:src="@drawable/ic_info_24dp"/>
 
                 <TextView
-                    style="@style/TextAppearance.Primary"
+                    style="?textAppearanceBody1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/btn_showDeviceInfo"/>
@@ -81,7 +82,7 @@
                     android:src="@drawable/ic_scan_qr_code_24dp"/>
 
                 <TextView
-                    style="@style/TextAppearance.Primary"
+                    style="?textAppearanceBody1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/btn_scanQrCode"/>
@@ -108,7 +109,7 @@
                     android:src="@drawable/ic_edit_24dp"/>
 
                 <TextView
-                    style="@style/TextAppearance.Primary"
+                    style="?textAppearanceBody1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/btn_enterIdManually"/>
@@ -122,27 +123,25 @@
     <include
         android:layout_marginTop="16dp"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        layout="@layout/discovery_help" />
+        layout="@layout/help_hint_static" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="22dp"
-        android:layout_marginRight="22dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginBottom="6dp">
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
 
         <TextView
-            style="@style/TextAppearance.Primary"
-            android:id="@+id/default_header_text"
+            style="?textAppearanceSubtitle2"
+            android:id="@+id/list_header_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/header_useDiscoveredDevices"
-            android:textStyle="bold"
-            android:textSize="@dimen/font_size_secondary"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:layout_centerVertical="true"/>
@@ -157,6 +156,13 @@
             android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:background="?colorDecorator" />
 
     <!-- TODO: think about height-->
     <fragment

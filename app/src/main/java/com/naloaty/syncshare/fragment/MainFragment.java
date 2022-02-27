@@ -7,9 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -55,8 +58,9 @@ public class MainFragment extends Fragment {
     private SSDeviceViewModel mDeviceViewModel;
 
     /* UI elements */
+    private FrameLayout mRootLayout;
     private RecyclerView mRecyclerView;
-    private LinearLayout mLocalDeviceLayout;
+    private View mThisDevice;
 
     /**
      * Receives a broadcast about CommunicationService state changes
@@ -108,12 +112,12 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mLocalDeviceLayout = view.findViewById(R.id.local_device_layout);
-        mLocalDeviceLayout.setOnClickListener((v -> startActivity(new Intent(getContext(), LocalDeviceActivity.class))));
+        mRootLayout = view.findViewById(R.id.list_root_layout);
         mRecyclerView = view.findViewById(R.id.main_fragment_devices_online);
 
         initMessage(view.findViewById(R.id.message_placeholder));
         setupRecyclerView();
+        setupView();
     }
 
     /**
@@ -125,15 +129,48 @@ public class MainFragment extends Fragment {
 
         Fragment localDevice = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_localDevice);
 
-        if (localDevice != null && DeviceUtils.isLandscape(getResources())){
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            mLocalDeviceLayout.setVisibility(View.GONE);
-        }
-        else
-        {
-            mLocalDeviceLayout.setVisibility(View.VISIBLE);
-        }
+        if (localDevice == null) {
 
+            if (DeviceUtils.isLandscape(getResources())) {
+                mThisDevice = getView().findViewById(R.id.this_device);
+                getView().findViewById(R.id.this_device_btn).setOnClickListener((v -> startActivity(new Intent(getContext(), LocalDeviceActivity.class))));
+            }
+            else
+            {
+                mThisDevice = getView().findViewById(R.id.layout);
+            }
+
+            mThisDevice.setOnClickListener((v -> startActivity(new Intent(getContext(), LocalDeviceActivity.class))));
+        }
+    }
+
+    /**
+     * Fixes the minHeight property of a fragment layout when it is inside ScrollView
+     */
+    private void setupView() {
+        ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!isAdded())
+                    return;
+
+                int height = mRootLayout.getMeasuredHeight();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mRootLayout.getLayoutParams();
+
+                mRootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+
+                if(height < (int)getResources().getDimension(R.dimen.online_devices_min_height)) {
+                    params.height = (int) getResources().getDimension(R.dimen.online_devices_min_height);
+                    mRootLayout.setLayoutParams(params);
+
+                    Log.d(TAG, "Layout adjusted");
+                }
+
+            }
+        };
+
+        ViewTreeObserver viewTreeObserver = mRootLayout.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener);
     }
 
     /**
@@ -150,16 +187,9 @@ public class MainFragment extends Fragment {
             startActivity(intent);
         };
 
-        RecyclerView.LayoutManager layoutManager;
-
-        if (DeviceUtils.isPortrait(getResources()))
-            layoutManager = new LinearLayoutManager(getContext());
-        else
-            layoutManager = new GridLayoutManager(getContext(), 2);
-
         mRVAdapter = new OnlineDevicesAdapter(clickListener);
 
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mRVAdapter);
 
         mNetworkDeviceViewModel.getAllDevices().observe(getViewLifecycleOwner(), networkDevices -> {

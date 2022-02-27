@@ -19,16 +19,18 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/TextAppearance.Primary.Big"
+            style="?textAppearanceHeadline4"
+            android:textColor="?colorTextPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_appName"
-            android:textSize="@dimen/font_size_title"/>
+            android:text="@string/text_appName"/>
 
         <TextView
-            style="@style/TextAppearance.Secondary.Big"
+            style="?textAppearanceSubtitle1"
+            android:textColor="?colorTextPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="@string/text_welcome"/>
 
     </LinearLayout>

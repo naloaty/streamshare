@@ -3,12 +3,41 @@
 
     <!-- light theme -->
     <style name="Prototype.Theme.SyncShare.Light" parent="@style/Theme.MaterialComponents.Light">
-        <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
-        <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
+
+        <!-- colors -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryLight</item>
+
+        <!-- Used by action buttons (toolbar, navigationDrawer) -->
+        <item name="colorControl">@color/colorControl</item>
+
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccentLight">@color/colorAccentLight</item>
         <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorDecorator">@color/colorDecorator</item>
+        <item name="colorIcon">@color/colorAccent</item>
+        <item name="colorButton">@color/colorAccent</item>
+        <item name="colorButtonRipple">?attr/colorControlHighlight</item>
+        <item name="statusBarColor">@android:color/transparent</item>
+
+        <!-- Text color on accent color -->
+        <item name="colorTextAccent">@color/colorTextAccent</item>
+
+        <!-- Text color on primary color -->
+        <item name="colorTextPrimary">@color/colorTextPrimary</item>
+
+        <item name="textStyleTitle">@style/TextAppearance.Title</item>
+
+        <!-- Toolbar styling -->
+        <item name="toolbarTheme">@style/Widget.SyncShare.Toolbar</item>
+        <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Light</item>
+
+        <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
+
+        <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
+        <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="roundProgressBar">@drawable/round_progress_bar</item>
         <item name="roundProgressBarShape">@drawable/round_progress_bar_shape</item>
@@ -16,7 +45,6 @@
         <item name="materialButtonStyle">@style/Widget.SyncShare.ButtonStyle</item>
         <item name="buttonStyle">@style/Widget.SyncShare.ButtonStyle</item>
         <item name="textAppearanceButton">@style/TextAppearance.Button</item>
-        <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
         <item name="rippleSelector">@drawable/ripple_selector</item>
         <item name="android:windowBackground">@color/windowBackground</item>
 
@@ -30,7 +58,6 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-
 
     <!-- Dark theme -->
     <style name="Prototype.Theme.SyncShare.Dark" parent="Theme.MaterialComponents">

@@ -110,7 +110,7 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
      * Initializes NavigationDrawer
      */
     private void setUpNavigationDrawer() {
-        mDrawerLayout = findViewById(R.id.activity_main_drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
@@ -136,7 +136,7 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
             }
         });
 
-        NavigationView mNavigationView = findViewById(R.id.activity_main_nav_view);
+        NavigationView mNavigationView = findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -167,9 +167,15 @@ public class MainActivity extends SSActivity implements NavigationView.OnNavigat
 
             case R.id.menu_main_manage_devices:
                 startActivity(new Intent(this, DeviceManageActivity.class));
-                mSelectedDrawerItem = null;
+
+                break;
+
+            case R.id.menu_main_about:
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
         }
+
+        mSelectedDrawerItem = null;
     }
 
     /**

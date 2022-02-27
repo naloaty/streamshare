@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#ffffff</color>
-    <color name="colorPrimaryDark">#ccc</color>
-    <color name="colorAccent">#438AFE</color>
+    <!-- Light theme -->
+
+    <!-- Used by contrast elements on white background-->
+    <color name="colorAccent">#1976D2</color>
+    <color name="colorAccentLight">#2196F3</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorPrimaryLight">#E2EDFF</color>
+    <color name="colorSurface">#FFFFFF</color>
+
+    <!-- Used by text located on accent color background -->
+    <color name="colorTextAccent">#FFFFFF</color>
+    <!-- Used by text located on primary color background -->
+    <color name="colorTextPrimary">#212121</color>
+    <!-- Used by secondary text located on primary color background -->
+    <color name="colorTextSecondary">#757575</color>
+
+    <color name="colorDecorator">#F5F5F5</color>
+    <color name="colorControl">#616161</color>
+
+    <!-- old theme -->
     <color name="colorSecondary">#66bb6a</color>
     <color name="colorPassive">#20000000</color>
     <color name="colorSelection">#20000000</color>
     <color name="colorSelectionDark">#74000000</color>
-    <color name="colorSurface">#fefefe</color>
     <color name="colorBlack">#000000</color>
     <color name="colorWhiteTransparent">#BFFFFFFF</color>
     <color name="colorBlackTransparent">#BF000000</color>
@@ -26,9 +43,6 @@
     <color name="colorEmptyThumbnail">#F2F3F5</color>
     <color name="colorTabletBackground">#F1F3F4</color>
     <color name="colorCardBackground">#FEFEFE</color>
-
-    <color name="colorDecorator">#DCDCDC</color>
-    <color name="colorTextSecondary">#737373</color>
 
     <color name="colorWarning">#F7B900</color>
     <color name="colorOffline">#F53703</color>

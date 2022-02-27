@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/help_hint"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?colorAccent"
+    android:paddingTop="35dp"
+    android:paddingBottom="35dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <TextView
+        android:id="@+id/help_hint_text"
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="?colorTextAccent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:lineSpacingExtra="@dimen/help_hint_line_spacing"
+        android:text="@string/text_defaultValue"
+        android:textAlignment="center" />
+</LinearLayout>

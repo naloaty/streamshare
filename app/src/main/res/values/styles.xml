@@ -21,11 +21,7 @@
     <!-- SyncShare light theme -->
     <style name="Theme.SyncShare.Light" parent="Base.Theme.SyncShare.Light"/>
 
-    <style name="Theme.SyncShare.Light.NoActionBar" parent="Base.Theme.SyncShare.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/white</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-    </style>
+    <style name="Theme.SyncShare.Light.NoActionBar" parent="Base.Theme.SyncShare.Light.NoActionBar"/>
 
     <!-- SyncShare dark theme -->
     <style name="Theme.SyncShare.Dark" parent="Base.Theme.SyncShare.Dark"/>
@@ -42,28 +38,34 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="TextAppearance.Primary" parent="@style/TextAppearance">
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-        <item name="android:textSize">@dimen/font_size_primary</item>
-        <item name="android:textColor">?android:textColorPrimary</item>
+    <style name="TextAppearance.Title" parent="@style/TextAppearance">
+        <item name="fontStyle">?attr/textAppearanceHeadline5</item>
+        <item name="android:textColor">?colorTextPrimary</item>
     </style>
 
-    <style name="TextAppearance.Primary.Big">
-        <item name="android:textSize">@dimen/font_size_big</item>
+    <style name="TextAppearance.Caption" parent="@style/TextAppearance">
+        <item name="fontStyle">?attr/textAppearanceHeadline6</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?colorTextPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Primary" parent="@style/TextAppearance">
+        <item name="fontStyle">?attr/textAppearanceHeadline5</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:textColor">?colorTextPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Primary.AccentBackground" parent="@style/TextAppearance.Primary">
+        <item name="android:textColor">?colorTextAccent</item>
     </style>
 
     <style name="TextAppearance.Secondary">
-        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
-        <item name="android:textSize">@dimen/font_size_secondary</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
         <item name="android:textColor">?android:textColorSecondary</item>
     </style>
 
-    <style name="TextAppearance.Secondary.Big">
-        <item name="android:textSize">@dimen/font_size_big</item>
-    </style>
-
     <style name="TextAppearance.Button" parent="@style/TextAppearance.MaterialComponents.Button">
-        <!-- this disable button text CAPS -->
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle2</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
@@ -74,8 +76,9 @@
         <item name="android:background">?roundProgressBarShape</item>
     </style>
 
-    <style name="DarkToolbar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:colorControlNormal">@android:color/white</item>
+    <style name="Widget.SyncShare.Toolbar" parent="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <item name="android:textColorPrimary">?colorTextPrimary</item>
+        <item name="colorControlNormal">?colorControl</item>
     </style>
 
     <style name="OverflowButton">
@@ -94,21 +97,20 @@
     </style>
 
     <style name="Widget.SyncShare.ButtonStyle" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/button_background_color_selector</item>
-        <item name="cornerRadius">8dp</item>
-        <item name="android:textColor">@color/button_text_color_selector</item>
+        <item name="backgroundTint">?colorButton</item>
+        <item name="android:textColor">?colorTextAccent</item>
     </style>
 
     <style name="Widget.SyncShare.ButtonStyle.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="backgroundTint">@color/text_button_background_color_selector</item>
-        <item name="cornerRadius">8dp</item>
-        <item name="android:textColor">@color/text_button_text_color_selector</item>
+        <item name="android:background">@drawable/text_button_background</item>
+        <item name="backgroundTint">?colorSurface</item>
+        <item name="android:textColor">?colorButton</item>
     </style>
 
     <style name="Widget.SyncShare.ButtonStyle.Dialog" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="cornerRadius">@dimen/corner_radius</item>
         <item name="rippleColor">@color/text_button_ripple_color</item>
-        <item name="android:textColor">@color/text_button_text_color_selector</item>
+        <item name="android:textColor">?colorButton</item>
     </style>
 
     <style name="Widget.SyncShare.DialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog">
@@ -117,9 +119,6 @@
     </style>
 
     <!-- Dark theme -->
-    <!--style name="Widget.SyncShare.ToolbarStyle.Dark" parent="Widget.MaterialComponents.Toolbar" >
-        <item name="android:background">@color/colorBlackTransparent</item>
-    </style-->
 
 
 </resources>

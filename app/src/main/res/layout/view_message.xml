@@ -23,7 +23,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_margin="8dp"
-                android:tint="@color/colorAccent"
+                android:tint="?colorIcon"
                 android:src="@drawable/ic_wifi_24dp"/>
         </LinearLayout>
 
@@ -34,12 +34,11 @@
             android:padding="16dp">
 
             <TextView
-                style="@style/TextAppearance.Primary"
+                style="?textAppearanceBody1"
                 android:id="@+id/message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_noOnlineDevices"
-                android:textSize="@dimen/font_size_big"
                 android:gravity="center"/>
         </LinearLayout>
 
@@ -48,13 +47,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:paddingBottom="4dp">
+            android:gravity="center">
 
             <androidx.appcompat.widget.AppCompatButton
                 style="?borderlessButtonStyle"
                 android:id="@+id/message_action_button"
-                android:textColor="@color/colorAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_defaultValue"/>

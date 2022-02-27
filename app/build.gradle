@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "0.3.5 indev"
+        versionName "0.4.1 indev"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
@@ -78,11 +78,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.11.0'
 
-
-    //Bouncy Castle
-    implementation files('D:\\Downloads\\Browsers\\bcprov-jdk15on-165.jar')
-    implementation files('D:\\Downloads\\Browsers\\bcpkix-jdk15on-165.jar')
-
     //For Base32 encoding
     implementation 'commons-codec:commons-codec:1.14'
 
@@ -100,6 +95,10 @@ dependencies {
 
     //ImageView with pinch to zoom support
     implementation 'com.github.MikeOrtiz:TouchImageView:3.0.2'
+
+    //BouncyCastle
+    implementation files('libs/bcpkix-jdk15on-165.jar')
+    implementation files('libs/bcprov-jdk15on-165.jar')
 
     //implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 

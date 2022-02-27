@@ -2,7 +2,7 @@
 <androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_main_drawer_layout"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -17,7 +17,7 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/appBarLayout"
+                android:id="@+id/appbar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +44,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/cardView2"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+                app:layout_constraintTop_toBottomOf="@+id/appbar_layout">
 
                 <fragment
                     android:id="@+id/fragment_main"
@@ -67,7 +67,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/cardView"
-                app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+                app:layout_constraintTop_toBottomOf="@+id/appbar_layout">
 
                 <fragment
                     android:id="@+id/fragment_localDevice"
@@ -81,10 +81,11 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/activity_main_nav_view"
+        android:id="@+id/navigation_view"
         android:layout_gravity="start"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        app:itemIconTint="?colorControl"
         app:headerLayout="@layout/drawer_menu_header"
         app:menu="@menu/drawer_menu_main"/>
 

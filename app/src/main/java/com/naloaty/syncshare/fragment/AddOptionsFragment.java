@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,6 +53,11 @@ public class AddOptionsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        ViewGroup helpHint = view.findViewById(R.id.help_hint_static);
+        TextView helpText = helpHint.findViewById(R.id.help_hint_static_text);
+
+        helpText.setText(R.string.text_deviceDiscoveryHelp);
 
         mProgressBar = view.findViewById(R.id.progressBar);
 

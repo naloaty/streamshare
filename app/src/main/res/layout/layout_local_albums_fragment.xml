@@ -8,12 +8,12 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -23,16 +23,17 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/local_device_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:visibility="visible"/>
+
+            <include
+                android:id="@+id/message_placeholder"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                layout="@layout/view_message_loader"/>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <include
-        android:id="@+id/message_placeholder"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:visibility="gone"
-        layout="@layout/view_message_loader"/>
 </FrameLayout>

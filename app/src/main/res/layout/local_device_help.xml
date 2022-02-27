@@ -11,15 +11,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/colorBlueLight"
+        android:background="?colorAccent"
         android:padding="12dp">
 
         <TextView
+            style="?textAppearanceBody2"
+            android:textColor="?colorTextAccent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_localDeviceHelp"
-            android:textSize="16dp"
-            android:textColor="@color/colorWhiteBlueTheme"/>
+            android:text="@string/text_localDeviceHelp" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

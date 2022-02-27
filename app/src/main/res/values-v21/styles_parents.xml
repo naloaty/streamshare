@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.SyncShare.Light" parent="Prototype.Theme.SyncShare.Light">
+        <item name="android:statusBarColor">?statusBarColor</item>
+    </style>
+
+    <style name="Base.Theme.SyncShare.Dark" parent="Prototype.Theme.SyncShare.Dark">
+        <item name="android:statusBarColor">?statusBarColor</item>
+    </style>
+</resources>

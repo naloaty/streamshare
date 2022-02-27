@@ -10,6 +10,12 @@
             android:icon="@drawable/ic_devices_24dp"
             android:orderInCategory="1"/>
 
+        <item
+            android:id="@+id/menu_main_about"
+            android:title="@string/menu_about"
+            android:icon="@drawable/ic_info_24dp"
+            android:orderInCategory="2"/>
+
         <!--item
             android:id="@+id/menu_main_preferences"
             android:title="@string/menu_prefernces"

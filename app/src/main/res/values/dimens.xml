@@ -1,20 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="short_content_width_padding">15dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
+    
+    <dimen name="button_corner_radius">8dp</dimen>
 
     <dimen name="font_size_title">24sp</dimen>
     <dimen name="font_size_big">18sp</dimen>
     <dimen name="font_size_primary">16sp</dimen>
     <dimen name="font_size_secondary">14sp</dimen>
 
-    <dimen name="corner_radius">8dp</dimen>
-    <dimen name="corner_radius_small">4dp</dimen>
+    <integer name="help_expand_duration">300</integer>
 
-    <dimen name="devices_online_padding">8dp</dimen>
+    <dimen name="icon_size_big">36dp</dimen>
+    <dimen name="icon_padding_big">24dp</dimen>
 
     <dimen name="collapsing_app_bar_height">180dp</dimen>
     <dimen name="media_column_size">150dp</dimen>
 
     <dimen name="nearby_discovery_min_height">250dp</dimen>
+    <dimen name="manage_devices_min_height">250dp</dimen>
+    <dimen name="online_devices_min_height">250dp</dimen>
+
+    <dimen name="help_hint_line_spacing">6sp</dimen>
+    <dimen name="help_hint_static_line_spacing">2sp</dimen>
+
+    <!-- old style -->
+    <dimen name="short_content_width_padding">15dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="corner_radius">8dp</dimen>
+    <dimen name="corner_radius_small">4dp</dimen>
+
+    <dimen name="devices_online_padding">8dp</dimen>
+
+
+
 </resources>

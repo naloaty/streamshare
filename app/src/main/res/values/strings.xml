@@ -159,4 +159,10 @@
 
     <string name="text_videoPlayerError">Unexpected video player error occurred. Please, try again</string>
 
+    <string name="text_about">This software is developed by &author; as a part of the individual project for Samsung IT School</string>
+
+    <string name="text_email">naloaty.dev@gmail.com</string>
+
+    <string name="menu_about">About</string>
+
 </resources>

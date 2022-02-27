@@ -57,8 +57,13 @@
             android:name=".activity.RemoteViewActivity"
             android:theme="@style/Theme.SyncShare.Light.NoActionBar"
             android:configChanges="orientation|screenSize">
-
         </activity>
+
+        <activity
+            android:name=".activity.AboutActivity"
+            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
+        </activity>
+
 
         <activity
             android:name=".activity.ImageViewActivity"

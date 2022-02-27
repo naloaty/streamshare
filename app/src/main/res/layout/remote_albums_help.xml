@@ -12,16 +12,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/colorBlueLight"
+        android:background="?colorAccent"
         android:padding="12dp">
 
         <TextView
+            style="?textAppearanceBody2"
+            android:textColor="?colorTextAccent"
             android:id="@+id/remote_albums_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_remoteAlbumsHelp"
-            android:textSize="16dp"
-            android:textColor="@color/colorWhiteBlueTheme"/>
+            android:text="@string/text_remoteAlbumsHelp" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

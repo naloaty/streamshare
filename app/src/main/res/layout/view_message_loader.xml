@@ -40,7 +40,7 @@
             android:padding="16dp">
 
             <TextView
-                style="@style/TextAppearance.Primary"
+                style="?textAppearanceBody1"
                 android:id="@+id/message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

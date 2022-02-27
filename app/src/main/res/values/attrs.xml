@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <attr name="toolbarTheme" format="reference"/>
+    <attr name="colorTextAccent" format="reference"/>
+    <attr name="colorTextPrimary" format="reference"/>
+    <attr name="colorIcon" format="reference"/>
+    <attr name="colorButton" format="reference"/>
+    <attr name="colorButtonRipple" format="reference"/>
+    <attr name="colorControl" format="reference"/>
+    <attr name="textStyleTitle" format="reference"/>
+    <attr name="colorDecorator" format="reference"/>
+    <attr name="statusBarColor" format="reference"/>
+    <attr name="colorAccentLight" format="reference"/>
+
+    <!-- old styling -->
     <attr name="roundSelector" format="reference"/>
     <attr name="roundProgressBar" format="reference" />
     <attr name="roundProgressBarShape" format="reference" />

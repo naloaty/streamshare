@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.circularreveal.cardview.CircularRevealCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/help_hint"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="invisible"
+    app:cardCornerRadius="@dimen/corner_radius">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorAccent"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/help_hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="6sp"
+            android:text="@string/text_defaultValue"
+            android:textAlignment="center"
+            android:textColor="?colorTextAccent"
+            android:textSize="@dimen/font_size_primary" />
+    </LinearLayout>
+
+
+</com.google.android.material.circularreveal.cardview.CircularRevealCardView>
