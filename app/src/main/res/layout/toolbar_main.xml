@@ -25,7 +25,7 @@
 
         <fragment
             android:id="@+id/content_main_fragment"
-            android:name="com.naloaty.syncshare.fragment.MainFragment"
+            android:name="com.naloaty.streamshare.fragment.MainFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

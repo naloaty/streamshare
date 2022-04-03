@@ -34,7 +34,7 @@
 
         <fragment
             android:id="@+id/fragment_localDevice"
-            android:name="com.naloaty.syncshare.fragment.LocalAlbumsFragment"
+            android:name="com.naloaty.streamshare.fragment.LocalAlbumsFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

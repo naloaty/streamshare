@@ -86,7 +86,7 @@
 
                 <fragment
                     android:id="@+id/device_manage_fragment"
-                    android:name="com.naloaty.syncshare.fragment.MyDevicesFragment"
+                    android:name="com.naloaty.streamshare.fragment.MyDevicesFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </LinearLayout>

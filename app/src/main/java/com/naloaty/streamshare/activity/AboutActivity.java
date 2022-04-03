@@ -1,0 +1,58 @@
+package com.naloaty.streamshare.activity;
+
+import android.os.Bundle;
+import android.util.Log;
+
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.naloaty.streamshare.R;
+import com.naloaty.streamshare.app.SSActivity;
+
+/**
+ * This activity shows information about the app.
+ * @see SSActivity
+ */
+public class AboutActivity extends SSActivity {
+
+    private static final String TAG = "AboutActivity";
+
+    /* UI elements */
+    private AppBarLayout mAppBarLayout;
+    private CollapsingToolbarLayout mToolBarLayout;
+    private Toolbar mToolBar;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_about);
+
+        mAppBarLayout = findViewById(R.id.app_bar_layout);
+        mToolBarLayout = findViewById(R.id.toolbar_layout);
+        mToolBar = findViewById(R.id.toolbar);
+
+        if (mToolBarLayout != null)
+            mToolBarLayout.setTitle(getString(R.string.menu_about));
+        else
+            mToolBar.setTitle(R.string.menu_about);
+
+        if (mAppBarLayout != null)
+            mAppBarLayout.setExpanded(true, true);
+
+        //Important to call this BEFORE setNavigationOnClickListener()
+        setSupportActionBar(mToolBar);
+
+        //To make "close" animation (this instead of using "parent activity")
+        mToolBar.setNavigationOnClickListener(v -> onBackPressed());
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_24dp);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        else
+            Log.w(TAG, "Toolbar is not properly initialized");
+    }
+}
