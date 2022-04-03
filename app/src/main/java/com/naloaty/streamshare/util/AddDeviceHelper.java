@@ -15,7 +15,7 @@ import com.naloaty.streamshare.database.device.SSDevice;
 import com.naloaty.streamshare.database.device.SSDeviceRepository;
 import com.naloaty.streamshare.dialog.SSProgressDialog;
 
-import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLProtocolException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,7 +35,7 @@ public class AddDeviceHelper {
     public static final int ERROR_UNTRUSTED_DEVICE    = 1;
     public static final int ERROR_DEVICE_OFFLINE      = 2;
     public static final int ERROR_BAD_RESPONSE        = 3;
-    public static final int ERROR_HANDSHAKE_EXCEPTION = 4;
+    public static final int ERROR_SSL_PROTOCOL_EXCEPTION = 4;
     public static final int ERROR_REQUEST_FAILED      = 5;
     public static final int ERROR_SENDING_FAILED      = 6;
 
@@ -108,8 +108,8 @@ public class AddDeviceHelper {
 
                     Log.e(TAG, String.format("Device information request is failed. Reason: %s", t.getMessage()));
 
-                    if (t instanceof SSLHandshakeException)
-                        mCallback.onException(ERROR_HANDSHAKE_EXCEPTION);
+                    if (t instanceof SSLProtocolException)
+                        mCallback.onException(ERROR_SSL_PROTOCOL_EXCEPTION);
                     else
                         mCallback.onException(ERROR_REQUEST_FAILED);
                 }

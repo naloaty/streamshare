@@ -99,7 +99,7 @@ public class NearbyDiscoveryFragment extends Fragment {
                     break;
 
                 case AddDeviceHelper.ERROR_BAD_RESPONSE:
-                case AddDeviceHelper.ERROR_HANDSHAKE_EXCEPTION:
+                case AddDeviceHelper.ERROR_SSL_PROTOCOL_EXCEPTION:
                     helpResource = R.string.text_handShakeException;
                     titleResource = R.string.title_step2;
                     break;

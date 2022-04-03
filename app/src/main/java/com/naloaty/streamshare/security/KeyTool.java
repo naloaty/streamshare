@@ -134,7 +134,7 @@ public class KeyTool {
             X509v3CertificateBuilder builder = new X509v3CertificateBuilder(issuer, serialNumber, notBefore, notAfter, subject, publicKeyInfo);
 
             //Key usage extension
-            X509KeyUsage keyUsage = new X509KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
+            X509KeyUsage keyUsage = new X509KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign | KeyUsage.digitalSignature);
             Extension extKeyUsage = new Extension(Extension.keyUsage, true, keyUsage.getEncoded());
 
             //Extended key usage (we can use that certificate in https)
