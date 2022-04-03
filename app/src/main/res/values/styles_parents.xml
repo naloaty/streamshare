@@ -2,7 +2,7 @@
 <resources>
 
     <!-- light theme -->
-    <style name="Prototype.Theme.SyncShare.Light" parent="@style/Theme.MaterialComponents.Light">
+    <style name="Prototype.Theme.StreamShare.Light" parent="@style/Theme.MaterialComponents.Light">
 
         <!-- colors -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -31,19 +31,19 @@
         <item name="textStyleTitle">@style/TextAppearance.Title</item>
 
         <!-- Toolbar styling -->
-        <item name="toolbarTheme">@style/Widget.SyncShare.Toolbar</item>
+        <item name="toolbarTheme">@style/Widget.StreamShare.Toolbar</item>
         <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Light</item>
 
-        <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
+        <item name="borderlessButtonStyle">@style/Widget.StreamShare.ButtonStyle.TextButton</item>
 
-        <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
-        <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
+        <item name="dialogTheme">@style/Widget.StreamShare.DialogTheme</item>
+        <item name="alertDialogTheme">@style/Widget.StreamShare.DialogTheme</item>
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="roundProgressBar">@drawable/round_progress_bar</item>
         <item name="roundProgressBarShape">@drawable/round_progress_bar_shape</item>
-        <item name="floatingActionButtonStyle">@style/Widget.SyncShare.FloatingActionButtonStyle</item>
-        <item name="materialButtonStyle">@style/Widget.SyncShare.ButtonStyle</item>
-        <item name="buttonStyle">@style/Widget.SyncShare.ButtonStyle</item>
+        <item name="floatingActionButtonStyle">@style/Widget.StreamShare.FloatingActionButtonStyle</item>
+        <item name="materialButtonStyle">@style/Widget.StreamShare.ButtonStyle</item>
+        <item name="buttonStyle">@style/Widget.StreamShare.ButtonStyle</item>
         <item name="textAppearanceButton">@style/TextAppearance.Button</item>
         <item name="rippleSelector">@drawable/ripple_selector</item>
         <item name="android:windowBackground">@color/windowBackground</item>
@@ -52,17 +52,17 @@
     </style>
 
     <!-- Note: use this to change properties for different android versions -->
-    <style name="Base.Theme.SyncShare.Light" parent="Prototype.Theme.SyncShare.Light"/>
+    <style name="Base.Theme.StreamShare.Light" parent="Prototype.Theme.StreamShare.Light"/>
 
-    <style name="Base.Theme.SyncShare.Light.NoActionBar" parent="Base.Theme.SyncShare.Light">
+    <style name="Base.Theme.StreamShare.Light.NoActionBar" parent="Base.Theme.StreamShare.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
     <!-- Dark theme -->
-    <style name="Prototype.Theme.SyncShare.Dark" parent="Theme.MaterialComponents">
-        <item name="dialogTheme">@style/Widget.SyncShare.DialogTheme</item>
-        <item name="alertDialogTheme">@style/Widget.SyncShare.DialogTheme</item>
+    <style name="Prototype.Theme.StreamShare.Dark" parent="Theme.MaterialComponents">
+        <item name="dialogTheme">@style/Widget.StreamShare.DialogTheme</item>
+        <item name="alertDialogTheme">@style/Widget.StreamShare.DialogTheme</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -70,11 +70,11 @@
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="roundProgressBar">@drawable/round_progress_bar</item>
         <item name="roundProgressBarShape">@drawable/round_progress_bar_shape</item>
-        <item name="floatingActionButtonStyle">@style/Widget.SyncShare.FloatingActionButtonStyle</item>
-        <item name="materialButtonStyle">@style/Widget.SyncShare.ButtonStyle</item>
-        <item name="buttonStyle">@style/Widget.SyncShare.ButtonStyle</item>
+        <item name="floatingActionButtonStyle">@style/Widget.StreamShare.FloatingActionButtonStyle</item>
+        <item name="materialButtonStyle">@style/Widget.StreamShare.ButtonStyle</item>
+        <item name="buttonStyle">@style/Widget.StreamShare.ButtonStyle</item>
         <item name="textAppearanceButton">@style/TextAppearance.Button</item>
-        <item name="borderlessButtonStyle">@style/Widget.SyncShare.ButtonStyle.TextButton</item>
+        <item name="borderlessButtonStyle">@style/Widget.StreamShare.ButtonStyle.TextButton</item>
         <item name="rippleSelector">@drawable/ripple_selector</item>
         <item name="android:windowBackground">@color/windowBackground</item>
 
@@ -83,9 +83,9 @@
     </style>
 
     <!-- Note: use this to change properties for different android versions -->
-    <style name="Base.Theme.SyncShare.Dark" parent="Prototype.Theme.SyncShare.Dark"/>
+    <style name="Base.Theme.StreamShare.Dark" parent="Prototype.Theme.StreamShare.Dark"/>
 
-    <style name="Base.Theme.SyncShare.Dark.NoActionBar" parent="Base.Theme.SyncShare.Dark">
+    <style name="Base.Theme.StreamShare.Dark.NoActionBar" parent="Base.Theme.StreamShare.Dark">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

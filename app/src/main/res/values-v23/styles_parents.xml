@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.SyncShare.Light" parent="Prototype.Theme.SyncShare.Light">
+    <style name="Base.Theme.StreamShare.Light" parent="Prototype.Theme.StreamShare.Light">
         <item name="android:navigationBarColor">@android:color/black</item>
         <item name="android:statusBarColor">?statusBarColor</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <style name="Base.Theme.SyncShare.Dark" parent="Prototype.Theme.SyncShare.Dark">
+    <style name="Base.Theme.StreamShare.Dark" parent="Prototype.Theme.StreamShare.Dark">
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">?statusBarColor</item>
         <item name="android:windowLightStatusBar">false</item>

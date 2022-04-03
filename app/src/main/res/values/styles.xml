@@ -3,30 +3,30 @@
     <!--
     ===========================================================================
     Note: if you want to change some properties for different android version,
-    then inherit style from Prototype.Theme.SyncShare.Light.
+    then inherit style from Prototype.Theme.StreamShare.Light.
 
     Example:
 
-      <style name="Base.Theme.SyncShare.Light" parent="Prototype.Theme.SyncShare.Light">
+      <style name="Base.Theme.StreamShare.Light" parent="Prototype.Theme.StreamShare.Light">
             change properties here
       <style>
 
-      <style name="Theme.SyncShare.Light" parent="Base.Theme.SyncShare.Light"/>
+      <style name="Theme.StreamShare.Light" parent="Base.Theme.StreamShare.Light"/>
 
-      <style name="Theme.SyncShare.Light.NoActionBar" parent="Theme.SyncShare.Light"/>
+      <style name="Theme.StreamShare.Light.NoActionBar" parent="Theme.StreamShare.Light"/>
     ===========================================================================
     Also see styles_parents.xml
     -->
 
-    <!-- SyncShare light theme -->
-    <style name="Theme.SyncShare.Light" parent="Base.Theme.SyncShare.Light"/>
+    <!-- StreamShare light theme -->
+    <style name="Theme.StreamShare.Light" parent="Base.Theme.StreamShare.Light"/>
 
-    <style name="Theme.SyncShare.Light.NoActionBar" parent="Base.Theme.SyncShare.Light.NoActionBar"/>
+    <style name="Theme.StreamShare.Light.NoActionBar" parent="Base.Theme.StreamShare.Light.NoActionBar"/>
 
-    <!-- SyncShare dark theme -->
-    <style name="Theme.SyncShare.Dark" parent="Base.Theme.SyncShare.Dark"/>
+    <!-- StreamShare dark theme -->
+    <style name="Theme.StreamShare.Dark" parent="Base.Theme.StreamShare.Dark"/>
 
-    <style name="Theme.SyncShare.Dark.NoActionBar" parent="Base.Theme.SyncShare.Dark.NoActionBar">
+    <style name="Theme.StreamShare.Dark.NoActionBar" parent="Base.Theme.StreamShare.Dark.NoActionBar">
         <item name="android:statusBarColor">@color/colorBlackTransparent</item>
         <item name="android:navigationBarColor">@color/colorBlackTransparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
@@ -71,12 +71,12 @@
 
 
     <!-- Widget styling -->
-    <style name="Widget.SyncShare.ProgressBar.Horizontal.Oval" parent="Widget.AppCompat.ProgressBar.Horizontal">
+    <style name="Widget.StreamShare.ProgressBar.Horizontal.Oval" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:progressDrawable">?roundProgressBar</item>
         <item name="android:background">?roundProgressBarShape</item>
     </style>
 
-    <style name="Widget.SyncShare.Toolbar" parent="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary">
+    <style name="Widget.StreamShare.Toolbar" parent="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary">
         <item name="android:textColorPrimary">?colorTextPrimary</item>
         <item name="colorControlNormal">?colorControl</item>
     </style>
@@ -91,31 +91,31 @@
         <item name="android:focusable">false</item>
     </style>
 
-    <style name="Widget.SyncShare.FloatingActionButtonStyle" parent="@style/Widget.MaterialComponents.FloatingActionButton">
+    <style name="Widget.StreamShare.FloatingActionButtonStyle" parent="@style/Widget.MaterialComponents.FloatingActionButton">
         <item name="tint">@android:color/white</item>
         <item name="backgroundTint">@color/colorAccent</item>
     </style>
 
-    <style name="Widget.SyncShare.ButtonStyle" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.StreamShare.ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">?colorButton</item>
         <item name="android:textColor">?colorTextAccent</item>
     </style>
 
-    <style name="Widget.SyncShare.ButtonStyle.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.StreamShare.ButtonStyle.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:background">@drawable/text_button_background</item>
         <item name="backgroundTint">?colorSurface</item>
         <item name="android:textColor">?colorButton</item>
     </style>
 
-    <style name="Widget.SyncShare.ButtonStyle.Dialog" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="Widget.StreamShare.ButtonStyle.Dialog" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="cornerRadius">@dimen/corner_radius</item>
         <item name="rippleColor">@color/text_button_ripple_color</item>
         <item name="android:textColor">?colorButton</item>
     </style>
 
-    <style name="Widget.SyncShare.DialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog">
+    <style name="Widget.StreamShare.DialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="android:windowBackground">?dialogBackground</item>
-        <item name="buttonBarButtonStyle">@style/Widget.SyncShare.ButtonStyle.Dialog</item>
+        <item name="buttonBarButtonStyle">@style/Widget.StreamShare.ButtonStyle.Dialog</item>
     </style>
 
     <!-- Dark theme -->

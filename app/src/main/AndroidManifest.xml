@@ -15,17 +15,17 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_syncshare"
+        android:icon="@drawable/ic_streamshare"
         android:label="@string/text_appName"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SyncShare.Light"
+        android:theme="@style/Theme.StreamShare.Light"
         tools:ignore="GoogleAppIndexingWarning"
         android:hardwareAccelerated="true">
 
         <activity
             android:name="com.naloaty.streamshare.activity.MainActivity"
-            android:theme="@style/Theme.SyncShare.Light.NoActionBar"
+            android:theme="@style/Theme.StreamShare.Light.NoActionBar"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -36,45 +36,45 @@
 
         <activity
             android:name="com.naloaty.streamshare.activity.WelcomeActivity"
-            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
+            android:theme="@style/Theme.StreamShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name="com.naloaty.streamshare.activity.DeviceManageActivity"
-            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
+            android:theme="@style/Theme.StreamShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name="com.naloaty.streamshare.activity.AddDeviceActivity"
-            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
+            android:theme="@style/Theme.StreamShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name="com.naloaty.streamshare.activity.LocalDeviceActivity"
-            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
+            android:theme="@style/Theme.StreamShare.Light.NoActionBar">
         </activity>
 
         <activity
             android:name="com.naloaty.streamshare.activity.RemoteViewActivity"
-            android:theme="@style/Theme.SyncShare.Light.NoActionBar"
+            android:theme="@style/Theme.StreamShare.Light.NoActionBar"
             android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name="com.naloaty.streamshare.activity.AboutActivity"
-            android:theme="@style/Theme.SyncShare.Light.NoActionBar">
+            android:theme="@style/Theme.StreamShare.Light.NoActionBar">
         </activity>
 
 
         <activity
             android:name="com.naloaty.streamshare.activity.ImageViewActivity"
-            android:theme="@style/Theme.SyncShare.Dark.NoActionBar"
+            android:theme="@style/Theme.StreamShare.Dark.NoActionBar"
             android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
             android:name="com.naloaty.streamshare.activity.VideoPlayerActivity"
-            android:theme="@style/Theme.SyncShare.Dark.NoActionBar"
+            android:theme="@style/Theme.StreamShare.Dark.NoActionBar"
             android:configChanges="orientation|screenSize">
         </activity>
 
@@ -85,7 +85,7 @@
 
         <service
             android:name="com.naloaty.streamshare.service.CommunicationService"
-            android:label="SyncShare Communication Service" >
+            android:label="StreamShare Communication Service" >
         </service>
 
     </application>

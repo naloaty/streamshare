@@ -77,7 +77,7 @@
                     android:layout_marginEnd="20dp"
                     android:layout_alignParentStart="true"
                     android:tint="@color/colorAccent"
-                    android:src="@drawable/ic_syncshare_wb_full"/>
+                    android:src="@drawable/ic_streamshare_wb_full"/>
 
                 <TextView
                     android:id="@+id/device_info_app_version"

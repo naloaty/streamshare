@@ -184,7 +184,7 @@ public class VideoPlayerActivity extends SSActivity implements CustomPlayerView.
         playerView.setPlayer(simpleExoPlayer);
 
         OkHttpClient client = SSOkHttpClient.getOkHttpClient(this);
-        DataSource.Factory dataSourceFactory = new OkHttpDataSourceFactory(client, Util.getUserAgent(this, "SyncShare"));
+        DataSource.Factory dataSourceFactory = new OkHttpDataSourceFactory(client, Util.getUserAgent(this, "StreamShare"));
 
         // This is the MediaSource representing the media to be played.
         MediaSource videoSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(videoUri);

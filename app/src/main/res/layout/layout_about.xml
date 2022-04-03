@@ -39,7 +39,7 @@
                     <ImageView
                         android:layout_width="@dimen/icon_size_big"
                         android:layout_height="@dimen/icon_size_big"
-                        android:src="@drawable/ic_syncshare_wb_full"
+                        android:src="@drawable/ic_streamshare_wb_full"
                         android:tint="?colorAccent" />
                 </FrameLayout>
 
