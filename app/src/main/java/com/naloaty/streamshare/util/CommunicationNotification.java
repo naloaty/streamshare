@@ -40,7 +40,7 @@ public class CommunicationNotification {
         intent.setAction(CommunicationService.ACTION_STOP_SHARING);
 
         PendingIntent contentAction =
-                PendingIntent.getService(notificationUtils.getContext(), requestCode, intent, 0);
+                PendingIntent.getService(notificationUtils.getContext(), requestCode, intent, PendingIntent.FLAG_IMMUTABLE);
 
         //------------------------
 
