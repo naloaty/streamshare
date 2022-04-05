@@ -82,7 +82,7 @@ public class PermissionHelper {
         List<Permission> permissions = new ArrayList<>();
 
         permissions.add(new Permission(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
                 R.string.title_storagePermission,
                 R.string.text_storagePermissionHelp));
 

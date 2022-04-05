@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.naloaty.streamshare.R;
 import com.naloaty.streamshare.config.AppConfig;
-import com.naloaty.streamshare.database.device.SSDevice;
+import com.naloaty.streamshare.database.entity.SSDevice;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,9 +9,9 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.naloaty.streamshare.communication.SimpleServerResponse;
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.device.SSDeviceRepository;
-import com.naloaty.streamshare.database.media.Album;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.repository.SSDeviceRepository;
+import com.naloaty.streamshare.database.entity.Album;
 import com.naloaty.streamshare.media.Media;
 import com.naloaty.streamshare.media.MediaObject;
 import com.naloaty.streamshare.media.MediaProvider;

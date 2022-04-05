@@ -9,10 +9,10 @@ import androidx.appcompat.app.AlertDialog;
 import com.naloaty.streamshare.R;
 import com.naloaty.streamshare.communication.CommunicationHelper;
 import com.naloaty.streamshare.communication.SimpleServerResponse;
-import com.naloaty.streamshare.database.device.NetworkDevice;
-import com.naloaty.streamshare.database.device.NetworkDeviceRepository;
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.device.SSDeviceRepository;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
+import com.naloaty.streamshare.database.repository.NetworkDeviceRepository;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.repository.SSDeviceRepository;
 import com.naloaty.streamshare.dialog.SSProgressDialog;
 
 import javax.net.ssl.SSLProtocolException;

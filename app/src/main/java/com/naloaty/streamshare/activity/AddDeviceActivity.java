@@ -24,7 +24,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.naloaty.streamshare.R;
 import com.naloaty.streamshare.app.SSActivity;
-import com.naloaty.streamshare.database.device.SSDevice;
+import com.naloaty.streamshare.database.entity.SSDevice;
 import com.naloaty.streamshare.dialog.EnterDeviceIdDialog;
 import com.naloaty.streamshare.dialog.SingleTextInputDialog;
 import com.naloaty.streamshare.fragment.DeviceInfoFragment;

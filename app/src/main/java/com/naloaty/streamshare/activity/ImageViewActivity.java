@@ -24,7 +24,7 @@ import com.naloaty.streamshare.R;
 import com.naloaty.streamshare.app.GlideApp;
 import com.naloaty.streamshare.app.MediaActivity;
 import com.naloaty.streamshare.communication.CommunicationHelper;
-import com.naloaty.streamshare.database.device.NetworkDevice;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
 import com.naloaty.streamshare.media.ListHolder;
 import com.naloaty.streamshare.media.Media;
 import com.ortiz.touchview.TouchImageView;

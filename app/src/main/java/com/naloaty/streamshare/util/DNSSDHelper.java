@@ -16,7 +16,7 @@ import com.github.druk.dnssd.RegisterListener;
 import com.github.druk.dnssd.ResolveListener;
 import com.github.druk.dnssd.TXTRecord;
 import com.naloaty.streamshare.config.AppConfig;
-import com.naloaty.streamshare.database.device.NetworkDevice;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

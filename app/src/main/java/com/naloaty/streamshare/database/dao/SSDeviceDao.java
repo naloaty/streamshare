@@ -1,4 +1,4 @@
-package com.naloaty.streamshare.database.device;
+package com.naloaty.streamshare.database.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -7,6 +7,8 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+
+import com.naloaty.streamshare.database.entity.SSDevice;
 
 import java.util.List;
 

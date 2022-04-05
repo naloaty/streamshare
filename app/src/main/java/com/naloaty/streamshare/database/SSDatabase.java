@@ -6,12 +6,12 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.naloaty.streamshare.database.device.NetworkDevice;
-import com.naloaty.streamshare.database.device.NetworkDeviceDao;
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.device.SSDeviceDao;
-import com.naloaty.streamshare.database.media.Album;
-import com.naloaty.streamshare.database.media.AlbumDao;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
+import com.naloaty.streamshare.database.dao.NetworkDeviceDao;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.dao.SSDeviceDao;
+import com.naloaty.streamshare.database.entity.Album;
+import com.naloaty.streamshare.database.dao.AlbumDao;
 
 /**
  * This class represents StreamShare database.

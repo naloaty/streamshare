@@ -19,7 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.streamshare.R;
-import com.naloaty.streamshare.database.media.Album;
+import com.naloaty.streamshare.database.entity.Album;
 import com.naloaty.streamshare.media.MediaObject;
 import com.naloaty.streamshare.media.MediaProvider;
 

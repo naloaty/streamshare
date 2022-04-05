@@ -1,4 +1,4 @@
-package com.naloaty.streamshare.database.media;
+package com.naloaty.streamshare.database.repository;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 
 import com.naloaty.streamshare.database.SSDatabase;
+import com.naloaty.streamshare.database.dao.AlbumDao;
+import com.naloaty.streamshare.database.entity.Album;
 
 import java.util.List;
 

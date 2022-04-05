@@ -26,11 +26,11 @@ import com.naloaty.streamshare.activity.RemoteViewActivity;
 import com.naloaty.streamshare.adapter.OnRVClickListener;
 import com.naloaty.streamshare.adapter.RemoteAlbumsAdapter;
 import com.naloaty.streamshare.communication.CommunicationHelper;
-import com.naloaty.streamshare.database.device.NetworkDevice;
-import com.naloaty.streamshare.database.device.NetworkDeviceViewModel;
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.device.SSDeviceViewModel;
-import com.naloaty.streamshare.database.media.Album;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
+import com.naloaty.streamshare.database.viewmodel.NetworkDeviceViewModel;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.viewmodel.SSDeviceViewModel;
+import com.naloaty.streamshare.database.entity.Album;
 
 import java.util.List;
 

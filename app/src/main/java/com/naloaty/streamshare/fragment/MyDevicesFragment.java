@@ -24,8 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.naloaty.streamshare.R;
 import com.naloaty.streamshare.adapter.MyDevicesAdapter;
 import com.naloaty.streamshare.adapter.OnRVClickListener;
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.device.SSDeviceViewModel;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.viewmodel.SSDeviceViewModel;
 import com.naloaty.streamshare.dialog.MyDeviceDetailsDialog;
 
 import java.util.ArrayList;

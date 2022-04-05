@@ -1,4 +1,4 @@
-package com.naloaty.streamshare.database.media;
+package com.naloaty.streamshare.database.entity;
 
 import android.database.Cursor;
 import android.provider.MediaStore;

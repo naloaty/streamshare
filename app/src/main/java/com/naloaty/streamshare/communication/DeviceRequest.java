@@ -1,6 +1,6 @@
 package com.naloaty.streamshare.communication;
 
-import com.naloaty.streamshare.database.device.SSDevice;
+import com.naloaty.streamshare.database.entity.SSDevice;
 import com.naloaty.streamshare.service.Requests;
 
 import retrofit2.Call;

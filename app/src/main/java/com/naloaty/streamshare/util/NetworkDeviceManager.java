@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 
-import com.naloaty.streamshare.database.device.NetworkDevice;
-import com.naloaty.streamshare.database.device.NetworkDeviceRepository;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
+import com.naloaty.streamshare.database.repository.NetworkDeviceRepository;
 
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;

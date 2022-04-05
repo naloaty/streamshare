@@ -8,13 +8,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.naloaty.streamshare.R;
-import com.naloaty.streamshare.database.media.Album;
-import com.naloaty.streamshare.database.media.AlbumRepository;
+import com.naloaty.streamshare.database.entity.Album;
+import com.naloaty.streamshare.database.repository.AlbumRepository;
 import com.naloaty.streamshare.util.PermissionHelper;
 
 import java.util.ArrayList;
@@ -38,7 +39,13 @@ public class MediaProvider {
         if (!PermissionHelper.checkRequiredPermissions(context))
             return new ArrayList<>();
 
-        Uri      uri        = MediaStore.Files.getContentUri("external");
+        Uri uri;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            uri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        else
+            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
         String[] projection = Album.getProjection();
         String   sort       = "max(" + MediaStore.Images.Media.DATE_MODIFIED + ")";
         boolean  ascending  = false;
@@ -258,8 +265,7 @@ public class MediaProvider {
             int media_type = 0;
             int orientation = -1;
 
-            if(cursor.moveToFirst())
-            {
+            if(cursor.moveToFirst()) {
                 path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA));
                 mime = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE));
                 media_type = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE));

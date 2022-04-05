@@ -1,6 +1,6 @@
 package com.naloaty.streamshare.media;
 
-import com.naloaty.streamshare.database.device.NetworkDevice;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
 
 import java.io.Serializable;
 import java.util.List;

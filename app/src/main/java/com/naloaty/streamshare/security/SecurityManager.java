@@ -3,8 +3,8 @@ package com.naloaty.streamshare.security;
 import android.content.Context;
 import android.util.Log;
 
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.device.SSDeviceRepository;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.repository.SSDeviceRepository;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;

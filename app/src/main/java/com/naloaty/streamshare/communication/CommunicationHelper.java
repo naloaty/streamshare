@@ -6,9 +6,9 @@ import androidx.annotation.NonNull;
 
 import com.naloaty.streamshare.config.AppConfig;
 import com.naloaty.streamshare.service.Requests;
-import com.naloaty.streamshare.database.device.NetworkDevice;
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.media.Album;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.entity.Album;
 import com.naloaty.streamshare.media.Media;
 
 import java.util.List;

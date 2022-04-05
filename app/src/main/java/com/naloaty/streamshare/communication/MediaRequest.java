@@ -1,7 +1,7 @@
 package com.naloaty.streamshare.communication;
 
 import com.naloaty.streamshare.service.Requests;
-import com.naloaty.streamshare.database.media.Album;
+import com.naloaty.streamshare.database.entity.Album;
 import com.naloaty.streamshare.media.Media;
 
 import java.util.List;

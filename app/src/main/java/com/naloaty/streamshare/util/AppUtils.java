@@ -10,7 +10,7 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.naloaty.streamshare.config.AppConfig;
-import com.naloaty.streamshare.database.device.SSDevice;
+import com.naloaty.streamshare.database.entity.SSDevice;
 import com.naloaty.streamshare.config.KeyConfig;
 import com.naloaty.streamshare.security.SecurityUtils;
 

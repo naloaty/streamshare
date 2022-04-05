@@ -1,4 +1,4 @@
-package com.naloaty.streamshare.database.device;
+package com.naloaty.streamshare.database.entity;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

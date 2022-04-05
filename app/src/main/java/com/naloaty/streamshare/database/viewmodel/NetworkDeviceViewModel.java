@@ -1,4 +1,4 @@
-package com.naloaty.streamshare.database.device;
+package com.naloaty.streamshare.database.viewmodel;
 
 import android.app.Application;
 import android.content.Context;
@@ -6,6 +6,10 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+
+import com.naloaty.streamshare.database.dao.NetworkDeviceDao;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
+import com.naloaty.streamshare.database.repository.NetworkDeviceRepository;
 
 import java.util.List;
 

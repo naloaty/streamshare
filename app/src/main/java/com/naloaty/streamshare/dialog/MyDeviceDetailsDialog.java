@@ -12,8 +12,8 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.naloaty.streamshare.R;
 import com.naloaty.streamshare.config.AppConfig;
-import com.naloaty.streamshare.database.device.SSDevice;
-import com.naloaty.streamshare.database.device.SSDeviceRepository;
+import com.naloaty.streamshare.database.entity.SSDevice;
+import com.naloaty.streamshare.database.repository.SSDeviceRepository;
 
 /**
  * This class represents a dialog that displays general information about a trusted device.

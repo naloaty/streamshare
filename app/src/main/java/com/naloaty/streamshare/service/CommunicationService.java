@@ -10,7 +10,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.naloaty.streamshare.app.SSService;
 import com.naloaty.streamshare.config.AppConfig;
-import com.naloaty.streamshare.database.device.NetworkDeviceRepository;
+import com.naloaty.streamshare.database.repository.NetworkDeviceRepository;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
 import com.naloaty.streamshare.util.CommunicationNotification;
 import com.naloaty.streamshare.util.DNSSDHelper;
 import com.naloaty.streamshare.util.PermissionHelper;
@@ -154,7 +155,7 @@ public class CommunicationService extends SSService {
 
     /**
      * Clears a table of network devices in the database.
-     * @see com.naloaty.streamshare.database.device.NetworkDevice
+     * @see NetworkDevice
      */
     private void clearNearbyDevices() {
         NetworkDeviceRepository repository = new NetworkDeviceRepository(this);

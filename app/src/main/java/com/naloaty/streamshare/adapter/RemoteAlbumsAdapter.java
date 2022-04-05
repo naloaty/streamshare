@@ -21,8 +21,8 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.naloaty.streamshare.R;
 import com.naloaty.streamshare.app.GlideApp;
 import com.naloaty.streamshare.communication.CommunicationHelper;
-import com.naloaty.streamshare.database.device.NetworkDevice;
-import com.naloaty.streamshare.database.media.Album;
+import com.naloaty.streamshare.database.entity.NetworkDevice;
+import com.naloaty.streamshare.database.entity.Album;
 
 import java.util.ArrayList;
 import java.util.List;
